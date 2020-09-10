@@ -31,5 +31,10 @@
   "_moduleAliases": {
     "@models": "src/models",
     "@utils": "src/utils"
+  },
+  "dependencies": {
+    "apollo-server": "^2.17.0",
+    "graphql": "^15.3.0",
+    "graphql-tools": "^6.2.1"
   }
 }
