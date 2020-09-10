@@ -8,3 +8,6 @@
 /node_modules
 /.pnp
 .pnp.js
+
+# environment variables
+.env
