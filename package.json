@@ -4,7 +4,9 @@
   "main": "src/index.ts",
   "license": "AGPL-3.0-only",
   "scripts": {
-    "start": "ts-node-dev -r dotenv/config src/index.ts"
+    "start": "ts-node-dev -r dotenv/config src/index.ts",
+    "pretty-quick": "pretty-quick --pattern \"**/*.*(js|ts)",
+    "lint": "eslint ."
   },
   "devDependencies": {
     "@types/node": "^14.6.4",
@@ -14,8 +16,15 @@
     "eslint": "^7.8.1",
     "eslint-plugin-import": "^2.22.0",
     "eslint-plugin-prettier": "^3.1.4",
+    "husky": "^4.3.0",
     "prettier": "^2.1.1",
+    "pretty-quick": "^3.0.1",
     "ts-node-dev": "^1.0.0-pre.62",
     "typescript": "^4.0.2"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "yarn pretty-quick && yarn lint --max-warnings=0"
+    }
   }
 }
