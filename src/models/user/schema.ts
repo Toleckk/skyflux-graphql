@@ -7,4 +7,8 @@ export const UserSchema = `
     extend type Query {
         me: User
     }
+
+    extend type Mutation {
+        createUser(email: String!, password: String!): User!
+    }
 `
