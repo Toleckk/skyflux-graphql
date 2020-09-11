@@ -10,5 +10,6 @@ export const UserSchema = `
 
     extend type Mutation {
         createUser(email: String!, password: String!): User!
+        resetPassword(token: String!, password: String!): Boolean
     }
 `
