@@ -2,6 +2,8 @@ import Mongoose from 'mongoose'
 import {ApolloServer} from 'apollo-server'
 import {makeExecutableSchema} from 'graphql-tools'
 import {SessionService} from '@models/session'
+import {typeDefs} from './typeDefs'
+import {resolvers} from './resolvers'
 
 Mongoose.connect(process.env.DB_URL as string, {
   useNewUrlParser: true,
@@ -9,16 +11,11 @@ Mongoose.connect(process.env.DB_URL as string, {
   useCreateIndex: true,
 })
 
-const schema = makeExecutableSchema({
-  typeDefs: `type Query {a: Boolean}`,
-  resolvers: {
-    a: () => true,
-  },
-})
+const schema = makeExecutableSchema({typeDefs, resolvers})
 
 const server = new ApolloServer({
   schema,
-  context: async (context) => {
+  context: async context => {
     const {authorization = ''} = context.req.headers
     const token = (authorization as string).match(/Bearer (.+)/)?.[1]
 
