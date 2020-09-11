@@ -7,7 +7,7 @@
   "jsxBracketSameLine": false,
   "semi": false,
   "bracketSpacing": false,
-  "parser": "babel",
+  "parser": "typescript",
   "arrowParens": "avoid",
   "endOfLine": "crlf"
 }
