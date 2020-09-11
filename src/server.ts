@@ -1,6 +1,7 @@
 import Mongoose from 'mongoose'
 import {ApolloServer} from 'apollo-server'
 import {makeExecutableSchema} from 'graphql-tools'
+import {SessionService} from '@models/session'
 
 Mongoose.connect(process.env.DB_URL as string, {
   useNewUrlParser: true,
@@ -17,6 +18,15 @@ const schema = makeExecutableSchema({
 
 const server = new ApolloServer({
   schema,
+  context: async (context) => {
+    const {authorization = ''} = context.req.headers
+    const token = (authorization as string).match(/Bearer (.+)/)?.[1]
+
+    return {
+      ...context,
+      user: token ? await SessionService.getMe(token) : null,
+    }
+  },
   cors: {
     origin: '*',
   },
