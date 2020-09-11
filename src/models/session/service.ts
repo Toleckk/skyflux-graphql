@@ -28,3 +28,15 @@ export const createSession = async ({
 
   return token
 }
+
+export const removeByToken = async ({
+  token,
+  user_id,
+}: {
+  token?: string
+  user_id?: string
+}): Promise<boolean> => {
+  const res = await SessionModel.deleteOne({token, user_id})
+  console.log(res)
+  return (res?.deletedCount || 0) > 0
+}

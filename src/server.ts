@@ -21,6 +21,7 @@ const server = new ApolloServer({
 
     return {
       ...context,
+      token,
       user: token ? await SessionService.getMe(token) : null,
     }
   },
