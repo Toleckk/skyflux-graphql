@@ -27,6 +27,14 @@ export const UserResolver: IResolvers = {
       }),
       UserService.updateNickname,
     ),
+    updateProfileInfo: pipe(
+      applySpec({
+        avatar: pipe(nthArg(1), path(['profileInfo', 'avatar'])),
+        description: pipe(nthArg(1), path(['profileInfo', 'description'])),
+        user_id: pipe(nthArg(2), path(['user', '_id'])),
+      }),
+      UserService.updateProfileInfo,
+    ),
   },
   Query: {
     me: pipe(nthArg(2), prop('user')),

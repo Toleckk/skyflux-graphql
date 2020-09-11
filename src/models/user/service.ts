@@ -1,6 +1,6 @@
 import Mongoose from 'mongoose'
 import {generateNickname} from '@utils/generateNickname'
-import {User, UserDocument, UserModel} from '@models/user'
+import {User, UserDescription, UserDocument, UserModel} from '@models/user'
 import {ResetModel} from '@models/reset'
 
 export const createUser = async ({
@@ -11,7 +11,7 @@ export const createUser = async ({
   password: string
 }): Promise<User> => {
   const nickname = generateNickname()
-  return await UserModel.create({nickname, email, password})
+  return await UserModel.create({nickname, email, password, description: {}})
 }
 
 export const resetPassword = async ({
@@ -72,6 +72,26 @@ export const updateNickname = async ({
   if (nickname === user.nickname) return user
 
   user.nickname = nickname
+  await user.save()
+
+  return user
+}
+
+export const updateProfileInfo = async ({
+  avatar,
+  description,
+  user_id,
+}: {
+  avatar?: string
+  description: UserDescription
+  user_id: string
+}): Promise<User | null> => {
+  const user = await UserModel.findById(user_id)
+
+  if (!user) return null
+
+  user.avatar = avatar
+  user.description = description
   await user.save()
 
   return user
