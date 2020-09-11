@@ -57,3 +57,22 @@ export const updatePassword = async ({
 
   return true
 }
+
+export const updateNickname = async ({
+  user_id,
+  nickname,
+}: {
+  user_id: string
+  nickname: string
+}): Promise<User | null> => {
+  const user = await UserModel.findById(user_id)
+
+  if (!user) return null
+
+  if (nickname === user.nickname) return user
+
+  user.nickname = nickname
+  await user.save()
+
+  return user
+}

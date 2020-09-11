@@ -20,6 +20,13 @@ export const UserResolver: IResolvers = {
       }),
       UserService.updatePassword,
     ),
+    updateNickname: pipe(
+      applySpec({
+        nickname: pipe(nthArg(1), prop<'nickname', string>('nickname')),
+        user_id: pipe(nthArg(2), path(['user', '_id'])),
+      }),
+      UserService.updateNickname,
+    ),
   },
   Query: {
     me: pipe(nthArg(2), prop('user')),
