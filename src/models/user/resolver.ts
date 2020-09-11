@@ -1,11 +1,25 @@
 import {IResolvers} from 'graphql-tools'
-import {nthArg, pipe, prop} from 'ramda'
+import {applySpec, nthArg, path, pipe, prop} from 'ramda'
 import * as UserService from './service'
 
 export const UserResolver: IResolvers = {
   Mutation: {
     createUser: pipe(nthArg(1), UserService.createUser),
     resetPassword: pipe(nthArg(1), UserService.resetPassword),
+    updatePassword: pipe(
+      applySpec({
+        oldPassword: pipe(
+          nthArg(1),
+          prop<'oldPassword', string>('oldPassword'),
+        ),
+        newPassword: pipe(
+          nthArg(1),
+          prop<'newPassword', string>('newPassword'),
+        ),
+        user_id: pipe(nthArg(2), path(['user', '_id'])),
+      }),
+      UserService.updatePassword,
+    ),
   },
   Query: {
     me: pipe(nthArg(2), prop('user')),

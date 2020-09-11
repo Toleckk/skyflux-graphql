@@ -36,3 +36,24 @@ export const resetPassword = async ({
 
   return true
 }
+
+export const updatePassword = async ({
+  oldPassword,
+  newPassword,
+  user_id,
+}: {
+  oldPassword: string
+  newPassword: string
+  user_id: string
+}): Promise<boolean> => {
+  const user = await UserModel.findById(user_id)
+
+  if (!user) return false
+
+  if (user.password !== oldPassword) return false
+
+  user.password = newPassword
+  await user.save()
+
+  return true
+}
