@@ -6,7 +6,7 @@
   "scripts": {
     "start": "ts-node-dev -r dotenv/config src/index.ts",
     "pretty-quick": "pretty-quick --pattern \"**/*.*(js|ts)",
-    "lint": "eslint ."
+    "lint": "eslint src"
   },
   "devDependencies": {
     "@types/node": "^14.6.4",
