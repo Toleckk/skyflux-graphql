@@ -2,6 +2,7 @@ import {UserSchema} from '@models/user'
 import {SessionSchema} from '@models/session'
 import {ResetSchema} from '@models/reset'
 import {PostSchema} from '@models/post'
+import {LikeSchema} from '@models/like'
 
 // language=GraphQL
 const Schema = `
@@ -17,4 +18,5 @@ export const typeDefs = [
   SessionSchema,
   ResetSchema,
   PostSchema,
+  LikeSchema,
 ]
