@@ -1,6 +1,7 @@
 import {UserSchema} from '@models/user'
 import {SessionSchema} from '@models/session'
 import {ResetSchema} from '@models/reset'
+import {PostSchema} from '@models/post'
 
 // language=GraphQL
 const Schema = `
@@ -10,4 +11,10 @@ const Schema = `
     type Query
 `
 
-export const typeDefs = [Schema, UserSchema, SessionSchema, ResetSchema]
+export const typeDefs = [
+  Schema,
+  UserSchema,
+  SessionSchema,
+  ResetSchema,
+  PostSchema,
+]
