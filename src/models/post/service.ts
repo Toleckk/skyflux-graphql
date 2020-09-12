@@ -20,3 +20,14 @@ export const createPost = async ({
     user,
   }
 }
+
+export const deletePost = async ({
+  _id,
+  user_id,
+}: {
+  _id: string
+  user_id: string
+}): Promise<boolean> => {
+  const deleted = await PostModel.deleteOne({_id, user_id})
+  return (deleted.deletedCount || 0) > 0
+}

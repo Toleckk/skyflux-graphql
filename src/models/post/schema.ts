@@ -9,5 +9,6 @@ export const PostSchema = `
 
     extend type Mutation {
         createPost(text: String!): Post!
+        deletePost(_id: ID!): Boolean
     }
 `

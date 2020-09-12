@@ -12,6 +12,13 @@ export const PostResolver = {
       }),
       PostService.createPost,
     ),
+    deletePost: pipe(
+      applySpec({
+        _id: pipe(nthArg(1), prop<'_id', string>('_id')),
+        user_id: pipe(nthArg(2), path(['user', '_id'])),
+      }),
+      PostService.deletePost,
+    ),
   },
   Post: {
     user: async (root: PostDocument | Post): Promise<User | null> => {
