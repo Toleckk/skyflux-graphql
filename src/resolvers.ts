@@ -4,6 +4,7 @@ import {SessionResolver} from '@models/session'
 import {ResetResolver} from '@models/reset'
 import {PostResolver} from '@models/post'
 import {LikeResolver} from '@models/like'
+import {CommentResolver} from '@models/comment'
 
 export const resolvers = mergeResolvers([
   UserResolver,
@@ -11,4 +12,5 @@ export const resolvers = mergeResolvers([
   ResetResolver,
   PostResolver,
   LikeResolver,
+  CommentResolver,
 ])

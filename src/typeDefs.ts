@@ -3,6 +3,7 @@ import {SessionSchema} from '@models/session'
 import {ResetSchema} from '@models/reset'
 import {PostSchema} from '@models/post'
 import {LikeSchema} from '@models/like'
+import {CommentSchema} from '@models/comment'
 
 // language=GraphQL
 const Schema = `
@@ -19,4 +20,5 @@ export const typeDefs = [
   ResetSchema,
   PostSchema,
   LikeSchema,
+  CommentSchema,
 ]
