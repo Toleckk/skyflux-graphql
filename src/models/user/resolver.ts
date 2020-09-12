@@ -38,5 +38,6 @@ export const UserResolver: IResolvers = {
   },
   Query: {
     me: pipe(nthArg(2), prop('user')),
+    doesNicknameExist: pipe(nthArg(1), UserService.doesNicknameExist),
   },
 }

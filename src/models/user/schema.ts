@@ -25,6 +25,7 @@ export const UserSchema = `
 
     extend type Query {
         me: User
+        doesNicknameExist(nickname: String!): Boolean!
     }
 
     extend type Mutation {

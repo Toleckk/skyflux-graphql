@@ -96,3 +96,9 @@ export const updateProfileInfo = async ({
 
   return user
 }
+
+export const doesNicknameExist = async ({
+  nickname,
+}: {
+  nickname: string
+}): Promise<boolean> => UserModel.exists({nickname})
