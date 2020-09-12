@@ -4,6 +4,7 @@ import {ResetSchema} from '@models/reset'
 import {PostSchema} from '@models/post'
 import {LikeSchema} from '@models/like'
 import {CommentSchema} from '@models/comment'
+import {SubSchema} from '@models/sub'
 
 // language=GraphQL
 const Schema = `
@@ -21,4 +22,5 @@ export const typeDefs = [
   PostSchema,
   LikeSchema,
   CommentSchema,
+  SubSchema,
 ]

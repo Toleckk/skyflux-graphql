@@ -111,3 +111,12 @@ export const getUserById = async ({
   const user = await UserModel.findById(_id)
   return user || null
 }
+
+export const getUserByNickname = async ({
+  nickname,
+}: {
+  nickname: string
+}): Promise<User | null> => {
+  const user = await UserModel.findOne({nickname})
+  return user || null
+}
