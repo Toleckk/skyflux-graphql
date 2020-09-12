@@ -8,5 +8,6 @@ export const LikeSchema = `
 
     extend type Mutation {
         createLike(post_id: ID!): Like!
+        removeLike(post_id: ID!): Boolean
     }
 `

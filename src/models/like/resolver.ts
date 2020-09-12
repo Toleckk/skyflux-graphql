@@ -13,6 +13,13 @@ export const LikeResolver = {
       }),
       LikeService.createLike,
     ),
+    removeLike: pipe(
+      applySpec({
+        post_id: pipe(nthArg(1), prop<'post_id', string>('post_id')),
+        user_id: pipe(nthArg(2), path(['user', '_id'])),
+      }),
+      LikeService.removeLike,
+    ),
   },
   Like: {
     user: async (root: LikeDocument | Like): Promise<User | null> => {
