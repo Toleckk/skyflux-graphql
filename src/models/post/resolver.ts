@@ -1,6 +1,6 @@
 import {applySpec, nthArg, path, pipe, prop} from 'ramda'
 import {Post, PostDocument} from '@models/post/types'
-import {User, UserModel} from '@models/user'
+import {User, UserService} from '@models/user'
 import * as PostService from './service'
 
 export const PostResolver = {
@@ -27,7 +27,7 @@ export const PostResolver = {
     user: async (root: PostDocument | Post): Promise<User | null> => {
       if ('user' in root) return root.user
 
-      return UserModel.findById(root.user_id)
+      return UserService.getUserById(root.user_id)
     },
   },
 }

@@ -102,3 +102,12 @@ export const doesNicknameExist = async ({
 }: {
   nickname: string
 }): Promise<boolean> => UserModel.exists({nickname})
+
+export const getUserById = async ({
+  _id,
+}: {
+  _id: string
+}): Promise<User | null> => {
+  const user = await UserModel.findById(_id)
+  return user || null
+}
