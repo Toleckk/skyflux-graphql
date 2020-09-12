@@ -4,6 +4,9 @@ import {User, UserModel} from '@models/user'
 import * as PostService from './service'
 
 export const PostResolver = {
+  Query: {
+    getPostById: pipe(nthArg(1), PostService.getPostById),
+  },
   Mutation: {
     createPost: pipe(
       applySpec({

@@ -7,6 +7,10 @@ export const PostSchema = `
         user: User!
     }
 
+    extend type Query {
+        getPostById(_id: ID!): Post
+    }
+
     extend type Mutation {
         createPost(text: String!): Post!
         deletePost(_id: ID!): Boolean

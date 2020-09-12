@@ -31,3 +31,11 @@ export const deletePost = async ({
   const deleted = await PostModel.deleteOne({_id, user_id})
   return (deleted.deletedCount || 0) > 0
 }
+
+export const getPostById = async ({
+  _id,
+}: {
+  _id: string
+}): Promise<Partial<Post> | null> => {
+  return PostModel.findById(_id) || null
+}
