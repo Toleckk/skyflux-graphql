@@ -14,5 +14,6 @@ export const UserResolver: IResolvers = {
   Query: {
     me: a([auth({passOnly: true})])(prop('user')),
     doesNicknameExist: a([injectArgs()])(UserService.doesNicknameExist),
+    getUserByNickname: a([injectArgs()])(UserService.getUserByNickname),
   },
 }

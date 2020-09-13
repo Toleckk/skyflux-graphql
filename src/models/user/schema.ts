@@ -25,6 +25,7 @@ export const UserSchema = `
 
     extend type Query {
         me: User
+        getUserByNickname(nickname: String!): User
         doesNicknameExist(nickname: String!): Boolean!
     }
 
