@@ -12,6 +12,22 @@ const Schema = `
 
     type Mutation
     type Query
+
+    interface Edge {
+        cursor: ID!
+    }
+
+    type PageInfo {
+        startCursor: ID
+        endCursor: ID
+        hasNextPage: Boolean!
+        hasPreviousPage: Boolean!
+    }
+
+    interface Connection {
+        edges: [Edge]!
+        pageInfo: PageInfo!
+    }
 `
 
 export const typeDefs = [
