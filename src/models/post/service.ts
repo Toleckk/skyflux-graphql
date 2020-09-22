@@ -1,6 +1,7 @@
 import Mongoose from 'mongoose'
 import {isMongoId} from '@utils/isMongoId'
-import {User} from '../user'
+import {ID} from '@models/types'
+import {User, UserService} from '@models/user'
 import {Post} from './types'
 import {PostModel} from './model'
 
@@ -52,4 +53,22 @@ export const resolvePost = ({
     return getPostById({_id: root.post_id})
 
   return root.post_id
+}
+
+export const getPostsByNickname = async ({
+  nickname,
+  first = 25,
+  after = 'ffffffffffffffffffffffff',
+}: {
+  nickname: string
+  first?: number
+  after?: ID
+}): Promise<Partial<Post>[]> => {
+  const user = await UserService.getUserByNickname({nickname})
+
+  if (!user) return []
+
+  return PostModel.find({user_id: user._id, _id: {$lt: after}})
+    .sort({_id: -1})
+    .limit(first)
 }

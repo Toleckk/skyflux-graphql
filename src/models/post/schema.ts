@@ -6,9 +6,20 @@ export const PostSchema = `
         createdAt: Date!
         user: User!
     }
+    
+    type PostEdge implements Edge {
+        cursor: ID!
+        node: Post!
+    }
+    
+    type PostConnection implements Connection {
+        pageInfo: PageInfo!
+        edges: [PostEdge]!
+    }
 
     extend type Query {
         getPostById(_id: ID!): Post
+        getPostsByNickname(nickname: String!, first: Int, after: String): PostConnection!
     }
 
     extend type Mutation {
