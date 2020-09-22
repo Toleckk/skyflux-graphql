@@ -1,9 +1,9 @@
 import {Document} from 'mongoose'
+import {Entity} from '@models/types'
 import {User} from '../user'
 import {Post} from '../post'
 
-export interface Comment {
-  _id: Document['_id']
+export interface Comment extends Entity {
   text: string
   user: User
   post: Post

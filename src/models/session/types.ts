@@ -1,12 +1,12 @@
-import {Document, Types} from 'mongoose'
+import {Document} from 'mongoose'
 import {User} from '@models/user'
+import {Entity, ID} from '@models/types'
 
-export interface Session {
-  _id: Document['_id']
+export interface Session extends Entity {
   user: User
   token: string
 }
 
 export interface SessionDocument extends Document, Omit<Session, 'user'> {
-  user_id: Types.ObjectId | User
+  user_id: ID | User
 }

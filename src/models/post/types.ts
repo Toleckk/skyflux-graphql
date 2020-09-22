@@ -1,12 +1,12 @@
 import {Document} from 'mongoose'
+import {Entity, ID} from '@models/types'
 import {User} from '../user'
 
-export interface Post {
-  _id: Document['_id']
+export interface Post extends Entity {
   text: string
   user: User
 }
 
 export interface PostDocument extends Omit<Post, 'user'>, Document {
-  user_id: Document['_id'] | User
+  user_id: ID | User
 }

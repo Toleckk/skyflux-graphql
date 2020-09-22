@@ -1,13 +1,13 @@
 import {Document} from 'mongoose'
 import {User} from '@models/user'
+import {Entity, ID} from '@models/types'
 
-export interface Sub {
-  _id: Document['_id']
+export interface Sub extends Entity {
   from: User
   to: User
 }
 
 export interface SubDocument extends Omit<Sub, 'from' | 'to'>, Document {
-  from_id: Document['_id'] | User
-  to_id: Document['_id'] | User
+  from_id: ID | User
+  to_id: ID | User
 }

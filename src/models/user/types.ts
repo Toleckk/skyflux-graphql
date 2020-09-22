@@ -1,4 +1,5 @@
 import {Document} from 'mongoose'
+import {Entity} from '@models/types'
 
 export interface UserDescription {
   about?: string
@@ -6,7 +7,7 @@ export interface UserDescription {
   from?: string
 }
 
-export interface User extends Pick<Document, '_id'> {
+export interface User extends Entity {
   nickname: string
   email: string
   password: string
