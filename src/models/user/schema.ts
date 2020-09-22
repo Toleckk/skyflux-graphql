@@ -12,6 +12,16 @@ export const UserSchema = `
         description: Description!
     }
 
+    type UserEdge implements Edge {
+        cursor: ID!
+        node: User!
+    }
+
+    type UserConnection implements Connection{
+        pageInfo: PageInfo!
+        edges: [UserEdge]!
+    }
+
     input DescrpitionInput {
         birthday: String
         about: String
