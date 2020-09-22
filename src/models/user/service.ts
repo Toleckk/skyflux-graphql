@@ -104,7 +104,7 @@ export const doesNicknameExist = async ({
 export const getUserById = async ({
   _id,
 }: {
-  _id: string
+  _id: string | Mongoose.Types.ObjectId
 }): Promise<User | null> => {
   const user = await UserModel.findById(_id)
   return user || null

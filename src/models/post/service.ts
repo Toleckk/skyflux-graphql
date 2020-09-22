@@ -1,3 +1,4 @@
+import Mongoose from 'mongoose'
 import {User} from '../user'
 import {Post} from './types'
 import {PostModel} from './model'
@@ -31,7 +32,8 @@ export const deletePost = async ({
 export const getPostById = async ({
   _id,
 }: {
-  _id: string
+  _id: string | Mongoose.Types.ObjectId
 }): Promise<Partial<Post> | null> => {
-  return PostModel.findById(_id) || null
+  const post = await PostModel.findById(_id)
+  return post || null
 }
