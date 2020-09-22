@@ -1,6 +1,6 @@
 import {IResolvers} from 'graphql-tools'
 import {prop} from 'ramda'
-import {a, auth, injectArgs} from '@decorators'
+import {a, auth, injectArgs, paginate} from '@decorators'
 import * as UserService from './service'
 
 export const UserResolver: IResolvers = {
@@ -15,5 +15,8 @@ export const UserResolver: IResolvers = {
     me: a([auth({passOnly: true})])(prop('user')),
     doesNicknameExist: a([injectArgs()])(UserService.doesNicknameExist),
     getUserByNickname: a([injectArgs()])(UserService.getUserByNickname),
+    getSuggestions: a([injectArgs(), auth(), paginate()])(
+      UserService.getSuggestions,
+    ),
   },
 }

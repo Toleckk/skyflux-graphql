@@ -118,3 +118,24 @@ export const getUserByNickname = async ({
   const user = await UserModel.findOne({nickname})
   return user || null
 }
+
+export const getSuggestions = async ({
+  first,
+  user,
+}: {
+  first: number
+  user: User
+}): Promise<User[]> =>
+  UserModel.aggregate([
+    {$match: {_id: {$ne: user._id}}},
+    {
+      $lookup: {
+        from: 'posts',
+        localField: '_id',
+        foreignField: 'user_id',
+        as: 'posts',
+      },
+    },
+    {$match: {posts: {$gt: [{$size: 'posts'}, 1]}}},
+    {$limit: first},
+  ])
