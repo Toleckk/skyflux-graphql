@@ -1,24 +1,12 @@
-import {applySpec, nthArg, path, pipe, prop} from 'ramda'
 import {User, UserService} from '@models/user'
-import {Sub, SubDocument} from './types'
+import {a, auth, injectArgs} from '@decorators'
 import * as SubService from './service'
+import {Sub, SubDocument} from './types'
 
 export const SubResolver = {
   Mutation: {
-    createSub: pipe(
-      applySpec({
-        nickname: pipe(nthArg(1), prop<'nickname', string>('nickname')),
-        user_id: pipe(nthArg(2), path(['user', '_id'])),
-      }),
-      SubService.createSub,
-    ),
-    removeSub: pipe(
-      applySpec({
-        nickname: pipe(nthArg(1), prop<'nickname', string>('nickname')),
-        user_id: pipe(nthArg(2), path(['user', '_id'])),
-      }),
-      SubService.removeSub,
-    ),
+    createSub: a([injectArgs(), auth()])(SubService.createSub),
+    removeSub: a([injectArgs(), auth()])(SubService.removeSub),
   },
   Sub: {
     from: (root: Sub | SubDocument): Promise<User | null> | User => {

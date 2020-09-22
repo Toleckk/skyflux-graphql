@@ -1,43 +1,18 @@
 import {IResolvers} from 'graphql-tools'
-import {applySpec, nthArg, path, pipe, prop} from 'ramda'
+import {prop} from 'ramda'
+import {a, auth, injectArgs} from '@decorators'
 import * as UserService from './service'
 
 export const UserResolver: IResolvers = {
   Mutation: {
-    createUser: pipe(nthArg(1), UserService.createUser),
-    resetPassword: pipe(nthArg(1), UserService.resetPassword),
-    updatePassword: pipe(
-      applySpec({
-        oldPassword: pipe(
-          nthArg(1),
-          prop<'oldPassword', string>('oldPassword'),
-        ),
-        newPassword: pipe(
-          nthArg(1),
-          prop<'newPassword', string>('newPassword'),
-        ),
-        user_id: pipe(nthArg(2), path(['user', '_id'])),
-      }),
-      UserService.updatePassword,
-    ),
-    updateNickname: pipe(
-      applySpec({
-        nickname: pipe(nthArg(1), prop<'nickname', string>('nickname')),
-        user_id: pipe(nthArg(2), path(['user', '_id'])),
-      }),
-      UserService.updateNickname,
-    ),
-    updateProfileInfo: pipe(
-      applySpec({
-        avatar: pipe(nthArg(1), path(['profileInfo', 'avatar'])),
-        description: pipe(nthArg(1), path(['profileInfo', 'description'])),
-        user_id: pipe(nthArg(2), path(['user', '_id'])),
-      }),
-      UserService.updateProfileInfo,
-    ),
+    createUser: a([injectArgs()])(UserService.createUser),
+    resetPassword: a([injectArgs()])(UserService.resetPassword),
+    updatePassword: a([injectArgs(), auth()])(UserService.updatePassword),
+    updateNickname: a([injectArgs(), auth()])(UserService.updateNickname),
+    updateProfileInfo: a([injectArgs(), auth()])(UserService.updateProfileInfo),
   },
   Query: {
-    me: pipe(nthArg(2), prop('user')),
-    doesNicknameExist: pipe(nthArg(1), UserService.doesNicknameExist),
+    me: a([auth({passOnly: true})])(prop('user')),
+    doesNicknameExist: a([injectArgs()])(UserService.doesNicknameExist),
   },
 }

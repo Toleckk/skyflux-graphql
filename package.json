@@ -34,7 +34,8 @@
   },
   "_moduleAliases": {
     "@models": "src/models",
-    "@utils": "src/utils"
+    "@utils": "src/utils",
+    "@decorators": "src/decorators"
   },
   "dependencies": {
     "@types/mongoose": "^5.7.36",

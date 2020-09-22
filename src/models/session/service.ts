@@ -31,12 +31,11 @@ export const createSession = async ({
 
 export const removeByToken = async ({
   token,
-  user_id,
+  user,
 }: {
-  token?: string
-  user_id?: string
+  token: string
+  user: User
 }): Promise<boolean> => {
-  const res = await SessionModel.deleteOne({token, user_id})
-  console.log(res)
+  const res = await SessionModel.deleteOne({token, user_id: user._id})
   return (res?.deletedCount || 0) > 0
 }

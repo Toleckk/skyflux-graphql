@@ -2,7 +2,11 @@ import {UserModel} from '@models/user'
 import {ResetModel} from '@models/reset/model'
 import {v4} from 'uuid'
 
-export const createResetRequest = async (login: string): Promise<boolean> => {
+export const createResetRequest = async ({
+  login,
+}: {
+  login: string
+}): Promise<boolean> => {
   const user = await UserModel.findOne({
     $or: [{nickname: login}, {email: login}],
   })

@@ -1,13 +1,9 @@
 import {IResolvers} from 'graphql-tools'
-import {nthArg, pipe, prop} from 'ramda'
+import {a, injectArgs} from '@decorators'
 import * as ResetService from './service'
 
 export const ResetResolver: IResolvers = {
   Mutation: {
-    createResetRequest: pipe(
-      nthArg(1),
-      prop('login'),
-      ResetService.createResetRequest,
-    ),
+    createResetRequest: a([injectArgs()])(ResetService.createResetRequest),
   },
 }

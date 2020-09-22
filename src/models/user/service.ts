@@ -40,61 +40,59 @@ export const resetPassword = async ({
 export const updatePassword = async ({
   oldPassword,
   newPassword,
-  user_id,
+  user,
 }: {
   oldPassword: string
   newPassword: string
-  user_id: string
+  user: User
 }): Promise<boolean> => {
-  const user = await UserModel.findById(user_id)
+  const userDoc = await UserModel.findById(user._id)
 
-  if (!user) return false
+  if (!userDoc) return false
 
-  if (user.password !== oldPassword) return false
+  if (userDoc.password !== oldPassword) return false
 
-  user.password = newPassword
-  await user.save()
+  userDoc.password = newPassword
+  await userDoc.save()
 
   return true
 }
 
 export const updateNickname = async ({
-  user_id,
+  user,
   nickname,
 }: {
-  user_id: string
+  user: User
   nickname: string
 }): Promise<User | null> => {
-  const user = await UserModel.findById(user_id)
-
-  if (!user) return null
-
   if (nickname === user.nickname) return user
 
-  user.nickname = nickname
-  await user.save()
+  const updated = await UserModel.updateOne({_id: user._id}, {nickname})
 
+  if (!updated.nModified) return null
+
+  user.nickname = nickname
   return user
 }
 
 export const updateProfileInfo = async ({
   avatar,
   description,
-  user_id,
+  user,
 }: {
   avatar?: string
   description: UserDescription
-  user_id: string
+  user: User
 }): Promise<User | null> => {
-  const user = await UserModel.findById(user_id)
+  const userDoc = await UserModel.findById(user._id)
 
-  if (!user) return null
+  if (!userDoc) return null
 
-  user.avatar = avatar
-  user.description = description
-  await user.save()
+  userDoc.avatar = avatar
+  userDoc.description = description
+  await userDoc.save()
 
-  return user
+  return userDoc
 }
 
 export const doesNicknameExist = async ({
