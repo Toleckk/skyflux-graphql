@@ -38,6 +38,7 @@ export const UserSchema = `
         getUserByNickname(nickname: String!): User
         doesNicknameExist(nickname: String!): Boolean!
         getSuggestions(first: Int!): UserConnection!
+        getFoundUsers(text: String!, first: Int, after: String): UserConnection
     }
 
     extend type Mutation {

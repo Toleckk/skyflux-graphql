@@ -18,5 +18,8 @@ export const UserResolver: IResolvers = {
     getSuggestions: a([injectArgs(), auth(), paginate()])(
       UserService.getSuggestions,
     ),
+    getFoundUsers: a([auth(), injectArgs(), paginate()])(
+      UserService.getFoundUsers,
+    ),
   },
 }

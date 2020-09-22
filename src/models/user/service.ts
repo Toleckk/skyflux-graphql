@@ -139,3 +139,13 @@ export const getSuggestions = async ({
     {$match: {posts: {$gt: [{$size: 'posts'}, 1]}}},
     {$limit: first},
   ])
+
+export const getFoundUsers = async ({
+  first = 25,
+  after = '000000000000',
+}: {
+  text: string
+  first: number
+  after?: string
+  user?: User
+}): Promise<User[]> => UserModel.find({_id: {$gt: after}}).limit(first + 1)
