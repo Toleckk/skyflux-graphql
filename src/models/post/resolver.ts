@@ -1,6 +1,5 @@
-import {Post, PostDocument} from '@models/post/types'
-import {User, UserService} from '@models/user'
-import {a, auth, injectArgs} from '@decorators'
+import {a, auth, injectArgs, injectRoot} from '@decorators'
+import {UserService} from '@models/user'
 import * as PostService from './service'
 
 export const PostResolver = {
@@ -12,10 +11,6 @@ export const PostResolver = {
     deletePost: a([injectArgs(), auth()])(PostService.deletePost),
   },
   Post: {
-    user: async (root: PostDocument | Post): Promise<User | null> => {
-      if ('user' in root) return root.user
-
-      return UserService.getUserById(root.user_id)
-    },
+    user: a([injectRoot()])(UserService.resolverUser),
   },
 }

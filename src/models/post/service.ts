@@ -1,4 +1,5 @@
 import Mongoose from 'mongoose'
+import {isMongoId} from '@utils/isMongoId'
 import {User} from '../user'
 import {Post} from './types'
 import {PostModel} from './model'
@@ -36,4 +37,19 @@ export const getPostById = async ({
 }): Promise<Partial<Post> | null> => {
   const post = await PostModel.findById(_id)
   return post || null
+}
+
+export const resolvePost = ({
+  root,
+}: {
+  root:
+    | {post: Partial<Post>}
+    | {post_id: Partial<Post> | string | Mongoose.Types.ObjectId}
+}): Promise<Partial<Post> | null> | Partial<Post> => {
+  if ('post' in root) return root.post
+
+  if (typeof root.post_id === 'string' || isMongoId(root.post_id))
+    return getPostById({_id: root.post_id})
+
+  return root.post_id
 }

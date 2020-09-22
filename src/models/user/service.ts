@@ -2,6 +2,7 @@ import Mongoose from 'mongoose'
 import {generateNickname} from '@utils/generateNickname'
 import {User, UserDescription, UserDocument, UserModel} from '@models/user'
 import {ResetModel} from '@models/reset'
+import {isMongoId} from '@utils/isMongoId'
 
 export const createUser = async ({
   email,
@@ -149,3 +150,16 @@ export const getFoundUsers = async ({
   after?: string
   user?: User
 }): Promise<User[]> => UserModel.find({_id: {$gt: after}}).limit(first + 1)
+
+export const resolverUser = ({
+  root,
+}: {
+  root: {user: User} | {user_id: User | string | Mongoose.Types.ObjectId}
+}): Promise<User | null> | User => {
+  if ('user' in root) return root.user
+
+  if (typeof root.user_id !== 'string' && !isMongoId(root.user_id))
+    return root.user_id
+
+  return getUserById({_id: root.user_id})
+}
