@@ -21,4 +21,8 @@ export const CommentSchema = `
         createComment(post_id: ID!, text: String!): Comment!
         deleteComment(_id: ID!): Boolean
     }
+
+    extend type Query {
+        getCommentsByPostId(post_id: ID!, first: Int, after: String): CommentConnection
+    }
 `

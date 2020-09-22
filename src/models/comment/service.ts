@@ -1,5 +1,6 @@
 import {PostService} from '@models/post'
 import {User} from '@models/user'
+import {ID} from '@models/types'
 import {CommentModel} from './model'
 import {Comment} from './types'
 
@@ -27,3 +28,17 @@ export const deleteComment = async ({
   const deleted = await CommentModel.deleteOne({_id, user_id: user._id})
   return (deleted?.deletedCount || 0) > 0
 }
+
+export const getCommentsByPostId = async ({
+  post_id,
+  first = 25,
+  after = 'ffffffffffffffffffffffff',
+}: {
+  post_id: ID
+  first?: number
+  after?: ID
+}): Promise<Partial<Comment>[]> =>
+  CommentModel.find({post_id})
+    .find(after ? {_id: {$lt: after}} : {})
+    .sort({_id: -1})
+    .limit(first + 1)
