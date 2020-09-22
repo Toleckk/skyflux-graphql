@@ -1,4 +1,6 @@
-import {a, auth, injectArgs, paginate} from '@decorators'
+import {a, auth, injectArgs, injectRoot, paginate} from '@decorators'
+import {UserService} from '@models/user'
+import {PostService} from '@models/post'
 import * as CommentService from './service'
 
 export const CommentResolver = {
@@ -10,5 +12,9 @@ export const CommentResolver = {
     getCommentsByPostId: a([injectArgs(), paginate()])(
       CommentService.getCommentsByPostId,
     ),
+  },
+  Comment: {
+    user: a([injectRoot()])(UserService.resolverUser),
+    post: a([injectRoot()])(PostService.resolvePost),
   },
 }
