@@ -20,3 +20,31 @@ export const subscribeUserToChannel = async ({
   channel: string
 }): Promise<Partial<Channel>> =>
   ChannelModel.create({user_id: user._id, channelRegex: channel})
+
+export const isUserSubscribedToChannel = async ({
+  user,
+  channel,
+}: {
+  user: User
+  channel: string
+}): Promise<boolean> => {
+  const [{count}] = await aggregateUserChannels<{count: number}>({
+    user,
+    pipeline: [
+      {
+        $match: {
+          $expr: {
+            $regexMatch: {
+              regex: '$channelRegex',
+              input: channel,
+            },
+          },
+        },
+      },
+      {$limit: 1},
+      {$count: 'count'},
+    ],
+  })
+
+  return count > 0
+}
