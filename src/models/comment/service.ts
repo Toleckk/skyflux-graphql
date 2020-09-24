@@ -2,9 +2,11 @@ import Mongoose from 'mongoose'
 import {PostService} from '@models/post'
 import {User} from '@models/user'
 import {ID} from '@models/types'
+import {EventService} from '@models/event'
 import {isMongoId} from '@utils/isMongoId'
 import {CommentModel} from './model'
 import {Comment} from './types'
+import {commentCreated} from './events'
 
 export const createComment = async ({
   post_id,
@@ -17,7 +19,11 @@ export const createComment = async ({
 }): Promise<Partial<Comment> | null> => {
   if (!(await PostService.getPostById({_id: post_id}))) return null
 
-  return CommentModel.create({post_id, text, user_id: user._id})
+  const comment = await CommentModel.create({post_id, text, user_id: user._id})
+
+  await EventService.createEvent(commentCreated({comment}))
+
+  return comment
 }
 
 export const deleteComment = async ({

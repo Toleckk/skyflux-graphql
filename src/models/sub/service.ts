@@ -1,6 +1,8 @@
 import Mongoose from 'mongoose'
+import {EventService} from '@models/event'
 import {User, UserService} from '@models/user'
 import {isMongoId} from '@utils/isMongoId'
+import {subRequested} from './events'
 import {Sub} from './types'
 import {SubModel} from './model'
 
@@ -16,6 +18,8 @@ export const createSub = async ({
   if (!to) return null
 
   const sub = await SubModel.create({from_id: user._id, to_id: to._id})
+
+  await EventService.createEvent(subRequested({sub}))
 
   return {
     ...sub.toObject(),

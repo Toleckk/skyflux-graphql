@@ -35,4 +35,8 @@ export const EventSchema = `
     extend type Query {
         getEvents(first: Int, after: ID): EventConnection!
     }
+    
+    extend type Subscription {
+        eventAdded: Event
+    }
 `

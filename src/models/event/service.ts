@@ -1,4 +1,5 @@
 import Mongoose from 'mongoose'
+import {pubsub} from '@pubsub'
 import {User} from '@models/user'
 import {ChannelService} from '@models/channel'
 import {EventModel} from '@models/event/model'
@@ -66,6 +67,8 @@ export const createEvent = async <T extends EventBody>({
     subj,
     kind,
   })
+
+  await pubsub.publish('event', {eventAdded: event})
 
   return event as any
 }

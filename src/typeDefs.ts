@@ -13,6 +13,7 @@ const Schema = `
 
     type Mutation
     type Query
+    type Subscription
 
     interface Edge {
         cursor: ID!
