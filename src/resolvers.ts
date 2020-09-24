@@ -6,6 +6,7 @@ import {PostResolver} from '@models/post'
 import {LikeResolver} from '@models/like'
 import {CommentResolver} from '@models/comment'
 import {SubResolver} from '@models/sub'
+import {EventResolver} from '@models/event'
 
 export const resolvers = mergeResolvers([
   UserResolver,
@@ -15,4 +16,5 @@ export const resolvers = mergeResolvers([
   LikeResolver,
   CommentResolver,
   SubResolver,
+  EventResolver,
 ])
