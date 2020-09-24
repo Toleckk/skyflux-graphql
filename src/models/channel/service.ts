@@ -3,13 +3,13 @@ import {User} from '@models/user'
 import {Channel} from './types'
 import {ChannelModel} from './model'
 
-export const aggregateUserChannels = ({
+export const aggregateUserChannels = <T extends any = any>({
   user,
-  pipeline,
+  pipeline = [],
 }: {
   user: User
-  pipeline: any[]
-}): Aggregate<any> =>
+  pipeline?: any[]
+}): Aggregate<T[]> =>
   ChannelModel.aggregate([{$match: {user_id: user._id}}, ...pipeline])
 
 export const subscribeUserToChannel = async ({
