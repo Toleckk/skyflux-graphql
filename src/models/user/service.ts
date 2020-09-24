@@ -2,6 +2,7 @@ import Mongoose from 'mongoose'
 import {generateNickname} from '@utils/generateNickname'
 import {User, UserDescription, UserDocument, UserModel} from '@models/user'
 import {ResetModel} from '@models/reset'
+import {ChannelService} from '@models/channel'
 import {isMongoId} from '@utils/isMongoId'
 
 export const createUser = async ({
@@ -12,7 +13,19 @@ export const createUser = async ({
   password: string
 }): Promise<User> => {
   const nickname = generateNickname()
-  return await UserModel.create({nickname, email, password, description: {}})
+  const user = await UserModel.create({
+    nickname,
+    email,
+    password,
+    description: {},
+  })
+
+  await ChannelService.subscribeUserToChannel({
+    user,
+    channel: `Sub_${user._id}`,
+  })
+
+  return user
 }
 
 export const resetPassword = async ({
