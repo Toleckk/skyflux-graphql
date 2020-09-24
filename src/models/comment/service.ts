@@ -1,6 +1,8 @@
+import Mongoose from 'mongoose'
 import {PostService} from '@models/post'
 import {User} from '@models/user'
 import {ID} from '@models/types'
+import {isMongoId} from '@utils/isMongoId'
 import {CommentModel} from './model'
 import {Comment} from './types'
 
@@ -29,6 +31,12 @@ export const deleteComment = async ({
   return (deleted?.deletedCount || 0) > 0
 }
 
+export const getCommentById = async ({
+  _id,
+}: {
+  _id: string | Mongoose.Types.ObjectId
+}): Promise<Partial<Comment> | null> => CommentModel.findById(_id)
+
 export const getCommentsByPostId = async ({
   post_id,
   first = 25,
@@ -42,3 +50,18 @@ export const getCommentsByPostId = async ({
     .find(after ? {_id: {$lt: after}} : {})
     .sort({_id: -1})
     .limit(first + 1)
+
+export const resolveComment = ({
+  root,
+}: {
+  root:
+    | {comment: Partial<Comment>}
+    | {comment_id: Partial<Comment> | string | Mongoose.Types.ObjectId}
+}): Promise<Partial<Comment> | null> | Partial<Comment> => {
+  if ('comment' in root) return root.comment
+
+  if (typeof root.comment_id !== 'string' && !isMongoId(root.comment_id))
+    return root.comment_id
+
+  return getCommentById({_id: root.comment_id})
+}
