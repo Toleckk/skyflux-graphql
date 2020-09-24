@@ -5,7 +5,9 @@
   "files": [
     "__types/index.ts"
   ],
-  "include": ["src/**/*"],
+  "include": [
+    "src/**/*"
+  ],
   "compilerOptions": {
     /* Visit https://aka.ms/tsconfig.json to read more about this file */
     "baseUrl": "./src",
@@ -18,6 +20,9 @@
       ],
       "@decorators": [
         "./decorators"
+      ],
+      "@pubsub": [
+        "./pubsub.ts"
       ]
     },
     /* Basic Options */
@@ -28,6 +33,7 @@
     /* Specify module code generation: 'none', 'commonjs', 'amd', 'system', 'umd', 'es2015', 'es2020', or 'ESNext'. */
     "lib": [
       "es6",
+      "esnext.asynciterable",
       "dom"
     ],
     /* Specify library files to be included in the compilation. */
