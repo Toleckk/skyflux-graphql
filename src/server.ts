@@ -16,7 +16,11 @@ const schema = makeExecutableSchema({typeDefs, resolvers})
 const server = new ApolloServer({
   schema,
   context: async context => {
-    const {authorization = ''} = context.req.headers
+    const authorization =
+      context.req?.headers?.authorization ||
+      context.connection?.context?.Authorization ||
+      String()
+
     const token = (authorization as string).match(/Bearer (.+)/)?.[1]
 
     return {
