@@ -14,6 +14,6 @@ export const PostResolver = {
     deletePost: a([injectArgs(), auth()])(PostService.deletePost),
   },
   Post: {
-    user: a([injectRoot()])(UserService.resolverUser),
+    user: a([injectRoot()])(UserService.resolveUser),
   },
 }

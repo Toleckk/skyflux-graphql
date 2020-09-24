@@ -151,7 +151,7 @@ export const getFoundUsers = async ({
   user?: User
 }): Promise<User[]> => UserModel.find({_id: {$gt: after}}).limit(first + 1)
 
-export const resolverUser = ({
+export const resolveUser = ({
   root,
 }: {
   root: {user: User} | {user_id: User | string | Mongoose.Types.ObjectId}

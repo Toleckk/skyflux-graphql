@@ -14,7 +14,7 @@ export const CommentResolver = {
     ),
   },
   Comment: {
-    user: a([injectRoot()])(UserService.resolverUser),
+    user: a([injectRoot()])(UserService.resolveUser),
     post: a([injectRoot()])(PostService.resolvePost),
   },
 }
