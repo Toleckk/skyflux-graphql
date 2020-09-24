@@ -2,6 +2,7 @@ import Mongoose from 'mongoose'
 import {isMongoId} from '@utils/isMongoId'
 import {ID} from '@models/types'
 import {User, UserService} from '@models/user'
+import {ChannelService} from '@models/channel'
 import {Post} from './types'
 import {PostModel} from './model'
 
@@ -13,6 +14,11 @@ export const createPost = async ({
   user: User
 }): Promise<Post | null> => {
   const post = await PostModel.create({text, user_id: user._id})
+
+  await ChannelService.subscribeUserToChannel({
+    channel: `Comment_${post._id}`,
+    user,
+  })
 
   return {
     ...post.toObject(),
