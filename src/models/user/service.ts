@@ -1,9 +1,10 @@
 import Mongoose from 'mongoose'
-import {generateNickname} from '@utils/generateNickname'
 import {User, UserDescription, UserDocument, UserModel} from '@models/user'
 import {ResetModel} from '@models/reset'
 import {ChannelService} from '@models/channel'
+import {generateNickname} from '@utils/generateNickname'
 import {isMongoId} from '@utils/isMongoId'
+import {makeSearchPipeline} from '@utils/makeSearchPipeline'
 
 export const createUser = async ({
   email,
@@ -155,14 +156,25 @@ export const getSuggestions = async ({
   ])
 
 export const getFoundUsers = async ({
+  text,
+  after,
   first = 25,
-  after = '000000000000',
 }: {
   text: string
   first: number
   after?: string
   user?: User
-}): Promise<User[]> => UserModel.find({_id: {$gt: after}}).limit(first + 1)
+}): Promise<User[]> => {
+  const users = await UserModel.aggregate([
+    ...makeSearchPipeline({text, after, field: 'nickname'}),
+    {$limit: first + 1},
+  ])
+
+  return users.map(user => ({
+    ...user,
+    __cursor: [user.score, user._id].join(' '),
+  }))
+}
 
 export const resolveUser = ({
   root,
