@@ -4,6 +4,7 @@ import {
   gt,
   head,
   identity,
+  ifElse,
   isNil,
   last,
   length,
@@ -11,6 +12,7 @@ import {
   nthArg,
   pipe,
   prop,
+  propSatisfies,
   useWith,
   when,
 } from 'ramda'
@@ -37,7 +39,11 @@ export const toEdges: <T extends Entity>(entities: T[]) => Edge<T>[] = pipe(
   map(
     applySpec({
       node: identity,
-      cursor: prop('_id'),
+      cursor: ifElse(
+        propSatisfies(complement(isNil), '__cursor'),
+        prop('__cursor'),
+        prop('_id'),
+      ),
     }),
   ),
 )
