@@ -2,11 +2,9 @@
   "ts-node": {
     "files": true
   },
-  "files": [
-    "__types/index.ts"
-  ],
   "include": [
-    "src/**/*"
+    "src/**/*",
+    "__types/**/*"
   ],
   "compilerOptions": {
     /* Visit https://aka.ms/tsconfig.json to read more about this file */
