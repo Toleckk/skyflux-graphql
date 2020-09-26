@@ -3,6 +3,7 @@ import {isMongoId} from '@utils/isMongoId'
 import {ID} from '@models/types'
 import {User, UserService} from '@models/user'
 import {ChannelService} from '@models/channel'
+import {makeSearchPipeline} from '@utils/makeSearchPipeline'
 import {Post} from './types'
 import {PostModel} from './model'
 
@@ -44,6 +45,26 @@ export const getPostById = async ({
 }): Promise<Partial<Post> | null> => {
   const post = await PostModel.findById(_id)
   return post || null
+}
+
+export const getFoundPosts = async ({
+  text,
+  after,
+  first = 25,
+}: {
+  text: string
+  first?: number
+  after?: string
+}): Promise<Post[]> => {
+  const posts = await PostModel.aggregate([
+    ...makeSearchPipeline({after, text, field: 'text'}),
+    {$limit: first + 1},
+  ])
+
+  return posts.map(post => ({
+    ...post,
+    __cursor: [post.score, post._id].join(' '),
+  }))
 }
 
 export const resolvePost = ({

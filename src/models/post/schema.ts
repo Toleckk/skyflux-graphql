@@ -20,6 +20,7 @@ export const PostSchema = `
     extend type Query {
         getPostById(_id: ID!): Post
         getPostsByNickname(nickname: String!, first: Int, after: String): PostConnection!
+        getFoundPosts(text: String!, first: Int, after: String): PostConnection!
     }
 
     extend type Mutation {

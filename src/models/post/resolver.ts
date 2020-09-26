@@ -8,6 +8,7 @@ export const PostResolver = {
     getPostsByNickname: a([injectArgs(), paginate()])(
       PostService.getPostsByNickname,
     ),
+    getFoundPosts: a([injectArgs(), paginate()])(PostService.getFoundPosts),
   },
   Mutation: {
     createPost: a([injectArgs(), auth()])(PostService.createPost),
