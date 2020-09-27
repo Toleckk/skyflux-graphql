@@ -3,8 +3,9 @@ import {isMongoId} from '@utils/isMongoId'
 import {ID} from '@models/types'
 import {User, UserService} from '@models/user'
 import {ChannelService} from '@models/channel'
+import {SubService} from '@models/sub'
 import {makeSearchPipeline} from '@utils/makeSearchPipeline'
-import {Post} from './types'
+import {Post, PostDocument} from './types'
 import {PostModel} from './model'
 
 export const createPost = async ({
@@ -40,24 +41,65 @@ export const deletePost = async ({
 
 export const getPostById = async ({
   _id,
+  user,
 }: {
+  user?: User
   _id: string | Mongoose.Types.ObjectId
 }): Promise<Partial<Post> | null> => {
   const post = await PostModel.findById(_id)
-  return post || null
+
+  if (!post) return null
+
+  return canSeePost({user, post}).then(canSee => (canSee ? post : null))
 }
 
 export const getFoundPosts = async ({
   text,
+  user,
   after,
   first = 25,
 }: {
   text: string
-  first?: number
+  user?: User
   after?: string
+  first?: number
 }): Promise<Post[]> => {
   const posts = await PostModel.aggregate([
     ...makeSearchPipeline({after, text, field: 'text'}),
+    {
+      $lookup: {
+        from: 'users',
+        localField: 'user_id',
+        foreignField: '_id',
+        as: 'user',
+      },
+    },
+    {
+      $unwind: {
+        path: '$user',
+      },
+    },
+    {
+      $lookup: {
+        from: 'subs',
+        localField: 'user._id',
+        foreignField: 'to_id',
+        as: 'subs',
+      },
+    },
+    {
+      $match: {
+        $or: [
+          {'user.private': false},
+          ...(user
+            ? [
+                {'user._id': user._id},
+                {subs: {$elemMatch: {from_id: user._id, accepted: true}}},
+              ]
+            : []),
+        ],
+      },
+    },
     {$limit: first + 1},
   ])
 
@@ -84,18 +126,53 @@ export const resolvePost = async ({
 
 export const getPostsByNickname = async ({
   nickname,
+  user,
   first = 25,
   after = 'ffffffffffffffffffffffff',
 }: {
   nickname: string
+  user?: User
   first?: number
   after?: ID
 }): Promise<Partial<Post>[]> => {
-  const user = await UserService.getUserByNickname({nickname})
+  const owner = await UserService.getUserByNickname({nickname})
 
-  if (!user) return []
+  if (!owner) return []
 
-  return PostModel.find({user_id: user._id, _id: {$lt: after}})
+  const canSee = await canSeeUserPosts({owner, user})
+
+  if (!canSee) return []
+
+  return PostModel.find({user_id: owner._id, _id: {$lt: after}})
     .sort({_id: -1})
     .limit(first)
+}
+
+export const canSeePost = async ({
+  user,
+  post,
+}: {
+  user?: User
+  post: Post | PostDocument
+}): Promise<boolean> => {
+  const owner = await UserService.resolveUser({root: post})
+  return canSeeUserPosts({user, owner})
+}
+
+export const canSeeUserPosts = async ({
+  owner,
+  user,
+}: {
+  owner?: User | null
+  user?: User | null
+}): Promise<boolean> => {
+  if (!owner) return false
+
+  if (!owner.private) return true
+
+  if (!user) return false
+
+  if (String(owner._id) === String(user._id)) return true
+
+  return SubService.isSubscribedBy({from: user, to: owner})
 }

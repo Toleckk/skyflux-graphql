@@ -4,11 +4,15 @@ import * as PostService from './service'
 
 export const PostResolver = {
   Query: {
-    getPostById: a([injectArgs()])(PostService.getPostById),
-    getPostsByNickname: a([injectArgs(), paginate()])(
+    getPostById: a([injectArgs(), auth({passOnly: true})])(
+      PostService.getPostById,
+    ),
+    getPostsByNickname: a([injectArgs(), paginate(), auth({passOnly: true})])(
       PostService.getPostsByNickname,
     ),
-    getFoundPosts: a([injectArgs(), paginate()])(PostService.getFoundPosts),
+    getFoundPosts: a([injectArgs(), paginate(), auth({passOnly: true})])(
+      PostService.getFoundPosts,
+    ),
   },
   Mutation: {
     createPost: a([injectArgs(), auth()])(PostService.createPost),
