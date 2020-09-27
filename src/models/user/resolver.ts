@@ -2,7 +2,8 @@ import {IResolvers} from 'graphql-tools'
 import {applySpec, pipe, prop} from 'ramda'
 import {a, auth, injectArgs, injectRoot, paginate} from '@decorators'
 import {SubService} from '@models/sub'
-import {User} from '@models/user/types'
+import {PostService} from '@models/post'
+import {User} from './types'
 import * as UserService from './service'
 
 export const UserResolver: IResolvers = {
@@ -34,6 +35,12 @@ export const UserResolver: IResolvers = {
           to: prop<'root', User>('root'),
         }),
         SubService.isSubscribedBy,
+      ),
+    ),
+    postsCount: a([injectRoot()])(
+      pipe(
+        applySpec({user: prop<'root', User>('root')}),
+        PostService.countUserPosts,
       ),
     ),
   },

@@ -176,3 +176,6 @@ export const canSeeUserPosts = async ({
 
   return SubService.isSubscribedBy({from: user, to: owner})
 }
+
+export const countUserPosts = async ({user}: {user: User}): Promise<number> =>
+  PostModel.count({user_id: user._id})
