@@ -1,5 +1,7 @@
 import {a, auth, injectArgs, injectRoot, paginate} from '@decorators'
 import {UserService} from '@models/user'
+import {LikeService} from '@models/like'
+import {assoc, converge, identity, pipe, prop} from 'ramda'
 import * as PostService from './service'
 
 export const PostResolver = {
@@ -20,5 +22,11 @@ export const PostResolver = {
   },
   Post: {
     user: a([injectRoot()])(({root}) => UserService.resolveUser({root})),
+    isLikedByMe: a([injectRoot(), auth({passOnly: true})])(
+      pipe(
+        converge(assoc('post'), [prop('root'), identity]),
+        LikeService.isPostLikedBy,
+      ),
+    ),
   },
 }
