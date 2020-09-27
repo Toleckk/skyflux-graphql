@@ -46,5 +46,11 @@ export const UserResolver: IResolvers = {
     subsCount: a([injectRoot()])(
       pipe(applySpec({user: prop<'root', User>('root')}), SubService.countSubs),
     ),
+    subscribersCount: a([injectRoot()])(
+      pipe(
+        applySpec({user: prop<'root', User>('root')}),
+        SubService.countSubscribers,
+      ),
+    ),
   },
 }

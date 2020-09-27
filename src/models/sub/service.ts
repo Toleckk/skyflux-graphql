@@ -104,3 +104,6 @@ export const isSubscribedBy = async ({
 
 export const countSubs = async ({user}: {user: User}): Promise<number> =>
   SubModel.count({from_id: user._id, accepted: true})
+
+export const countSubscribers = async ({user}: {user: User}): Promise<number> =>
+  SubModel.count({to_id: user._id, accepted: true})
