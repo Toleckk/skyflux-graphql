@@ -85,3 +85,16 @@ export const acceptSub = async ({
 
   return sub
 }
+
+export const isSubscribedBy = async ({
+  from,
+  to,
+}: {
+  from: User
+  to: User
+}): Promise<boolean> =>
+  SubModel.exists({
+    from_id: from._id,
+    to_id: to._id,
+    accepted: true,
+  })
