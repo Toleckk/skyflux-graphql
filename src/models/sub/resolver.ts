@@ -16,7 +16,7 @@ export const SubResolver = {
             user_id: path(['root', 'from_id']),
           },
         }),
-        UserService.resolveUser,
+        ({root}: {root: any}) => UserService.resolveUser({root}),
       ),
     ),
     to: a([injectRoot()])(
@@ -26,7 +26,7 @@ export const SubResolver = {
             user_id: path(['root', 'to_id']),
           },
         }),
-        UserService.resolveUser,
+        ({root}: {root: any}) => UserService.resolveUser({root}),
       ),
     ),
   },

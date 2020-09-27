@@ -43,6 +43,6 @@ export const EventResolver: IResolvers = {
     ),
   },
   SubEventBody: {
-    sub: a([injectRoot()])(SubService.resolveSub),
+    sub: a([injectRoot()])(({root}): any => SubService.resolveSub({root})),
   },
 }
