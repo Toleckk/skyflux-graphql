@@ -176,11 +176,11 @@ export const getFoundUsers = async ({
   }))
 }
 
-export const resolveUser = ({
+export const resolveUser = async ({
   root,
 }: {
   root: {user: User} | {user_id: User | string | Mongoose.Types.ObjectId}
-}): Promise<User | null> | User => {
+}): Promise<User | null> => {
   if ('user' in root) return root.user
 
   if (typeof root.user_id !== 'string' && !isMongoId(root.user_id))

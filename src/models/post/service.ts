@@ -67,13 +67,13 @@ export const getFoundPosts = async ({
   }))
 }
 
-export const resolvePost = ({
+export const resolvePost = async ({
   root,
 }: {
   root:
     | {post: Partial<Post>}
     | {post_id: Partial<Post> | string | Mongoose.Types.ObjectId}
-}): Promise<Partial<Post> | null> | Partial<Post> => {
+}): Promise<Partial<Post> | null> => {
   if ('post' in root) return root.post
 
   if (typeof root.post_id === 'string' || isMongoId(root.post_id))

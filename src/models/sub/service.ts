@@ -49,13 +49,13 @@ export const getSubById = async ({
   _id: string | Mongoose.Types.ObjectId
 }): Promise<Partial<Sub> | null> => SubModel.findById(_id)
 
-export const resolveSub = ({
+export const resolveSub = async ({
   root,
 }: {
   root:
     | {sub: Partial<Sub>}
     | {sub_id: Partial<Sub> | string | Mongoose.Types.ObjectId}
-}): Promise<Partial<Sub> | null> | Partial<Sub> => {
+}): Promise<Partial<Sub> | null> => {
   if ('sub' in root) return root.sub
 
   if (typeof root.sub_id !== 'string' && !isMongoId(root.sub_id))
