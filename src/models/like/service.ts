@@ -36,3 +36,6 @@ export const isPostLikedBy = async ({
 
   return LikeModel.exists({post_id: post._id, user_id: user._id})
 }
+
+export const countPostLikes = async ({post}: {post: Post}): Promise<number> =>
+  LikeModel.count({post_id: post._id})

@@ -28,5 +28,11 @@ export const PostResolver = {
         LikeService.isPostLikedBy,
       ),
     ),
+    likesCount: a([injectRoot()])(
+      pipe(
+        converge(assoc('post'), [prop('root'), identity]),
+        LikeService.countPostLikes,
+      ),
+    ),
   },
 }
