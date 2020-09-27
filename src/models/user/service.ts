@@ -1,4 +1,4 @@
-import Mongoose from 'mongoose'
+import Mongoose, {ModelUpdateOptions} from 'mongoose'
 import {User, UserDescription, UserDocument, UserModel} from '@models/user'
 import {ResetModel} from '@models/reset'
 import {ChannelService} from '@models/channel'
@@ -18,6 +18,7 @@ export const createUser = async ({
     nickname,
     email,
     password,
+    private: false,
     description: {},
   })
 
@@ -188,3 +189,38 @@ export const resolveUser = async ({
 
   return getUserById({_id: root.user_id})
 }
+
+export const setPrivate = async ({
+  user,
+  isPrivate,
+  options = {},
+}: {
+  user: User
+  isPrivate: boolean
+  options?: ModelUpdateOptions
+}): Promise<User> => {
+  if (user.private === isPrivate) return user
+
+  await UserModel.updateOne({_id: user._id}, {private: isPrivate}, options)
+
+  user.private = isPrivate
+  return user
+}
+
+export const makePublic = async ({user}: {user: User}): Promise<User> => {
+  const session = await Mongoose.startSession()
+  session.startTransaction()
+
+  const updatedUser = await setPrivate({
+    user,
+    isPrivate: false,
+    options: {session},
+  })
+
+  await session.commitTransaction()
+
+  return updatedUser
+}
+
+export const makePrivate = ({user}: {user: User}): Promise<User> =>
+  setPrivate({user, isPrivate: true})

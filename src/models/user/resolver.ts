@@ -10,6 +10,8 @@ export const UserResolver: IResolvers = {
     updatePassword: a([injectArgs(), auth()])(UserService.updatePassword),
     updateNickname: a([injectArgs(), auth()])(UserService.updateNickname),
     updateProfileInfo: a([injectArgs(), auth()])(UserService.updateProfileInfo),
+    makeAccountPublic: a([auth()])(UserService.makePublic),
+    makeAccountPrivate: a([auth()])(UserService.makePrivate),
   },
   Query: {
     me: a([auth({passOnly: true})])(prop('user')),

@@ -14,6 +14,11 @@ const schema = new Mongoose.Schema({
   nickname: {type: Mongoose.Schema.Types.String, required: true, unique: true},
   avatar: {type: Mongoose.Schema.Types.String},
   description: {type: Description, required: true, default: {}},
+  private: {
+    type: Mongoose.Schema.Types.Boolean,
+    required: true,
+    default: false,
+  },
 })
 
 schema.plugin(fuzzySearching, {fields: ['nickname']})

@@ -10,6 +10,7 @@ export const UserSchema = `
         nickname: String!
         avatar: String
         description: Description!
+        private: Boolean!
     }
 
     type UserEdge implements Edge {
@@ -47,5 +48,7 @@ export const UserSchema = `
         updatePassword(oldPassword: String!, newPassword: String!): Boolean
         updateNickname(nickname: String!): User!
         updateProfileInfo(profileInfo: ProfileInfoInput): User!
+        makeAccountPublic: User!
+        makeAccountPrivate: User!
     }
 `

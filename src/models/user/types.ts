@@ -13,6 +13,7 @@ export interface User extends Entity {
   password: string
   avatar?: string
   description: UserDescription
+  private: boolean
 }
 
 export interface UserDocument extends Document, User {}
