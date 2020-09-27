@@ -11,6 +11,7 @@ export const UserSchema = `
         avatar: String
         description: Description!
         private: Boolean!
+        isSubscribedByMe: Boolean!
     }
 
     type UserEdge implements Edge {

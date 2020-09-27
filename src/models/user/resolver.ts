@@ -1,6 +1,8 @@
 import {IResolvers} from 'graphql-tools'
-import {prop} from 'ramda'
-import {a, auth, injectArgs, paginate} from '@decorators'
+import {applySpec, pipe, prop} from 'ramda'
+import {a, auth, injectArgs, injectRoot, paginate} from '@decorators'
+import {SubService} from '@models/sub'
+import {User} from '@models/user/types'
 import * as UserService from './service'
 
 export const UserResolver: IResolvers = {
@@ -22,6 +24,17 @@ export const UserResolver: IResolvers = {
     ),
     getFoundUsers: a([auth(), injectArgs(), paginate()])(
       UserService.getFoundUsers,
+    ),
+  },
+  User: {
+    isSubscribedByMe: a([auth({passOnly: true}), injectRoot()])(
+      pipe(
+        applySpec({
+          from: prop<'user', User | undefined>('user'),
+          to: prop<'root', User>('root'),
+        }),
+        SubService.isSubscribedBy,
+      ),
     ),
   },
 }
