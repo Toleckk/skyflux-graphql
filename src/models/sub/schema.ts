@@ -4,10 +4,12 @@ export const SubSchema = `
         _id: ID!
         from: User!
         to: User!
+        accepted: Boolean!
     }
 
     extend type Mutation {
         createSub(nickname: String!): Sub!
         removeSub(nickname: String!): Boolean
+        acceptSub(sub_id: ID!): Sub!
     }
 `

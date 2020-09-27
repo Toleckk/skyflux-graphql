@@ -1,4 +1,5 @@
 import Mongoose from 'mongoose'
+import {ID} from '@models/types'
 import {EventService} from '@models/event'
 import {User, UserService} from '@models/user'
 import {isMongoId} from '@utils/isMongoId'
@@ -17,7 +18,11 @@ export const createSub = async ({
 
   if (!to) return null
 
-  const sub = await SubModel.create({from_id: user._id, to_id: to._id})
+  const sub = await SubModel.create({
+    from_id: user._id,
+    to_id: to._id,
+    accepted: !to.private,
+  })
 
   await EventService.createEvent(subRequested({sub}))
 
@@ -62,4 +67,21 @@ export const resolveSub = async ({
     return root.sub_id
 
   return getSubById({_id: root.sub_id})
+}
+
+export const acceptSub = async ({
+  user,
+  sub_id,
+}: {
+  user: User
+  sub_id: ID
+}): Promise<Partial<Sub> | null> => {
+  const sub = await SubModel.findOne({_id: sub_id, to_id: user._id})
+
+  if (!sub) return null
+
+  sub.accepted = true
+  sub.save()
+
+  return sub
 }

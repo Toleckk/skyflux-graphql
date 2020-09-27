@@ -7,6 +7,7 @@ export const SubResolver = {
   Mutation: {
     createSub: a([injectArgs(), auth()])(SubService.createSub),
     removeSub: a([injectArgs(), auth()])(SubService.removeSub),
+    acceptSub: a([injectArgs(), auth()])(SubService.acceptSub),
   },
   Sub: {
     from: a([injectRoot()])(

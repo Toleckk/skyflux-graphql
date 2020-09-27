@@ -4,6 +4,7 @@ import {SubDocument} from '@models/sub/types'
 const schema = new Mongoose.Schema({
   from_id: {type: Mongoose.Schema.Types.ObjectId, required: true, ref: 'User'},
   to_id: {type: Mongoose.Schema.Types.ObjectId, required: true, ref: 'User'},
+  accepted: {type: Mongoose.Schema.Types.Boolean, required: true},
 })
 
 schema.index({from_id: 1, to_id: 1}, {unique: true})

@@ -5,6 +5,7 @@ import {Entity, ID} from '@models/types'
 export interface Sub extends Entity {
   from: User
   to: User
+  accepted: boolean
 }
 
 export interface SubDocument extends Omit<Sub, 'from' | 'to'>, Document {
