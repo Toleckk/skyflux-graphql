@@ -43,5 +43,8 @@ export const UserResolver: IResolvers = {
         PostService.countUserPosts,
       ),
     ),
+    subsCount: a([injectRoot()])(
+      pipe(applySpec({user: prop<'root', User>('root')}), SubService.countSubs),
+    ),
   },
 }

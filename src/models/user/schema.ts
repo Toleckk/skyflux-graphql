@@ -13,6 +13,7 @@ export const UserSchema = `
         private: Boolean!
         isSubscribedByMe: Boolean!
         postsCount: Int!
+        subsCount: Int!
     }
 
     type UserEdge implements Edge {
