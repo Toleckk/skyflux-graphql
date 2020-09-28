@@ -1,11 +1,13 @@
-import {a, auth, injectArgs, injectRoot, paginate} from '@decorators'
+import {a, auth, injectArgs, injectRoot, paginate, validate} from '@decorators'
 import {UserService} from '@models/user'
 import {PostService} from '@models/post'
 import * as CommentService from './service'
 
 export const CommentResolver = {
   Mutation: {
-    createComment: a([injectArgs(), auth()])(CommentService.createComment),
+    createComment: a([injectArgs(), auth(), validate()])(
+      CommentService.createComment,
+    ),
     deleteComment: a([injectArgs(), auth()])(CommentService.deleteComment),
   },
   Query: {

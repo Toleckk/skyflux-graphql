@@ -1,18 +1,32 @@
 import {IResolvers} from 'graphql-tools'
 import {applySpec, pipe, prop} from 'ramda'
-import {a, auth, injectArgs, injectRoot, paginate} from '@decorators'
+import {a, auth, injectArgs, injectRoot, paginate, validate} from '@decorators'
 import {SubService} from '@models/sub'
 import {PostService} from '@models/post'
+import {password} from '@validation'
 import {User} from './types'
 import * as UserService from './service'
 
 export const UserResolver: IResolvers = {
   Mutation: {
-    createUser: a([injectArgs()])(UserService.createUser),
-    resetPassword: a([injectArgs()])(UserService.resetPassword),
-    updatePassword: a([injectArgs(), auth()])(UserService.updatePassword),
-    updateNickname: a([injectArgs(), auth()])(UserService.updateNickname),
-    updateProfileInfo: a([injectArgs(), auth()])(UserService.updateProfileInfo),
+    createUser: a([injectArgs(), validate()])(UserService.createUser),
+    resetPassword: a([injectArgs(), validate()])(UserService.resetPassword),
+    updatePassword: a([
+      injectArgs(),
+      auth(),
+      validate({
+        schemas: {
+          newPassword: password,
+          oldPassword: password,
+        },
+      }),
+    ])(UserService.updatePassword),
+    updateNickname: a([injectArgs(), auth(), validate()])(
+      UserService.updateNickname,
+    ),
+    updateProfileInfo: a([injectArgs(), auth(), validate()])(
+      UserService.updateProfileInfo,
+    ),
     makeAccountPublic: a([auth()])(UserService.makePublic),
     makeAccountPrivate: a([auth()])(UserService.makePrivate),
   },

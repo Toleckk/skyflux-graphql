@@ -1,4 +1,4 @@
-import {a, auth, injectArgs, injectRoot, paginate} from '@decorators'
+import {a, auth, injectArgs, injectRoot, paginate, validate} from '@decorators'
 import {UserService} from '@models/user'
 import {LikeService} from '@models/like'
 import {assoc, converge, identity, pipe, prop} from 'ramda'
@@ -17,7 +17,7 @@ export const PostResolver = {
     ),
   },
   Mutation: {
-    createPost: a([injectArgs(), auth()])(PostService.createPost),
+    createPost: a([injectArgs(), auth(), validate()])(PostService.createPost),
     deletePost: a([injectArgs(), auth()])(PostService.deletePost),
   },
   Post: {
