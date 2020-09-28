@@ -21,6 +21,9 @@
       ],
       "@pubsub": [
         "./pubsub.ts"
+      ],
+      "@validation": [
+        "./validation.ts"
       ]
     },
     /* Basic Options */

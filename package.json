@@ -36,7 +36,8 @@
     "@models": "src/models",
     "@utils": "src/utils",
     "@decorators": "src/decorators",
-    "@pubsub": "src/pubsub.ts"
+    "@pubsub": "src/pubsub.ts",
+    "@validation": "src/validation.ts"
   },
   "dependencies": {
     "@types/mongoose": "^5.7.36",
