@@ -55,6 +55,10 @@
     "yup": "^0.29.3"
   },
   "jest": {
+    "moduleNameMapper": {
+      "@utils\/(.*)$": "<rootDir>/src/utils/$1",
+      "@validation": "<rootDir>/src/validation.ts"
+    },
     "transform": {
       ".ts": "ts-jest"
     },
