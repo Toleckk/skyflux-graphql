@@ -32,12 +32,7 @@ export const UserSchema = `
         about: String
         from: String
     }
-
-    input ProfileInfoInput {
-        avatar: String
-        description: DescrpitionInput!
-    }
-
+    
     extend type Query {
         me: User
         getUserByNickname(nickname: String!): User
@@ -51,7 +46,7 @@ export const UserSchema = `
         resetPassword(token: String!, password: String!): Boolean
         updatePassword(oldPassword: String!, newPassword: String!): Boolean
         updateNickname(nickname: String!): User!
-        updateProfileInfo(profileInfo: ProfileInfoInput): User!
+        updateProfileInfo(avatar: String, description: DescrpitionInput!): User!
         makeAccountPublic: User!
         makeAccountPrivate: User!
     }
