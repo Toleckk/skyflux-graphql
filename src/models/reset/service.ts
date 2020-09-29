@@ -1,6 +1,8 @@
-import {UserModel} from '@models/user'
-import {ResetModel} from '@models/reset/model'
 import {v4} from 'uuid'
+import {ModelOptions} from 'mongoose'
+import {UserModel} from '@models/user'
+import {ResetDocument} from './types'
+import {ResetModel} from './model'
 
 export const createResetRequest = async ({
   login,
@@ -16,4 +18,21 @@ export const createResetRequest = async ({
   await ResetModel.create({user_id: user._id, token: v4()})
 
   return true
+}
+
+export const getResetByToken = async ({
+  token,
+}: {
+  token: string
+}): Promise<ResetDocument | null> => ResetModel.findOne({token})
+
+export const deleteResetByToken = async ({
+  token,
+  options,
+}: {
+  token: string
+  options?: ModelOptions
+}): Promise<boolean> => {
+  const {deletedCount} = await ResetModel.deleteOne({token}, options || {})
+  return (deletedCount || 0) > 0
 }

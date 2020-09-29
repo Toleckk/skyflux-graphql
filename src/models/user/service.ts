@@ -1,6 +1,6 @@
 import Mongoose, {ModelUpdateOptions} from 'mongoose'
-import {User, UserDescription, UserDocument, UserModel} from '@models/user'
-import {ResetModel} from '@models/reset'
+import {User, UserDescription, UserModel} from '@models/user'
+import {ResetService} from '@models/reset'
 import {ChannelService} from '@models/channel'
 import {generateNickname} from '@utils/generateNickname'
 import {isMongoId} from '@utils/isMongoId'
@@ -37,17 +37,14 @@ export const resetPassword = async ({
   token: string
   password: string
 }): Promise<boolean> => {
-  const request = await ResetModel.findOne({token}).populate('user_id')
+  const request = await ResetService.getResetByToken({token})
 
   if (!request) return false
 
-  const user = request.user_id as UserDocument
-  user.password = password
-
   const session = await Mongoose.startSession()
   await session.withTransaction(async () => {
-    await user.save({session})
-    await request.deleteOne({session})
+    await UserModel.updateOne({_id: request.user_id}, {password}, {session})
+    await ResetService.deleteResetByToken({token, options: {session}})
   })
 
   return true
