@@ -14,6 +14,8 @@ export const createSub = async ({
   nickname: string
   user: User
 }): Promise<Partial<Sub> | null> => {
+  if (user.nickname === nickname) return null
+
   const to = await UserService.getUserByNickname({nickname})
 
   if (!to) return null
