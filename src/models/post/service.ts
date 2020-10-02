@@ -28,6 +28,50 @@ export const createPost = async ({
   }
 }
 
+export const getFeed = async ({
+  user,
+  after = 'ffffffffffffffffffffffff',
+  first = 25,
+}: {
+  user: User
+  after?: ID
+  first?: number
+}): Promise<Post[]> =>
+  PostModel.aggregate([
+    {
+      $lookup: {
+        from: 'subs',
+        let: {user: '$user_id'},
+        pipeline: [
+          {
+            $match: {
+              $expr: {
+                $and: [
+                  {$eq: ['$to_id', '$$user']},
+                  {$eq: ['$accepted', true]},
+                  {$eq: ['$from_id', user._id]},
+                ],
+              },
+            },
+          },
+        ],
+        as: 'receivers',
+      },
+    },
+    {
+      $match: {
+        $expr: {
+          $and: [
+            {$eq: [{$size: '$receivers'}, 1]},
+            {$lt: ['$_id', Mongoose.Types.ObjectId(after)]},
+          ],
+        },
+      },
+    },
+    {$sort: {_id: -1}},
+    {$limit: first + 1},
+  ])
+
 export const deletePost = async ({
   _id,
   user,

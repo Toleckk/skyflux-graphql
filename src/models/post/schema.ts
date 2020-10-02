@@ -23,6 +23,7 @@ export const PostSchema = `
         getPostById(_id: ID!): Post
         getPostsByNickname(nickname: String!, first: Int, after: String): PostConnection!
         getFoundPosts(text: String!, first: Int, after: String): PostConnection!
+        getFeed(first: Int, after: ID): PostConnection!
     }
 
     extend type Mutation {

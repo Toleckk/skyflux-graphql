@@ -15,6 +15,7 @@ export const PostResolver = {
     getFoundPosts: a([injectArgs(), paginate(), auth({passOnly: true})])(
       PostService.getFoundPosts,
     ),
+    getFeed: a([auth(), paginate()])(PostService.getFeed),
   },
   Mutation: {
     createPost: a([injectArgs(), auth(), validate()])(PostService.createPost),
