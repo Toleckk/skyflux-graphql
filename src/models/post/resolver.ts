@@ -1,7 +1,7 @@
 import {a, auth, injectArgs, injectRoot, paginate, validate} from '@decorators'
 import {UserService} from '@models/user'
 import {LikeService} from '@models/like'
-import {assoc, converge, identity, pipe, prop} from 'ramda'
+import {CommentService} from '@models/comment'
 import * as PostService from './service'
 
 export const PostResolver = {
@@ -27,5 +27,8 @@ export const PostResolver = {
       LikeService.isPostLikedBy,
     ),
     likesCount: a([injectRoot({as: 'post'})])(LikeService.countPostLikes),
+    commentsCount: a([injectRoot({as: 'post'})])(({post}) =>
+      CommentService.countPostComments({post}),
+    ),
   },
 }

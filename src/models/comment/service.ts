@@ -1,5 +1,5 @@
 import Mongoose from 'mongoose'
-import {PostService} from '@models/post'
+import {Post, PostService} from '@models/post'
 import {User} from '@models/user'
 import {ID} from '@models/types'
 import {EventService} from '@models/event'
@@ -71,3 +71,9 @@ export const resolveComment = ({
 
   return getCommentById({_id: root.comment_id})
 }
+
+export const countPostComments = async ({
+  post,
+}: {
+  post: Post
+}): Promise<number> => CommentModel.count({post_id: post._id})

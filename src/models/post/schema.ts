@@ -7,6 +7,7 @@ export const PostSchema = `
         user: User!
         isLikedByMe: Boolean!
         likesCount: Int!
+        commentsCount: Int!
     }
     
     type PostEdge implements Edge {
