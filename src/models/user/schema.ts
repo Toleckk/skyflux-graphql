@@ -7,6 +7,7 @@ export const UserSchema = `
     }
 
     type User {
+        _id: ID!
         nickname: String!
         avatar: String
         description: Description!
