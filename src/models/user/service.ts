@@ -5,6 +5,7 @@ import {ChannelService} from '@models/channel'
 import {generateNickname} from '@utils/generateNickname'
 import {isMongoId} from '@utils/isMongoId'
 import {makeSearchPipeline} from '@utils/makeSearchPipeline'
+import {EmailService} from '@models/email'
 
 export const createUser = async ({
   email,
@@ -14,6 +15,7 @@ export const createUser = async ({
   password: string
 }): Promise<User> => {
   const nickname = generateNickname()
+
   const user = await UserModel.create({
     nickname,
     email,
@@ -21,6 +23,8 @@ export const createUser = async ({
     private: false,
     description: {},
   })
+
+  await EmailService.changeEmail({user, email: user.email})
 
   await ChannelService.subscribeUserToChannel({
     user,
