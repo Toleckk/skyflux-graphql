@@ -52,20 +52,10 @@ export const UserResolver: IResolvers = {
         SubService.isSubscribedBy,
       ),
     ),
-    postsCount: a([injectRoot()])(
-      pipe(
-        applySpec({user: prop<'root', User>('root')}),
-        PostService.countUserPosts,
-      ),
-    ),
-    subsCount: a([injectRoot()])(
-      pipe(applySpec({user: prop<'root', User>('root')}), SubService.countSubs),
-    ),
-    subscribersCount: a([injectRoot()])(
-      pipe(
-        applySpec({user: prop<'root', User>('root')}),
-        SubService.countSubscribers,
-      ),
+    postsCount: a([injectRoot({as: 'user'})])(PostService.countUserPosts),
+    subsCount: a([injectRoot({as: 'user'})])(SubService.countSubs),
+    subscribersCount: a([injectRoot({as: 'user'})])(
+      SubService.countSubscribers,
     ),
   },
 }

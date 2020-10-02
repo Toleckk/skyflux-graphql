@@ -23,17 +23,9 @@ export const PostResolver = {
   },
   Post: {
     user: a([injectRoot()])(({root}) => UserService.resolveUser({root})),
-    isLikedByMe: a([injectRoot(), auth({passOnly: true})])(
-      pipe(
-        converge(assoc('post'), [prop('root'), identity]),
-        LikeService.isPostLikedBy,
-      ),
+    isLikedByMe: a([injectRoot({as: 'post'}), auth({passOnly: true})])(
+      LikeService.isPostLikedBy,
     ),
-    likesCount: a([injectRoot()])(
-      pipe(
-        converge(assoc('post'), [prop('root'), identity]),
-        LikeService.countPostLikes,
-      ),
-    ),
+    likesCount: a([injectRoot({as: 'post'})])(LikeService.countPostLikes),
   },
 }
