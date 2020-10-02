@@ -3,7 +3,7 @@ import {User} from '@models/user'
 import {Like} from './types'
 import {LikeModel} from './model'
 
-export const removeLike = async ({
+export const deleteLike = async ({
   post_id,
   user,
 }: {

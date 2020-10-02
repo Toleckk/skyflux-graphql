@@ -7,7 +7,7 @@ import * as LikeService from './service'
 export const LikeResolver = {
   Mutation: {
     createLike: a([injectArgs(), auth()])(LikeService.createLike),
-    removeLike: a([injectArgs(), auth()])(LikeService.removeLike),
+    deleteLike: a([injectArgs(), auth()])(LikeService.deleteLike),
   },
   Like: {
     user: async (root: LikeDocument | Like): Promise<User | null> => {

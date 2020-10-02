@@ -29,7 +29,7 @@ export const createSession = async ({
   return token
 }
 
-export const removeByToken = async ({
+export const deleteByToken = async ({
   token,
   user,
 }: {

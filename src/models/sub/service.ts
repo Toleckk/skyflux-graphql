@@ -33,7 +33,7 @@ export const createSub = async ({
   }
 }
 
-export const removeSub = async ({
+export const deleteSub = async ({
   nickname,
   user,
 }: {

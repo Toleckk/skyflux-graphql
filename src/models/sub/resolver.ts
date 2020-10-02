@@ -6,7 +6,7 @@ import * as SubService from './service'
 export const SubResolver = {
   Mutation: {
     createSub: a([injectArgs(), auth()])(SubService.createSub),
-    removeSub: a([injectArgs(), auth()])(SubService.removeSub),
+    deleteSub: a([injectArgs(), auth()])(SubService.deleteSub),
     acceptSub: a([injectArgs(), auth()])(SubService.acceptSub),
   },
   Sub: {

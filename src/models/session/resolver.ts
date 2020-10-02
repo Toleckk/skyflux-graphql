@@ -5,8 +5,8 @@ import * as SessionService from './service'
 export const SessionResolver: IResolvers = {
   Mutation: {
     createSession: a([injectArgs(), validate()])(SessionService.createSession),
-    removeCurrentSession: a([injectArgs(), injectToken(), auth(), validate()])(
-      SessionService.removeByToken,
+    deleteCurrentSession: a([injectArgs(), injectToken(), auth(), validate()])(
+      SessionService.deleteByToken,
     ),
   },
 }
