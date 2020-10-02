@@ -18,7 +18,8 @@
       "error",
       {
         "allow": [
-          "module-alias/register"
+          "module-alias/register",
+          "nodemailer/lib/*"
         ]
       }
     ],
