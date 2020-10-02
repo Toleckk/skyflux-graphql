@@ -7,6 +7,7 @@ import {isMongoId} from '@utils/isMongoId'
 import {makeSearchPipeline} from '@utils/makeSearchPipeline'
 import {EmailService} from '@models/email'
 
+/** Creates a new user with passed email and password and generated nickname */
 export const createUser = async ({
   email,
   password,
@@ -34,6 +35,7 @@ export const createUser = async ({
   return user
 }
 
+/** Updates user password by reset token */
 export const resetPassword = async ({
   token,
   password,
@@ -54,6 +56,7 @@ export const resetPassword = async ({
   return true
 }
 
+/** Updates user password by old password */
 export const updatePassword = async ({
   oldPassword,
   newPassword,
@@ -75,6 +78,7 @@ export const updatePassword = async ({
   return true
 }
 
+/** Updates user nickname */
 export const updateNickname = async ({
   user,
   nickname,
@@ -92,6 +96,7 @@ export const updateNickname = async ({
   return user
 }
 
+/** Updates user's 'about', 'birthday', 'from' and 'avatar' */
 export const updateProfileInfo = async ({
   avatar,
   description,
@@ -112,12 +117,14 @@ export const updateProfileInfo = async ({
   return userDoc
 }
 
+/** Checks if user with specified nickname exists */
 export const doesNicknameExist = async ({
   nickname,
 }: {
   nickname: string
 }): Promise<boolean> => UserModel.exists({nickname})
 
+/** Returns user by specified id if exists */
 export const getUserById = async ({
   _id,
 }: {
@@ -127,6 +134,7 @@ export const getUserById = async ({
   return user || null
 }
 
+/** Returns user by specified nickname if exists */
 export const getUserByNickname = async ({
   nickname,
 }: {
@@ -136,6 +144,10 @@ export const getUserByNickname = async ({
   return user || null
 }
 
+/**
+ * Returns users suggested for subs.
+ * Searches public accounts, who own any post
+ */
 export const getSuggestions = async ({
   first,
   user,
@@ -157,6 +169,7 @@ export const getSuggestions = async ({
     {$limit: first},
   ])
 
+/** Searches users by nickname */
 export const getFoundUsers = async ({
   text,
   after,
@@ -178,6 +191,7 @@ export const getFoundUsers = async ({
   }))
 }
 
+/** Resolves user from object that contains user_id or user field */
 export const resolveUser = async ({
   root,
 }: {
@@ -191,6 +205,7 @@ export const resolveUser = async ({
   return getUserById({_id: root.user_id})
 }
 
+/** Updates user with specified 'private' value */
 export const setPrivate = async ({
   user,
   isPrivate,
@@ -208,6 +223,7 @@ export const setPrivate = async ({
   return user
 }
 
+/** Updates user by setting the 'private' field to false */
 export const makePublic = async ({user}: {user: User}): Promise<User> => {
   const session = await Mongoose.startSession()
   session.startTransaction()
@@ -223,5 +239,6 @@ export const makePublic = async ({user}: {user: User}): Promise<User> => {
   return updatedUser
 }
 
+/** Updates user by setting the 'private' field to true */
 export const makePrivate = ({user}: {user: User}): Promise<User> =>
   setPrivate({user, isPrivate: true})
