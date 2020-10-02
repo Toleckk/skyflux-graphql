@@ -5,6 +5,7 @@ export const CommentSchema = `
         text: String!
         user: User!
         post: Post!
+        createdAt: Date!
     }
 
     type CommentEdge implements Edge {
