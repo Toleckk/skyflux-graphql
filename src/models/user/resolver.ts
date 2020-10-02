@@ -29,6 +29,7 @@ export const UserResolver: IResolvers = {
     ),
     makeAccountPublic: a([auth()])(UserService.makePublic),
     makeAccountPrivate: a([auth()])(UserService.makePrivate),
+    confirmEmail: a([injectArgs(), validate()])(UserService.confirmEmail),
   },
   Query: {
     me: a([auth({passOnly: true})])(prop('user')),

@@ -49,5 +49,6 @@ export const UserSchema = `
         updateProfileInfo(avatar: String, description: DescrpitionInput!): User!
         makeAccountPublic: User!
         makeAccountPrivate: User!
+        confirmEmail(token: String!): Boolean!
     }
 `

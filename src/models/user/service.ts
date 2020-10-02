@@ -2,10 +2,10 @@ import Mongoose, {ModelUpdateOptions} from 'mongoose'
 import {User, UserDescription, UserModel} from '@models/user'
 import {ResetService} from '@models/reset'
 import {ChannelService} from '@models/channel'
+import {EmailService} from '@models/email'
 import {generateNickname} from '@utils/generateNickname'
 import {isMongoId} from '@utils/isMongoId'
 import {makeSearchPipeline} from '@utils/makeSearchPipeline'
-import {EmailService} from '@models/email'
 
 /** Creates a new user with passed email and password and generated nickname */
 export const createUser = async ({
@@ -33,6 +33,33 @@ export const createUser = async ({
   })
 
   return user
+}
+
+/** Changes email by token */
+export const confirmEmail = async ({
+  token,
+}: {
+  token: string
+}): Promise<boolean> => {
+  const request = await EmailService.getRequestByToken({token})
+
+  if (!request) return false
+
+  const user = await getUserById({_id: request.user_id})
+
+  if (!user) return false
+
+  const session = await Mongoose.startSession()
+  await session.withTransaction(async () => {
+    await UserModel.updateOne(
+      {_id: user._id},
+      {email: request.email},
+      {session},
+    )
+    await EmailService.deleteAllUserRequests({user, options: {session}})
+  })
+
+  return true
 }
 
 /** Updates user password by reset token */
