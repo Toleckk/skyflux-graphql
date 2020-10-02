@@ -1,5 +1,5 @@
 import {UserService} from '@models/user'
-import {a, auth, injectArgs, injectRoot} from '@decorators'
+import {a, auth, injectArgs, injectRoot, paginate} from '@decorators'
 import {applySpec, path, pipe} from 'ramda'
 import * as SubService from './service'
 
@@ -8,6 +8,11 @@ export const SubResolver = {
     createSub: a([injectArgs(), auth()])(SubService.createSub),
     deleteSub: a([injectArgs(), auth()])(SubService.deleteSub),
     acceptSub: a([injectArgs(), auth()])(SubService.acceptSub),
+  },
+  Query: {
+    getSubRequests: a([injectArgs(), auth(), paginate()])(
+      SubService.getSubRequests,
+    ),
   },
   Sub: {
     from: a([injectRoot()])(

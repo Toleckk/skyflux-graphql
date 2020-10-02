@@ -4,7 +4,7 @@ import {EventService} from '@models/event'
 import {User, UserService} from '@models/user'
 import {isMongoId} from '@utils/isMongoId'
 import {subRequested} from './events'
-import {Sub} from './types'
+import {Sub, SubDocument} from './types'
 import {SubModel} from './model'
 
 export const createSub = async ({
@@ -107,3 +107,18 @@ export const countSubs = async ({user}: {user: User}): Promise<number> =>
 
 export const countSubscribers = async ({user}: {user: User}): Promise<number> =>
   SubModel.count({to_id: user._id, accepted: true})
+
+export const getSubRequests = async ({
+  user,
+  first = 25,
+  after = 'ffffffffffffffffffffffff',
+}: {
+  user: User
+  first?: number
+  after?: ID
+}): Promise<SubDocument[]> =>
+  SubModel.find({
+    accepted: false,
+    to_id: user._id,
+    _id: {$lt: Mongoose.Types.ObjectId(after)},
+  }).limit(first + 1)

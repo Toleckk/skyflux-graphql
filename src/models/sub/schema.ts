@@ -22,4 +22,8 @@ export const SubSchema = `
         deleteSub(nickname: String!): Boolean
         acceptSub(sub_id: ID!): Sub!
     }
+
+    extend type Query {
+        getSubRequests(first: Int, after: ID): SubConnection!
+    }
 `
