@@ -1,6 +1,7 @@
 import {v4} from 'uuid'
 import {ModelOptions} from 'mongoose'
 import {UserModel} from '@models/user'
+import {EmailService} from '@models/email'
 import {ResetDocument} from './types'
 import {ResetModel} from './model'
 
@@ -15,7 +16,16 @@ export const createResetRequest = async ({
 
   if (!user) return false
 
-  await ResetModel.create({user_id: user._id, token: v4()})
+  const token = v4()
+
+  await ResetModel.create({user_id: user._id, token})
+
+  await EmailService.sendEmail({
+    email: user.email,
+    subject: 'Password resetting',
+    template: 'restore',
+    payload: {user, token},
+  })
 
   return true
 }
