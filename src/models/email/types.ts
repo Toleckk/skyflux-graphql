@@ -11,3 +11,13 @@ export interface Email extends Entity {
 export interface EmailDocument extends Omit<Email, 'user'>, Document {
   user_id: ID
 }
+
+export interface Mailer {
+  sendMail: (mailOptions: {
+    from?: string
+    to: string
+    subject?: string
+    text?: string
+    html?: string
+  }) => Promise<any>
+}
