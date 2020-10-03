@@ -22,8 +22,8 @@ export const PostSchema = `
 
     extend type Query {
         getPostById(_id: ID!): Post
-        getPostsByNickname(nickname: String!, first: Int, after: String): PostConnection!
-        getFoundPosts(text: String!, first: Int, after: String): PostConnection!
+        getPostsByNickname(nickname: String!, first: Int, after: ID): PostConnection!
+        getFoundPosts(text: String!, first: Int, after: ID): PostConnection!
         getFeed(first: Int, after: ID): PostConnection!
     }
 

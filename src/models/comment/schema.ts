@@ -24,6 +24,6 @@ export const CommentSchema = `
     }
 
     extend type Query {
-        getCommentsByPostId(post_id: ID!, first: Int, after: String): CommentConnection
+        getCommentsByPostId(post_id: ID!, first: Int, after: ID): CommentConnection
     }
 `
