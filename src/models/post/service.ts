@@ -189,7 +189,7 @@ export const getPostsByNickname = async ({
 
   return PostModel.find({user_id: owner._id, _id: {$lt: after}})
     .sort({_id: -1})
-    .limit(first)
+    .limit(first + 1)
 }
 
 export const canSeePost = async ({
