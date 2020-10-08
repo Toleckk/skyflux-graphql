@@ -1,7 +1,7 @@
 // language=GraphQL
 export const UserSchema = `
     type Description {
-        birthday: String
+        birthday: Date
         about: String
         from: String
     }
