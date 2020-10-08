@@ -1,6 +1,14 @@
 import {IResolvers} from 'graphql-tools'
 import {applySpec, pipe, prop} from 'ramda'
-import {a, auth, injectArgs, injectRoot, paginate, validate} from '@decorators'
+import {
+  a,
+  auth,
+  date,
+  injectArgs,
+  injectRoot,
+  paginate,
+  validate,
+} from '@decorators'
 import {SubService} from '@models/sub'
 import {PostService} from '@models/post'
 import {password} from '@validation'
@@ -24,9 +32,12 @@ export const UserResolver: IResolvers = {
     updateNickname: a([injectArgs(), auth(), validate()])(
       UserService.updateNickname,
     ),
-    updateProfileInfo: a([injectArgs(), auth(), validate()])(
-      UserService.updateProfileInfo,
-    ),
+    updateProfileInfo: a([
+      validate(),
+      auth(),
+      injectArgs(),
+      date({paths: [['description', 'birthday']]}),
+    ])(UserService.updateProfileInfo),
     makeAccountPublic: a([auth()])(UserService.makePublic),
     makeAccountPrivate: a([auth()])(UserService.makePrivate),
     confirmEmail: a([injectArgs(), validate()])(UserService.confirmEmail),

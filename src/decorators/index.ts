@@ -1,5 +1,6 @@
 export * from './types'
 export {a} from './a'
+export {date} from './date'
 export * from './injectRoot'
 export * from './injectArgs'
 export * from './injectToken'
