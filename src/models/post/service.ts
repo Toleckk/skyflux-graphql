@@ -83,9 +83,20 @@ export const deletePost = async ({
 }: {
   _id: string
   user: User
-}): Promise<boolean> => {
-  const deleted = await PostModel.deleteOne({_id, user_id: user._id})
-  return (deleted.deletedCount || 0) > 0
+}): Promise<ID | null> => {
+  const post = await PostModel.findOne({_id, user_id: user._id})
+
+  if (!post) return null
+
+  await post.deleteOne()
+  await pubsub.publish('post', {
+    postDeleted: {
+      ...post.toObject(),
+      user,
+    },
+  })
+
+  return post._id
 }
 
 export const getPostById = async ({

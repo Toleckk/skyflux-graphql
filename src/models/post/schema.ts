@@ -29,10 +29,11 @@ export const PostSchema = `
     
     extend type Subscription {
         postCreated(nickname: String): Post!
+        postDeleted(nickname: String): Entity
     }
 
     extend type Mutation {
         createPost(text: String!): Post!
-        deletePost(_id: ID!): Boolean
+        deletePost(_id: ID!): ID
     }
 `

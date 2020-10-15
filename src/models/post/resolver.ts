@@ -33,6 +33,18 @@ export const PostResolver = {
           PostService.canSeePost({user, post: postCreated}),
       ),
     },
+    postDeleted: {
+      subscribe: withFilter(
+        (): AsyncIterator<Post> => pubsub.asyncIterator('post'),
+        async (
+          {postDeleted}: {postDeleted: Post},
+          {nickname},
+          {user},
+        ): Promise<boolean> =>
+          postDeleted.user.nickname === nickname &&
+          PostService.canSeePost({user, post: postDeleted}),
+      ),
+    },
   },
   Mutation: {
     createPost: a([injectArgs(), auth(), validate()])(PostService.createPost),
