@@ -4,6 +4,7 @@ import {User} from '@models/user'
 import {ID} from '@models/types'
 import {EventService} from '@models/event'
 import {isMongoId} from '@utils/isMongoId'
+import {pubsub} from '@pubsub'
 import {CommentModel} from './model'
 import {Comment} from './types'
 import {commentCreated} from './events'
@@ -22,6 +23,7 @@ export const createComment = async ({
   const comment = await CommentModel.create({post_id, text, user_id: user._id})
 
   await EventService.createEvent(commentCreated({comment}))
+  await pubsub.publish('comment', {commentCreated: comment})
 
   return comment
 }
@@ -32,9 +34,15 @@ export const deleteComment = async ({
 }: {
   _id: string
   user: User
-}): Promise<boolean> => {
-  const deleted = await CommentModel.deleteOne({_id, user_id: user._id})
-  return (deleted?.deletedCount || 0) > 0
+}): Promise<ID | null> => {
+  const comment = await CommentModel.findOne({_id, user_id: user._id})
+
+  if (!comment) return null
+
+  await EventService.deleteEvent(commentCreated({comment}))
+  await comment.deleteOne()
+
+  return comment._id
 }
 
 export const getCommentById = async ({

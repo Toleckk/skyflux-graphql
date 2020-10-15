@@ -20,7 +20,11 @@ export const CommentSchema = `
 
     extend type Mutation {
         createComment(post_id: ID!, text: String!): Comment!
-        deleteComment(_id: ID!): Boolean
+        deleteComment(_id: ID!): ID
+    }
+
+    extend type Subscription {
+        commentCreated(post_id: ID!): Comment!
     }
 
     extend type Query {
