@@ -19,6 +19,7 @@ const server = new ApolloServer({
     const authorization =
       context.req?.headers?.authorization ||
       context.connection?.context?.Authorization ||
+      context.connection?.context?.authorization ||
       String()
 
     const token = (authorization as string).match(/Bearer (.+)/)?.[1]
