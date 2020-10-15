@@ -25,5 +25,6 @@ export const SubSchema = `
 
     extend type Query {
         getSubRequests(first: Int, after: ID): SubConnection!
+        getSubRequestsCount: Int!
     }
 `

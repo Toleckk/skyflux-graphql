@@ -13,6 +13,7 @@ export const SubResolver = {
     getSubRequests: a([injectArgs(), auth(), paginate()])(
       SubService.getSubRequests,
     ),
+    getSubRequestsCount: a([auth()])(SubService.countSubRequests),
   },
   Sub: {
     from: a([injectRoot()])(

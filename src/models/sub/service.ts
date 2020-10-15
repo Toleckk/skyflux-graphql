@@ -110,6 +110,9 @@ export const countSubs = async ({user}: {user: User}): Promise<number> =>
 export const countSubscribers = async ({user}: {user: User}): Promise<number> =>
   SubModel.count({to_id: user._id, accepted: true})
 
+export const countSubRequests = async ({user}: {user: User}): Promise<number> =>
+  user.private ? SubModel.count({to_id: user._id, accepted: false}) : 0
+
 export const getSubRequests = async ({
   user,
   first = 25,
