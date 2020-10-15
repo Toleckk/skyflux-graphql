@@ -19,7 +19,7 @@ export const PostResolver = {
     getFoundPosts: a([injectArgs(), paginate(), auth({passOnly: true})])(
       PostService.getFoundPosts,
     ),
-    getFeed: a([auth(), paginate()])(PostService.getFeed),
+    getFeed: a([auth(), paginate(), injectArgs()])(PostService.getFeed),
   },
   Subscription: {
     postCreated: {
