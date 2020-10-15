@@ -1,5 +1,6 @@
 import Mongoose from 'mongoose'
 import {pubsub} from '@pubsub'
+import {ID} from '@models/types'
 import {User} from '@models/user'
 import {ChannelService} from '@models/channel'
 import {EventModel} from '@models/event/model'
@@ -71,4 +72,23 @@ export const createEvent = async <T extends EventBody>({
   await pubsub.publish('event', {eventAdded: event})
 
   return event as any
+}
+
+export const deleteEvent = async <T extends EventBody>({
+  channel,
+  subj,
+  kind,
+}: {
+  channel: string
+  subj: T
+  kind: EventKind<T>
+}): Promise<ID | null> => {
+  const event = await EventModel.findOne({channel, subj, kind})
+
+  if (!event) return null
+
+  await pubsub.publish('event', {eventDeleted: event})
+  await event.deleteOne()
+
+  return event._id
 }
