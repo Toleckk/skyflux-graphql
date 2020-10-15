@@ -85,3 +85,21 @@ export const countPostComments = async ({
 }: {
   post: Post
 }): Promise<number> => CommentModel.count({post_id: post._id})
+
+export const canDeleteComment = async ({
+  comment,
+  user,
+}: {
+  comment: Comment | CommentDocument
+  user: User
+}): Promise<boolean> => {
+  const userId = 'user_id' in comment ? comment.user_id : comment.user._id
+  if (String(userId) === String(user._id)) return true
+
+  const post = await PostService.resolvePost({root: comment, user})
+  if (!post) return false
+
+  const postOwnerId = 'user_id' in post ? post.user_id : post.user._id
+
+  return String(postOwnerId) === String(user._id)
+}
