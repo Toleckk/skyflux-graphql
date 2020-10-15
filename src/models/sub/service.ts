@@ -45,7 +45,7 @@ export const deleteSub = async ({
 }: {
   nickname: string
   user: User
-}): Promise<boolean> => {
+}): Promise<ID | null> => {
   const to = await UserService.getUserByNickname({nickname})
 
   if (!to) return false
@@ -58,7 +58,7 @@ export const deleteSub = async ({
   await pubsub.publish('sub', {subDeleted: sub})
   await sub.deleteOne()
 
-  return true
+  return sub._id
 }
 
 export const getSubById = async ({
