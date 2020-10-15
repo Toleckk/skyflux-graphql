@@ -17,7 +17,7 @@ export const createComment = async ({
   text: string
   user: User
 }): Promise<Partial<Comment> | null> => {
-  if (!(await PostService.getPostById({_id: post_id}))) return null
+  if (!(await PostService.getPostById({_id: post_id, user}))) return null
 
   const comment = await CommentModel.create({post_id, text, user_id: user._id})
 
