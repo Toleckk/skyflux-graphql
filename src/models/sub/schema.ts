@@ -23,6 +23,12 @@ export const SubSchema = `
         acceptSub(sub_id: ID!): Sub!
     }
 
+    extend type Subscription {
+        subAccepted: Sub!
+        subRequestCreated: Sub!
+        subDeleted: Entity
+    }
+
     extend type Query {
         getSubRequests(first: Int, after: ID): SubConnection!
         getSubRequestsCount: Int!

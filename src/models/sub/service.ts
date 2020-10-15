@@ -1,4 +1,5 @@
 import Mongoose from 'mongoose'
+import {pubsub} from '@pubsub'
 import {ID} from '@models/types'
 import {EventService} from '@models/event'
 import {User, UserService} from '@models/user'
@@ -27,6 +28,9 @@ export const createSub = async ({
   })
 
   await EventService.createEvent(subRequested({sub}))
+  await pubsub.publish('sub', {
+    [to.private ? 'subRequestCreated' : 'subAccepted']: sub,
+  })
 
   return {
     ...sub.toObject(),
@@ -46,8 +50,15 @@ export const deleteSub = async ({
 
   if (!to) return false
 
-  const deleted = await SubModel.deleteOne({from_id: user._id, to_id: to._id})
-  return (deleted?.deletedCount || 0) > 0
+  const sub = await SubModel.findOne({from_id: user._id, to_id: to._id})
+
+  if (!sub) return null
+
+  await EventService.deleteEvent(subRequested({sub}))
+  await pubsub.publish('sub', {subDeleted: sub})
+  await sub.deleteOne()
+
+  return true
 }
 
 export const getSubById = async ({
@@ -83,7 +94,9 @@ export const acceptSub = async ({
   if (!sub) return null
 
   sub.accepted = true
-  sub.save()
+  await sub.save()
+
+  await pubsub.publish('sub', {subAccepted: sub})
 
   return sub
 }
