@@ -1,6 +1,6 @@
 import {IResolvers} from 'graphql-tools'
 import {withFilter} from 'apollo-server'
-import {__, assoc, concat, converge, identity, path, pipe, prop} from 'ramda'
+import {__, concat, pipe, prop} from 'ramda'
 import {pubsub} from '@pubsub'
 import {a, auth, injectArgs, injectRoot, paginate} from '@decorators'
 import {CommentService} from '@models/comment'
@@ -19,14 +19,22 @@ export const EventResolver: IResolvers = {
     eventAdded: {
       subscribe: withFilter(
         (): AsyncIterator<Event> => pubsub.asyncIterator('event'),
-        a([injectRoot(), auth()])(
-          pipe(
-            converge(assoc('channel'), [
-              path(['root', 'eventAdded', 'channel']),
-              identity,
-            ]),
-            ChannelService.isUserSubscribedToChannel,
-          ),
+        a([injectRoot(), auth()])(({root, user}) =>
+          ChannelService.isUserSubscribedToChannel({
+            user,
+            channel: root.eventAdded.channel,
+          }),
+        ),
+      ),
+    },
+    eventDeleted: {
+      subscribe: withFilter(
+        (): AsyncIterator<Event> => pubsub.asyncIterator('event'),
+        a([injectRoot(), auth()])(({root, user}) =>
+          ChannelService.isUserSubscribedToChannel({
+            user,
+            channel: root.eventDeleted.channel,
+          }),
         ),
       ),
     },

@@ -37,6 +37,7 @@ export const EventSchema = `
     }
     
     extend type Subscription {
-        eventAdded: Event
+        eventAdded: Event!
+        eventDeleted: Entity
     }
 `
