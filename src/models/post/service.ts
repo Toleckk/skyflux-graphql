@@ -164,9 +164,9 @@ export const resolvePost = async ({
 }: {
   user?: User
   root:
-    | {post: Partial<Post>}
-    | {post_id: Partial<Post> | string | Mongoose.Types.ObjectId}
-}): Promise<Partial<Post> | null> => {
+    | {post: Post | PostDocument}
+    | {post_id: Post | PostDocument | string | Mongoose.Types.ObjectId}
+}): Promise<PostDocument | Post | null> => {
   if ('post' in root) return root.post
 
   if (typeof root.post_id === 'string' || isMongoId(root.post_id))
