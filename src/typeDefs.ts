@@ -15,6 +15,10 @@ const Schema = `
     type Query
     type Subscription
 
+    type Entity {
+        _id: ID!
+    }
+
     interface Edge {
         cursor: ID!
     }
