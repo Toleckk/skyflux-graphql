@@ -2,10 +2,9 @@ import {a, auth, injectArgs, injectRoot, paginate, validate} from '@decorators'
 import {UserService} from '@models/user'
 import {LikeService} from '@models/like'
 import {CommentService} from '@models/comment'
-import {Event} from '@models/event'
 import {pubsub} from '@pubsub'
 import {withFilter} from 'apollo-server'
-import {Post} from '@models/post/types'
+import {Post} from './types'
 import * as PostService from './service'
 
 export const PostResolver = {
@@ -24,7 +23,7 @@ export const PostResolver = {
   Subscription: {
     postCreated: {
       subscribe: withFilter(
-        (): AsyncIterator<Event> => pubsub.asyncIterator('post'),
+        (): AsyncIterator<Post> => pubsub.asyncIterator('post'),
         async (
           {postCreated}: {postCreated: Post},
           {nickname},
