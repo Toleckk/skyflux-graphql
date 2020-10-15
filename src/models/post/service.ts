@@ -1,6 +1,7 @@
 import Mongoose from 'mongoose'
 import {isMongoId} from '@utils/isMongoId'
 import {ID} from '@models/types'
+import {pubsub} from '@pubsub'
 import {User, UserService} from '@models/user'
 import {ChannelService} from '@models/channel'
 import {SubService} from '@models/sub'
@@ -22,10 +23,14 @@ export const createPost = async ({
     user,
   })
 
-  return {
+  const postWithUser = {
     ...post.toObject(),
     user,
   }
+
+  await pubsub.publish('post', {postCreated: postWithUser})
+
+  return postWithUser
 }
 
 export const getFeed = async ({

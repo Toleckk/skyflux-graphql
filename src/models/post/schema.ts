@@ -26,6 +26,10 @@ export const PostSchema = `
         getFoundPosts(text: String!, first: Int, after: ID): PostConnection!
         getFeed(first: Int, after: ID): PostConnection!
     }
+    
+    extend type Subscription {
+        postCreated(nickname: String): Post!
+    }
 
     extend type Mutation {
         createPost(text: String!): Post!

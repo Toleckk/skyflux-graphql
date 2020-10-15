@@ -2,6 +2,10 @@ import {a, auth, injectArgs, injectRoot, paginate, validate} from '@decorators'
 import {UserService} from '@models/user'
 import {LikeService} from '@models/like'
 import {CommentService} from '@models/comment'
+import {Event} from '@models/event'
+import {pubsub} from '@pubsub'
+import {withFilter} from 'apollo-server'
+import {Post} from '@models/post/types'
 import * as PostService from './service'
 
 export const PostResolver = {
@@ -16,6 +20,20 @@ export const PostResolver = {
       PostService.getFoundPosts,
     ),
     getFeed: a([auth(), paginate()])(PostService.getFeed),
+  },
+  Subscription: {
+    postCreated: {
+      subscribe: withFilter(
+        (): AsyncIterator<Event> => pubsub.asyncIterator('post'),
+        async (
+          {postCreated}: {postCreated: Post},
+          {nickname},
+          {user},
+        ): Promise<boolean> =>
+          postCreated.user.nickname === nickname &&
+          PostService.canSeePost({user, post: postCreated}),
+      ),
+    },
   },
   Mutation: {
     createPost: a([injectArgs(), auth(), validate()])(PostService.createPost),
