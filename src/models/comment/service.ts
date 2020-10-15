@@ -6,7 +6,7 @@ import {EventService} from '@models/event'
 import {isMongoId} from '@utils/isMongoId'
 import {pubsub} from '@pubsub'
 import {CommentModel} from './model'
-import {Comment} from './types'
+import {Comment, CommentDocument} from './types'
 import {commentCreated} from './events'
 
 export const createComment = async ({
