@@ -94,7 +94,7 @@ export const getPostById = async ({
 }: {
   user?: User
   _id: string | Mongoose.Types.ObjectId
-}): Promise<Partial<Post> | null> => {
+}): Promise<PostDocument | null> => {
   const post = await PostModel.findById(_id)
 
   if (!post) return null
