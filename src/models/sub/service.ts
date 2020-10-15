@@ -126,4 +126,6 @@ export const getSubRequests = async ({
     accepted: false,
     to_id: user._id,
     _id: {$lt: Mongoose.Types.ObjectId(after)},
-  }).limit(first + 1)
+  })
+    .sort({_id: -1})
+    .limit(first + 1)
