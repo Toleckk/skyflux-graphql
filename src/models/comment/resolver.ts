@@ -6,6 +6,17 @@ import {PostService} from '@models/post'
 import {Comment} from './types'
 import * as CommentService from './service'
 
+const subscribe = (name: string) =>
+  withFilter(
+    (): AsyncIterator<Comment> => pubsub.asyncIterator('comment'),
+    a([auth({passOnly: true}), injectRoot(), injectArgs()])(
+      async ({root: {[name]: root}, post_id, user}): Promise<boolean> =>
+        PostService.resolvePost({root, user}).then(
+          post => !!post && String(post._id) === post_id,
+        ),
+    ),
+  )
+
 export const CommentResolver = {
   Mutation: {
     createComment: a([injectArgs(), auth(), validate()])(
@@ -15,15 +26,10 @@ export const CommentResolver = {
   },
   Subscription: {
     commentCreated: {
-      subscribe: withFilter(
-        (): AsyncIterator<Comment> => pubsub.asyncIterator('comment'),
-        a([auth({passOnly: true}), injectRoot(), injectArgs()])(
-          async ({root: {commentCreated}, post_id, user}): Promise<boolean> =>
-            PostService.resolvePost({root: commentCreated, user}).then(
-              post => !!post && String(post._id) === post_id,
-            ),
-        ),
-      ),
+      subscribe: subscribe('commentCreated'),
+    },
+    commentDeleted: {
+      subscribe: subscribe('commentDeleted'),
     },
   },
   Query: {

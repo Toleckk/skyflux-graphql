@@ -25,6 +25,7 @@ export const CommentSchema = `
 
     extend type Subscription {
         commentCreated(post_id: ID!): Comment!
+        commentDeleted(post_id: ID!): Entity
     }
 
     extend type Query {

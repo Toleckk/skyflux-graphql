@@ -35,12 +35,15 @@ export const deleteComment = async ({
   _id: string
   user: User
 }): Promise<ID | null> => {
-  const comment = await CommentModel.findOne({_id, user_id: user._id})
+  const comment = await CommentModel.findById(_id)
 
-  if (!comment) return null
+  if (!(comment && (await canDeleteComment({comment, user})))) return null
 
-  await EventService.deleteEvent(commentCreated({comment}))
   await comment.deleteOne()
+  await EventService.deleteEvent(commentCreated({comment}))
+  await pubsub.publish('comment', {
+    commentDeleted: comment,
+  })
 
   return comment._id
 }
