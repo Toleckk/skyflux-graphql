@@ -17,6 +17,8 @@ export const CommentResolver = {
   },
   Comment: {
     user: a([injectRoot()])(({root}) => UserService.resolveUser({root})),
-    post: a([injectRoot()])(({root}) => PostService.resolvePost({root})),
+    post: a([injectRoot(), auth({passOnly: true})])(({root, user}) =>
+      PostService.resolvePost({root, user}),
+    ),
   },
 }

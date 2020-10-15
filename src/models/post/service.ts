@@ -155,7 +155,9 @@ export const getFoundPosts = async ({
 
 export const resolvePost = async ({
   root,
+  user,
 }: {
+  user?: User
   root:
     | {post: Partial<Post>}
     | {post_id: Partial<Post> | string | Mongoose.Types.ObjectId}
@@ -163,7 +165,7 @@ export const resolvePost = async ({
   if ('post' in root) return root.post
 
   if (typeof root.post_id === 'string' || isMongoId(root.post_id))
-    return getPostById({_id: root.post_id})
+    return getPostById({_id: root.post_id, user})
 
   return root.post_id
 }
