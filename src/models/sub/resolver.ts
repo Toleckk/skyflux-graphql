@@ -1,4 +1,3 @@
-import {applySpec, path, pipe} from 'ramda'
 import {withFilter} from 'apollo-server'
 import {pubsub} from '@pubsub'
 import {a, auth, injectArgs, injectRoot, paginate} from '@decorators'
@@ -41,25 +40,19 @@ export const SubResolver = {
     getSubRequestsCount: a([auth()])(SubService.countSubRequests),
   },
   Sub: {
-    from: a([injectRoot()])(
-      pipe(
-        applySpec({
-          root: {
-            user_id: path(['root', 'from_id']),
-          },
-        }),
-        ({root}: {root: any}) => UserService.resolveUser({root}),
-      ),
+    from: a([injectRoot()])(({root}) =>
+      UserService.resolveUser({root: {user_id: root.from_id || root.from}}),
     ),
-    to: a([injectRoot()])(
-      pipe(
-        applySpec({
-          root: {
-            user_id: path(['root', 'to_id']),
-          },
-        }),
-        ({root}: {root: any}) => UserService.resolveUser({root}),
-      ),
+    to: a([injectRoot()])(({root}) =>
+      UserService.resolveUser({root: {user_id: root.to_id || root.to}}),
+    ),
+  },
+  DeletedSub: {
+    from: a([injectRoot()])(({root}) =>
+      UserService.resolveUser({root: {user_id: root.from_id || root.from}}),
+    ),
+    to: a([injectRoot()])(({root}) =>
+      UserService.resolveUser({root: {user_id: root.to_id || root.to}}),
     ),
   },
 }

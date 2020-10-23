@@ -45,10 +45,10 @@ export const deleteSub = async ({
 }: {
   nickname: string
   user: User
-}): Promise<ID | null> => {
+}): Promise<SubDocument | null> => {
   const to = await UserService.getUserByNickname({nickname})
 
-  if (!to) return false
+  if (!to) return null
 
   const sub = await SubModel.findOne({from_id: user._id, to_id: to._id})
 
@@ -58,7 +58,7 @@ export const deleteSub = async ({
   await pubsub.publish('sub', {subDeleted: sub})
   await sub.deleteOne()
 
-  return sub._id
+  return sub
 }
 
 export const getSubById = async ({

@@ -17,16 +17,22 @@ export const SubSchema = `
         edges: [SubEdge]!
     }
 
+    type DeletedSub {
+        _id: ID!
+        from: User!
+        to: User!
+    }
+
     extend type Mutation {
         createSub(nickname: String!): Sub!
-        deleteSub(nickname: String!): ID
+        deleteSub(nickname: String!): DeletedSub
         acceptSub(sub_id: ID!): Sub!
     }
 
     extend type Subscription {
         subAccepted: Sub!
         subRequestCreated: Sub!
-        subDeleted: Entity
+        subDeleted: DeletedSub
     }
 
     extend type Query {
