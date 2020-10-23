@@ -34,7 +34,7 @@ export const deleteComment = async ({
 }: {
   _id: string
   user: User
-}): Promise<ID | null> => {
+}): Promise<CommentDocument | null> => {
   const comment = await CommentModel.findById(_id)
 
   if (!(comment && (await canDeleteComment({comment, user})))) return null
@@ -45,7 +45,7 @@ export const deleteComment = async ({
     commentDeleted: comment,
   })
 
-  return comment._id
+  return comment
 }
 
 export const getCommentById = async ({

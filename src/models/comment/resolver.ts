@@ -43,4 +43,9 @@ export const CommentResolver = {
       PostService.resolvePost({root, user}),
     ),
   },
+  DeletedComment: {
+    post: a([injectRoot(), auth({passOnly: true})])(({root, user}) =>
+      PostService.resolvePost({root, user}),
+    ),
+  },
 }

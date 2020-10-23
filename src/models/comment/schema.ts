@@ -18,14 +18,19 @@ export const CommentSchema = `
         pageInfo: PageInfo!
     }
 
+    type DeletedComment {
+        _id: ID!
+        post: Post!
+    }
+
     extend type Mutation {
         createComment(post_id: ID!, text: String!): Comment!
-        deleteComment(_id: ID!): ID
+        deleteComment(_id: ID!): DeletedComment
     }
 
     extend type Subscription {
         commentCreated(post_id: ID!): Comment!
-        commentDeleted(post_id: ID!): Entity
+        commentDeleted(post_id: ID!): DeletedComment
     }
 
     extend type Query {
