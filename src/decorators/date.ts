@@ -3,9 +3,9 @@ import {
   anyPass,
   assocPath,
   converge,
-  empty,
   invoker,
-  is,
+  isEmpty,
+  isNil,
   nthArg,
   path,
   pipe,
@@ -30,10 +30,10 @@ export const formatPaths = (
 
 export const dateOf = (value: string | number | Date): Date => new Date(value)
 
-export const toUTCDate: (date: string | Date) => Date = unless(
-  anyPass([is(Date), empty as (v: string | Date) => v is '']),
+export const toUTCDate: (date?: string | Date) => Date = unless(
+  anyPass([isNil, isEmpty]),
   pipe(
-    dateOf,
+    dateOf as (value?: string | number | Date) => Date,
     converge(Date.UTC, [
       invoker(0, 'getFullYear'),
       invoker(0, 'getMonth'),

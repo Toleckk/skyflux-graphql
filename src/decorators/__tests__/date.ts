@@ -1,5 +1,5 @@
 import {dissoc} from 'ramda'
-import {pathToUTCDate, toUTCDate, formatPaths} from '../date'
+import {formatPaths, pathToUTCDate, toUTCDate} from '../date'
 
 const date = new Date(1978, 6, 16, 16, 12, 44, 666)
 
@@ -16,6 +16,11 @@ describe('toUTCDate', function () {
     expect(utc.getFullYear()).toBe(date.getFullYear())
     expect(utc.getMonth()).toBe(date.getMonth())
     expect(utc.getDate()).toBe(date.getDate())
+  })
+
+  test.each(['', undefined])('should ignore empty values', function (v) {
+    const utc = toUTCDate(v)
+    expect(utc).toBe(v)
   })
 })
 
