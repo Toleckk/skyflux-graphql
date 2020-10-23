@@ -142,3 +142,21 @@ export const getSubRequests = async ({
   })
     .sort({_id: -1})
     .limit(first + 1)
+
+export const declineSub = async ({
+  _id,
+  user,
+}: {
+  _id: ID
+  user: User
+}): Promise<SubDocument | null> => {
+  const sub = await getSubById({_id})
+
+  if (!sub || String(sub.to_id) !== String(user._id)) return null
+
+  await sub.deleteOne()
+  await EventService.deleteEvent(subRequested({sub, user}))
+  await pubsub.publish('sub', {subDeleted: sub})
+
+  return sub
+}

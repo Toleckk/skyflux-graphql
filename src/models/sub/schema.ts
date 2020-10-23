@@ -27,6 +27,7 @@ export const SubSchema = `
         createSub(nickname: String!): Sub!
         deleteSub(nickname: String!): DeletedSub
         acceptSub(sub_id: ID!): Sub!
+        declineSub(_id: ID!): DeletedSub
     }
 
     extend type Subscription {

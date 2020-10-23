@@ -21,6 +21,7 @@ export const SubResolver = {
     createSub: a([injectArgs(), auth()])(SubService.createSub),
     deleteSub: a([injectArgs(), auth()])(SubService.deleteSub),
     acceptSub: a([injectArgs(), auth()])(SubService.acceptSub),
+    declineSub: a([injectArgs(), auth()])(SubService.declineSub),
   },
   Subscription: {
     subAccepted: {
