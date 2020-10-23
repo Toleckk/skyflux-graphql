@@ -67,7 +67,12 @@ export const getFeed = async ({
       $match: {
         $expr: {
           $and: [
-            {$eq: [{$size: '$receivers'}, 1]},
+            {
+              $or: [
+                {$eq: ['$user_id', user._id]},
+                {$eq: [{$size: '$receivers'}, 1]},
+              ],
+            },
             {$lt: ['$_id', Mongoose.Types.ObjectId(after)]},
           ],
         },
