@@ -83,7 +83,7 @@ export const deletePost = async ({
 }: {
   _id: string
   user: User
-}): Promise<ID | null> => {
+}): Promise<PostDocument | null> => {
   const post = await PostModel.findOne({_id, user_id: user._id})
 
   if (!post) return null
@@ -96,7 +96,7 @@ export const deletePost = async ({
     },
   })
 
-  return post._id
+  return post
 }
 
 export const getPostById = async ({

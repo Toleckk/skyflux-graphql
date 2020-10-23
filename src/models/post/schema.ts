@@ -20,6 +20,11 @@ export const PostSchema = `
         edges: [PostEdge]!
     }
 
+    type DeletedPost {
+        _id: ID!
+        user: User!
+    }
+
     extend type Query {
         getPostById(_id: ID!): Post
         getPostsByNickname(nickname: String!, first: Int, after: ID): PostConnection!
@@ -29,11 +34,11 @@ export const PostSchema = `
     
     extend type Subscription {
         postCreated(nickname: String): Post!
-        postDeleted(nickname: String): Entity
+        postDeleted(nickname: String): DeletedPost
     }
 
     extend type Mutation {
         createPost(text: String!): Post!
-        deletePost(_id: ID!): ID
+        deletePost(_id: ID!): DeletedPost
     }
 `

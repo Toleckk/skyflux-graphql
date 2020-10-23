@@ -60,4 +60,7 @@ export const PostResolver = {
       CommentService.countPostComments({post}),
     ),
   },
+  DeletedPost: {
+    user: a([injectRoot()])(({root}) => UserService.resolveUser({root})),
+  },
 }
