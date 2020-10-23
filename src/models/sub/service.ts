@@ -65,7 +65,7 @@ export const getSubById = async ({
   _id,
 }: {
   _id: string | Mongoose.Types.ObjectId
-}): Promise<Partial<Sub> | null> => SubModel.findById(_id)
+}): Promise<SubDocument | null> => SubModel.findById(_id)
 
 export const resolveSub = async ({
   root,
