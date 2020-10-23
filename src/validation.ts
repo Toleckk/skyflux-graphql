@@ -25,7 +25,11 @@ export const login = yup
 
 export const avatar = yup.string().url()
 
-export const birthday = yup.date()
+export const birthday = yup.mixed().test({
+  name: 'birthday',
+  test: value => !value || yup.date().isValidSync(value),
+  message: 'Birthday should be a valid date or empty string',
+})
 
 export const from = yup.string().max(36)
 
