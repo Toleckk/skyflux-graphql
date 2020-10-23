@@ -27,7 +27,7 @@ export const createSub = async ({
     accepted: !to.private,
   })
 
-  await EventService.createEvent(subRequested({sub}))
+  await EventService.createEvent(subRequested({sub, user}))
   await pubsub.publish('sub', {
     [to.private ? 'subRequestCreated' : 'subAccepted']: sub,
   })
@@ -54,7 +54,7 @@ export const deleteSub = async ({
 
   if (!sub) return null
 
-  await EventService.deleteEvent(subRequested({sub}))
+  await EventService.deleteEvent(subRequested({sub, user}))
   await pubsub.publish('sub', {subDeleted: sub})
   await sub.deleteOne()
 

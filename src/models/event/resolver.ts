@@ -19,22 +19,26 @@ export const EventResolver: IResolvers = {
     eventAdded: {
       subscribe: withFilter(
         (): AsyncIterator<Event> => pubsub.asyncIterator('event'),
-        a([injectRoot(), auth()])(({root, user}) =>
-          ChannelService.isUserSubscribedToChannel({
-            user,
-            channel: root.eventAdded.channel,
-          }),
+        a([injectRoot(), auth()])(
+          ({root, user}) =>
+            String(root.eventAdded.emitter_id) !== String(user._id) &&
+            ChannelService.isUserSubscribedToChannel({
+              user,
+              channel: root.eventAdded.channel,
+            }),
         ),
       ),
     },
     eventDeleted: {
       subscribe: withFilter(
         (): AsyncIterator<Event> => pubsub.asyncIterator('event'),
-        a([injectRoot(), auth()])(({root, user}) =>
-          ChannelService.isUserSubscribedToChannel({
-            user,
-            channel: root.eventDeleted.channel,
-          }),
+        a([injectRoot(), auth()])(
+          ({root, user}) =>
+            String(root.eventAdded.emitter_id) !== String(user._id) &&
+            ChannelService.isUserSubscribedToChannel({
+              user,
+              channel: root.eventDeleted.channel,
+            }),
         ),
       ),
     },

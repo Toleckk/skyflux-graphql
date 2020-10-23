@@ -37,7 +37,10 @@ export const getEventsByUser = async ({
             {
               $match: {
                 $expr: {
-                  $lt: [{$cmp: ['$$date', '$createdAt']}, 1],
+                  $and: [
+                    {$lt: [{$cmp: ['$$date', '$createdAt']}, 1]},
+                    {$ne: ['$emitter_id', user._id]},
+                  ],
                 },
               },
             },
@@ -58,15 +61,18 @@ export const createEvent = async <T extends EventBody>({
   channel,
   subj,
   kind,
+  emitter,
 }: {
   channel: string
   subj: T
   kind: EventKind<T>
+  emitter: User
 }): Promise<Partial<Event<T>>> => {
   const event = await EventModel.create({
     channel,
     subj,
     kind,
+    emitter_id: emitter._id,
   })
 
   await pubsub.publish('event', {eventAdded: event})

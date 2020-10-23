@@ -22,7 +22,7 @@ export const createComment = async ({
 
   const comment = await CommentModel.create({post_id, text, user_id: user._id})
 
-  await EventService.createEvent(commentCreated({comment}))
+  await EventService.createEvent(commentCreated({comment, user}))
   await pubsub.publish('comment', {commentCreated: comment})
 
   return comment
@@ -40,7 +40,7 @@ export const deleteComment = async ({
   if (!(comment && (await canDeleteComment({comment, user})))) return null
 
   await comment.deleteOne()
-  await EventService.deleteEvent(commentCreated({comment}))
+  await EventService.deleteEvent(commentCreated({comment, user}))
   await pubsub.publish('comment', {
     commentDeleted: comment,
   })

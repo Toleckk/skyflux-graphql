@@ -1,6 +1,7 @@
 import {Document} from 'mongoose'
 import {Entity, ID} from '@models/types'
 import {Sub} from '@models/sub'
+import {User} from '@models/user'
 
 export enum EventType {
   Sub = 'Sub',
@@ -29,6 +30,11 @@ export interface Event<T extends EventBody = EventBody> extends Entity {
   createdAt?: Date
   kind: EventKind<T>
   subj: T
+  emitter: User
 }
 
-export type EventDocument<T extends EventBody = EventBody> = Event<T> & Document
+export interface EventDocument<T extends EventBody = EventBody>
+  extends Omit<Event<T>, 'emitter'>,
+    Document {
+  emitter_id: ID
+}
