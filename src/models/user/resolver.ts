@@ -1,5 +1,5 @@
 import {IResolvers} from 'graphql-tools'
-import {applySpec, pipe, prop} from 'ramda'
+import {prop} from 'ramda'
 import {
   a,
   auth,
@@ -12,7 +12,6 @@ import {
 import {SubService} from '@models/sub'
 import {PostService} from '@models/post'
 import {password} from '@validation'
-import {User} from './types'
 import * as UserService from './service'
 
 export const UserResolver: IResolvers = {
@@ -54,14 +53,8 @@ export const UserResolver: IResolvers = {
     ),
   },
   User: {
-    isSubscribedByMe: a([auth({passOnly: true}), injectRoot()])(
-      pipe(
-        applySpec({
-          from: prop<'user', User | undefined>('user'),
-          to: prop<'root', User>('root'),
-        }),
-        SubService.isSubscribedBy,
-      ),
+    mySub: a([auth({passOnly: true}), injectRoot()])(({user, root}) =>
+      SubService.getSubFromTo({from: user, to: root}),
     ),
     postsCount: a([injectRoot({as: 'user'})])(PostService.countUserPosts),
     subsCount: a([injectRoot({as: 'user'})])(SubService.countSubs),

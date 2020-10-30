@@ -12,7 +12,7 @@ export const UserSchema = `
         avatar: String
         description: Description!
         private: Boolean!
-        isSubscribedByMe: Boolean!
+        mySub: Sub
         postsCount: Int!
         subsCount: Int!
         subscribersCount: Int!
