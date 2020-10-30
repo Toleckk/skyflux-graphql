@@ -3,6 +3,7 @@ import {isMongoId} from '@utils/isMongoId'
 import {ID} from '@models/types'
 import {pubsub} from '@pubsub'
 import {User, UserService} from '@models/user'
+import {CommentService} from '@models/comment'
 import {ChannelService} from '@models/channel'
 import {SubService} from '@models/sub'
 import {makeSearchPipeline} from '@utils/makeSearchPipeline'
@@ -94,6 +95,8 @@ export const deletePost = async ({
   if (!post) return null
 
   await post.deleteOne()
+  await CommentService.deleteCommentsByPost({post})
+  await ChannelService.deleteChannel({channel: 'Comment_' + post._id})
   await pubsub.publish('post', {
     postDeleted: {
       ...post.toObject(),
