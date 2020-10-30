@@ -1,5 +1,5 @@
 import Mongoose from 'mongoose'
-import {Post, PostService} from '@models/post'
+import {Post, PostDocument, PostService} from '@models/post'
 import {User} from '@models/user'
 import {ID} from '@models/types'
 import {EventService} from '@models/event'
@@ -105,4 +105,12 @@ export const canDeleteComment = async ({
   const postOwnerId = 'user_id' in post ? post.user_id : post.user._id
 
   return String(postOwnerId) === String(user._id)
+}
+
+export const deleteCommentsByPost = async ({
+  post,
+}: {
+  post: PostDocument | Post
+}): Promise<void> => {
+  await CommentModel.deleteMany({post_id: post._id})
 }
