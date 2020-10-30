@@ -167,3 +167,12 @@ export const remove = async ({
 
   return sub
 }
+
+export const getSubFromTo = async ({
+  from,
+  to,
+}: {
+  from?: User | UserDocument
+  to: User | UserDocument
+}): Promise<SubDocument | null> =>
+  from ? SubModel.findOne({from_id: from._id, to_id: to._id}) : null
