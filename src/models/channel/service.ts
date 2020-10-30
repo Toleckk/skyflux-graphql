@@ -1,5 +1,6 @@
 import {Aggregate} from 'mongoose'
 import {User} from '@models/user'
+import {EventService} from '@models/event'
 import {Channel} from './types'
 import {ChannelModel} from './model'
 
@@ -47,4 +48,13 @@ export const isUserSubscribedToChannel = async ({
   })
 
   return count > 0
+}
+
+export const deleteChannel = async ({
+  channel,
+}: {
+  channel: string
+}): Promise<void> => {
+  await ChannelModel.deleteMany({channelRegex: channel})
+  await EventService.deleteEventsByChannel({channel})
 }
