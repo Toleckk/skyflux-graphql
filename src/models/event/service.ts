@@ -98,3 +98,9 @@ export const deleteEvent = async <T extends EventBody>({
 
   return event._id
 }
+
+export const deleteEventsByChannel = async ({
+  channel,
+}: {
+  channel: string
+}): Promise<void> => void (await EventModel.deleteMany({channel}))
