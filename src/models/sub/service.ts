@@ -2,7 +2,7 @@ import Mongoose from 'mongoose'
 import {pubsub} from '@pubsub'
 import {ID} from '@models/types'
 import {EventService} from '@models/event'
-import {User, UserService} from '@models/user'
+import {User, UserDocument, UserService} from '@models/user'
 import {isMongoId} from '@utils/isMongoId'
 import {subRequested} from './events'
 import {Sub, SubDocument} from './types'
@@ -54,11 +54,7 @@ export const deleteSub = async ({
 
   if (!sub) return null
 
-  await EventService.deleteEvent(subRequested({sub, user}))
-  await pubsub.publish('sub', {subDeleted: sub})
-  await sub.deleteOne()
-
-  return sub
+  return remove({user, sub})
 }
 
 export const getSubById = async ({
@@ -154,7 +150,18 @@ export const declineSub = async ({
 
   if (!sub || String(sub.to_id) !== String(user._id)) return null
 
+  return remove({user, sub})
+}
+
+export const remove = async ({
+  sub,
+  user,
+}: {
+  sub: SubDocument
+  user: User
+}): Promise<SubDocument> => {
   await sub.deleteOne()
+
   await EventService.deleteEvent(subRequested({sub, user}))
   await pubsub.publish('sub', {subDeleted: sub})
 
