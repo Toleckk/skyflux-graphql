@@ -1,5 +1,6 @@
 import {v4} from 'uuid'
 import {ModelOptions} from 'mongoose'
+import {UserNotFoundError} from '@errors'
 import {UserModel} from '@models/user'
 import {EmailService} from '@models/email'
 import {ResetDocument} from './types'
@@ -14,7 +15,7 @@ export const createResetRequest = async ({
     $or: [{nickname: login}, {email: login}],
   })
 
-  if (!user) return false
+  if (!user) throw new UserNotFoundError()
 
   const token = v4()
 

@@ -14,8 +14,8 @@ import {
   useWith,
 } from 'ramda'
 import * as yup from 'yup'
-import {ObjectSchema, Schema, ValidationError} from 'yup'
-import {UserInputError} from 'apollo-server'
+import {ObjectSchema, Schema, ValidationError as TValidationError} from 'yup'
+import {ValidationError} from '@errors'
 import {validateSync} from '@utils/validateSync'
 import * as validation from '@validation'
 import {Decorator} from './types'
@@ -29,24 +29,24 @@ export const validate = (config?: {
 
   if (isEmpty(errors)) return {}
 
-  throw new UserInputError('Validation error', errors)
+  throw new ValidationError(errors)
 }
 
 export const mergeSchemas = (schemas: Dictionary<Schema<any>>): ObjectSchema =>
   yup.object().shape(schemas)
 
 export const extractMessages: (
-  errors?: ValidationError,
+  errors?: TValidationError,
 ) => Dictionary<string[]> = pipe(
   ifElse(isNil, always([]), prop('inner')),
-  groupBy<ValidationError>(prop('path')),
+  groupBy<TValidationError>(prop('path')),
   mapObjIndexed(chain(prop('errors'))),
 )
 
 export const getValidationErrors: (
   schemas: Dictionary<Schema<any>>,
   args: Dictionary<any>,
-) => Dictionary<ValidationError> = useWith(
+) => Dictionary<string[]> = useWith(
   pipe(validateSync(__, __, {abortEarly: false}), extractMessages),
   [mergeSchemas, identity],
 )

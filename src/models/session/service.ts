@@ -1,4 +1,5 @@
 import {v4} from 'uuid'
+import {InvalidPasswordError, UserNotFoundError} from '@errors'
 import {User, UserModel} from '../user'
 import {SessionModel} from './model'
 
@@ -15,13 +16,12 @@ export const createSession = async ({
   password: string
 }): Promise<string | null> => {
   const user = await UserModel.findOne({
-    $or: [
-      {nickname: login, password},
-      {email: login, password},
-    ],
+    $or: [{nickname: login}, {email: login}],
   })
 
-  if (!user) return null
+  if (!user) throw new UserNotFoundError()
+
+  if (user.password !== password) throw new InvalidPasswordError()
 
   const token = v4()
   await SessionModel.create({token, user_id: user._id})

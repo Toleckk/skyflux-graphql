@@ -37,7 +37,8 @@
     "@utils": "src/utils",
     "@decorators": "src/decorators",
     "@pubsub": "src/pubsub.ts",
-    "@validation": "src/validation.ts"
+    "@validation": "src/validation.ts",
+    "@errors": "src/errors"
   },
   "dependencies": {
     "@types/mongoose": "^5.7.36",
@@ -59,7 +60,8 @@
   "jest": {
     "moduleNameMapper": {
       "@utils/(.*)$": "<rootDir>/src/utils/$1",
-      "@validation": "<rootDir>/src/validation.ts"
+      "@validation": "<rootDir>/src/validation.ts",
+      "@errors": "<rootDir>/src/errors"
     },
     "transform": {
       ".ts": "ts-jest"
