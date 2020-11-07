@@ -4,6 +4,7 @@ import {ID} from '@models/types'
 import {pubsub} from '@pubsub'
 import {User, UserService} from '@models/user'
 import {CommentService} from '@models/comment'
+import {LikeService} from '@models/like'
 import {ChannelService} from '@models/channel'
 import {SubService} from '@models/sub'
 import {makeSearchPipeline} from '@utils/makeSearchPipeline'
@@ -21,6 +22,11 @@ export const createPost = async ({
 
   await ChannelService.subscribeUserToChannel({
     channel: `Comment_${post._id}`,
+    user,
+  })
+
+  await ChannelService.subscribeUserToChannel({
+    channel: `Like_${post._id}`,
     user,
   })
 
@@ -95,8 +101,13 @@ export const deletePost = async ({
   if (!post) return null
 
   await post.deleteOne()
+
   await CommentService.deleteCommentsByPost({post})
-  await ChannelService.deleteChannel({channel: 'Comment_' + post._id})
+  await ChannelService.deleteChannel({channel: `Comment_${post._id}`})
+
+  await LikeService.deleteLikesByPost({post})
+  await ChannelService.deleteChannel({channel: `Like_${post._id}`})
+
   await pubsub.publish('post', {
     postDeleted: {
       ...post.toObject(),

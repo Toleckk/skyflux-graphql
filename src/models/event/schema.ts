@@ -19,8 +19,18 @@ export const EventSchema = `
     type CommentEventBody {
         comment: Comment!
     }
+    
+    type LikeEvent {
+        createdAt: Date!
+        kind: String!
+        subj: LikeEventBody!
+    }
+    
+    type LikeEventBody {
+        like: Like!
+    }
 
-    union Event = SubEvent | CommentEvent
+    union Event = SubEvent | CommentEvent | LikeEvent
 
     type EventEdge implements Edge {
         cursor: ID!

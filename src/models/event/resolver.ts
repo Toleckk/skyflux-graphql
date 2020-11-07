@@ -4,6 +4,7 @@ import {__, concat, pipe, prop} from 'ramda'
 import {pubsub} from '@pubsub'
 import {a, auth, injectArgs, injectRoot, paginate} from '@decorators'
 import {CommentService} from '@models/comment'
+import {LikeService} from '@models/like'
 import {SubService} from '@models/sub'
 import {ChannelService} from '@models/channel'
 import * as EventService from './service'
@@ -56,5 +57,8 @@ export const EventResolver: IResolvers = {
   },
   SubEventBody: {
     sub: a([injectRoot()])(({root}): any => SubService.resolveSub({root})),
+  },
+  LikeEventBody: {
+    like: a([injectRoot()])(({root}): any => LikeService.resolveLike({root})),
   },
 }
