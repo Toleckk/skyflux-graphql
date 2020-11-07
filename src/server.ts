@@ -2,6 +2,7 @@ import Mongoose from 'mongoose'
 import {ApolloServer} from 'apollo-server'
 import {makeExecutableSchema} from 'graphql-tools'
 import {SessionService} from '@models/session'
+import {map} from 'ramda'
 import {typeDefs} from './typeDefs'
 import {resolvers} from './resolvers'
 
@@ -15,6 +16,21 @@ const schema = makeExecutableSchema({typeDefs, resolvers})
 
 const server = new ApolloServer({
   schema,
+  formatError: e => {
+    if (e.message.match(/E11000/))
+      return {
+        ...e,
+        extensions: {
+          ...e.extensions,
+          exception: map(
+            () => 'Duplicate value',
+            e.extensions?.exception?.keyValue || {},
+          ),
+        },
+      }
+
+    return e
+  },
   context: async context => {
     const authorization =
       context.req?.headers?.authorization ||
