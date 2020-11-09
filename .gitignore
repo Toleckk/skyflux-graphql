@@ -1,6 +1,9 @@
 # WebStorm
 .idea
 
+# production
+lib
+
 # testing
 /coverage
 

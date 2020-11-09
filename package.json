@@ -4,7 +4,9 @@
   "main": "src/index.ts",
   "license": "AGPL-3.0-only",
   "scripts": {
-    "start": "ts-node-dev -r dotenv/config src/index.ts",
+    "dev": "ts-node-dev -r dotenv/config src/index.ts",
+    "start": "yarn build && node -r dotenv/config lib/index.js",
+    "build": "tsc",
     "pretty-quick": "pretty-quick --pattern \"**/*.*(js|ts)",
     "lint": "eslint src",
     "test": "jest"
@@ -33,12 +35,12 @@
     }
   },
   "_moduleAliases": {
-    "@models": "src/models",
-    "@utils": "src/utils",
-    "@decorators": "src/decorators",
-    "@pubsub": "src/pubsub.ts",
-    "@validation": "src/validation.ts",
-    "@errors": "src/errors"
+    "@models": "lib/models",
+    "@utils": "lib/utils",
+    "@decorators": "lib/decorators",
+    "@pubsub": "lib/pubsub.js",
+    "@validation": "lib/validation.js",
+    "@errors": "lib/errors"
   },
   "dependencies": {
     "@types/mongoose": "^5.7.36",
