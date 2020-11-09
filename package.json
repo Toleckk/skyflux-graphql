@@ -11,37 +11,6 @@
     "lint": "eslint src",
     "test": "jest"
   },
-  "devDependencies": {
-    "@types/jest": "^26.0.14",
-    "@types/node": "^14.6.4",
-    "@typescript-eslint/eslint-plugin": "^4.1.0",
-    "@typescript-eslint/parser": "^4.1.0",
-    "dotenv": "^8.2.0",
-    "eslint": "^7.8.1",
-    "eslint-plugin-import": "^2.22.0",
-    "eslint-plugin-prettier": "^3.1.4",
-    "husky": "^4.3.0",
-    "jest": "^26.4.2",
-    "module-alias": "^2.2.2",
-    "prettier": "^2.1.1",
-    "pretty-quick": "^3.0.1",
-    "ts-jest": "^26.4.0",
-    "ts-node-dev": "^1.0.0-pre.62",
-    "typescript": "^4.0.2"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "yarn pretty-quick && yarn lint --max-warnings=0"
-    }
-  },
-  "_moduleAliases": {
-    "@models": "lib/models",
-    "@utils": "lib/utils",
-    "@decorators": "lib/decorators",
-    "@pubsub": "lib/pubsub.js",
-    "@validation": "lib/validation.js",
-    "@errors": "lib/errors"
-  },
   "dependencies": {
     "@types/mongoose": "^5.7.36",
     "@types/nodemailer": "^6.4.0",
@@ -57,7 +26,38 @@
     "ramda": "^0.27.1",
     "unique-names-generator": "^4.3.1",
     "uuid": "^8.3.0",
-    "yup": "^0.29.3"
+    "yup": "^0.29.3",
+    "module-alias": "^2.2.2",
+    "dotenv": "^8.2.0",
+    "typescript": "^4.0.2"
+  },
+  "devDependencies": {
+    "@types/jest": "^26.0.14",
+    "@types/node": "^14.6.4",
+    "@typescript-eslint/eslint-plugin": "^4.1.0",
+    "@typescript-eslint/parser": "^4.1.0",
+    "eslint": "^7.8.1",
+    "eslint-plugin-import": "^2.22.0",
+    "eslint-plugin-prettier": "^3.1.4",
+    "husky": "^4.3.0",
+    "jest": "^26.4.2",
+    "prettier": "^2.1.1",
+    "pretty-quick": "^3.0.1",
+    "ts-jest": "^26.4.0",
+    "ts-node-dev": "^1.0.0-pre.62"
+  },
+  "_moduleAliases": {
+    "@models": "lib/models",
+    "@utils": "lib/utils",
+    "@decorators": "lib/decorators",
+    "@pubsub": "lib/pubsub.js",
+    "@validation": "lib/validation.js",
+    "@errors": "lib/errors"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "yarn pretty-quick && yarn lint --max-warnings=0"
+    }
   },
   "jest": {
     "moduleNameMapper": {
