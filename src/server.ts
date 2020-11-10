@@ -49,6 +49,12 @@ const server = new ApolloServer({
   cors: {
     origin: '*',
   },
+  subscriptions: {
+    path: '/',
+  },
+  playground: {
+    subscriptionEndpoint: '/',
+  },
 })
 
 server.listen({port: process.env.PORT || 4000}).then(({url}) => {
