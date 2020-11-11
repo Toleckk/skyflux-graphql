@@ -1,7 +1,7 @@
 import {a, auth, injectArgs, injectRoot, paginate, validate} from '@decorators'
 import {UserService} from '@models/user'
 import {LikeService} from '@models/like'
-import {CommentService} from '@models/comment'
+import {CommentDocument, CommentService} from '@models/comment'
 import {pubsub} from '@pubsub'
 import {withFilter} from 'apollo-server'
 import {Post} from './types'
@@ -58,6 +58,17 @@ export const PostResolver = {
     likesCount: a([injectRoot({as: 'post'})])(LikeService.countPostLikes),
     commentsCount: a([injectRoot({as: 'post'})])(({post}) =>
       CommentService.countPostComments({post}),
+    ),
+    comments: a([paginate(), injectRoot(), injectArgs()])(
+      async ({root, after, first, ...rest}): Promise<CommentDocument[]> => {
+        console.log(rest, after, first)
+        if (root === null) return []
+        return CommentService.getCommentsByPostId({
+          post_id: root._id,
+          after: after,
+          first: first,
+        })
+      },
     ),
   },
   DeletedPost: {

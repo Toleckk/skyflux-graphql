@@ -62,7 +62,7 @@ export const getCommentsByPostId = async ({
   post_id: ID
   first?: number
   after?: ID
-}): Promise<Partial<Comment>[]> =>
+}): Promise<CommentDocument[]> =>
   CommentModel.find({post_id})
     .find(after ? {_id: {$lt: after}} : {})
     .sort({_id: -1})
