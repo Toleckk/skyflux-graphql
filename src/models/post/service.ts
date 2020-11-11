@@ -37,6 +37,8 @@ export const createPost = async ({
 
   await pubsub.publish('post', {postCreated: postWithUser})
 
+  await pubsub.publish('post', {postUpdated: postWithUser})
+
   return postWithUser
 }
 
@@ -108,14 +110,12 @@ export const deletePost = async ({
   await LikeService.deleteLikesByPost({post})
   await ChannelService.deleteChannel({channel: `Like_${post._id}`})
 
-  await pubsub.publish('post', {
-    postDeleted: {
-      ...post.toObject(),
-      user,
-    },
-  })
+  const deletedPost = {...post.toObject(), user, deleted: true}
 
-  return post
+  await pubsub.publish('post', {postDeleted: deletedPost})
+  await pubsub.publish('post', {postUpdated: deletedPost})
+
+  return deletedPost
 }
 
 export const getPostById = async ({

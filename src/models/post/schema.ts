@@ -23,8 +23,11 @@ export const PostSchema = `
 
     type DeletedPost {
         _id: ID!
+        deleted: Boolean!
         user: User!
     }
+
+    union MaybePost = Post | DeletedPost
 
     extend type Query {
         getPostById(_id: ID!): Post
@@ -36,6 +39,8 @@ export const PostSchema = `
     extend type Subscription {
         postCreated(nickname: String): Post!
         postDeleted(nickname: String): DeletedPost
+
+        postUpdated(nickname: String!): MaybePost!
     }
 
     extend type Mutation {
