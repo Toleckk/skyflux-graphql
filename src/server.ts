@@ -12,7 +12,7 @@ Mongoose.connect(process.env.DB_URL as string, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
   useCreateIndex: true,
-})
+}).catch(console.error)
 
 const schema = makeExecutableSchema({
   typeDefs,
