@@ -4,8 +4,8 @@
   "main": "src/index.ts",
   "license": "AGPL-3.0-only",
   "scripts": {
-    "dev": "ts-node-dev -r dotenv/config src/index.ts",
-    "start": "yarn build && node -r dotenv/config lib/index.js",
+    "dev": "ts-node-dev -r dotenv/config -r tsconfig-paths/register src/index.ts",
+    "start": "yarn build && node -r dotenv/config -r ./scripts/prod-paths lib/index.js",
     "build": "tsc",
     "pretty-quick": "pretty-quick --pattern \"**/*.*(js|ts)",
     "lint": "eslint src",
@@ -47,15 +47,8 @@
     "prettier": "^2.1.1",
     "pretty-quick": "^3.0.1",
     "ts-jest": "^26.4.0",
-    "ts-node-dev": "^1.0.0-pre.62"
-  },
-  "_moduleAliases": {
-    "@models": "lib/models",
-    "@utils": "lib/utils",
-    "@decorators": "lib/decorators",
-    "@pubsub": "lib/pubsub.js",
-    "@validation": "lib/validation.js",
-    "@errors": "lib/errors"
+    "ts-node-dev": "^1.0.0-pre.62",
+    "tsconfig-paths": "^3.9.0"
   },
   "husky": {
     "hooks": {
