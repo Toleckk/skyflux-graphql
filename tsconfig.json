@@ -26,6 +26,9 @@
       ],
       "@errors": [
         "./errors"
+      ],
+      "@directives": [
+        "./directives/index"
       ]
     },
     "target": "es6",

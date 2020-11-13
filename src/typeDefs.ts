@@ -15,6 +15,8 @@ const Schema = `
     type Query
     type Subscription
 
+    directive @auth on FIELD_DEFINITION
+
     type Entity {
         _id: ID!
     }

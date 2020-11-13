@@ -3,6 +3,7 @@ import {ApolloServer} from 'apollo-server'
 import {makeExecutableSchema} from 'graphql-tools'
 import {SessionService} from '@models/session'
 import {map} from 'ramda'
+import {AuthDirective} from '@directives'
 import {typeDefs} from './typeDefs'
 import {resolvers} from './resolvers'
 
@@ -12,7 +13,13 @@ Mongoose.connect(process.env.DB_URL as string, {
   useCreateIndex: true,
 })
 
-const schema = makeExecutableSchema({typeDefs, resolvers})
+const schema = makeExecutableSchema({
+  typeDefs,
+  resolvers,
+  schemaDirectives: {
+    auth: AuthDirective,
+  },
+})
 
 const server = new ApolloServer({
   schema,
