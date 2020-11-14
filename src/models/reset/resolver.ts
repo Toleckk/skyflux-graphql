@@ -1,9 +1,8 @@
-import {IResolvers} from 'graphql-tools'
-import {a, injectArgs} from '@decorators'
+import {MutationResolvers, Resolvers} from '@models/types'
 import * as ResetService from './service'
 
-export const ResetResolver: IResolvers = {
-  Mutation: {
-    createResetRequest: a([injectArgs()])(ResetService.createResetRequest),
+export const ResetResolver: Resolvers = {
+  Mutation: <MutationResolvers>{
+    createResetRequest: (_, {login}) => ResetService.createResetRequest(login),
   },
 }

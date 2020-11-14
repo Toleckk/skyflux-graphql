@@ -1,7 +1,14 @@
+import {login, password} from '@validation'
+
 // language=GraphQL
 export const SessionSchema = `
-  extend type Mutation {
-      createSession(login: String!, password: String!): String!
-      deleteCurrentSession: Boolean
-  }
+    input CreateSession {
+        login: String! @constraint(pattern: "${login}")
+        password: String! @constraint(pattern: "${password}")
+    }
+
+    extend type Mutation {
+        createSession(credentials: CreateSession!): String!
+        deleteCurrentSession: Boolean @auth
+    }
 `

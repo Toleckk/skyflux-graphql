@@ -1,16 +1,19 @@
-import {Event, EventType, SubEventBody} from '@models/event'
-import {User} from '@models/user'
-import {SubDocument} from './types'
+import {
+  EventDbObject,
+  EventType,
+  SubDbObject,
+  UserDbObject,
+} from '@models/types'
 
 export const subRequested = ({
   sub,
   user,
 }: {
-  sub: SubDocument
-  user: User
-}): Omit<Event<SubEventBody>, '_id'> => ({
+  sub: SubDbObject
+  user: UserDbObject
+}): Omit<EventDbObject, '_id' | 'createdAt'> => ({
   kind: EventType.Sub,
-  channel: `Sub_${sub.to_id}`,
-  subj: {sub_id: sub._id},
+  channel: `Sub_${sub.to}`,
+  subj: {sub: sub._id},
   emitter: user,
 })

@@ -1,6 +1,12 @@
-import {User} from '@models/user'
+import {User, UserDbObject} from '@models/types'
 
-export const restore = ({user, token}: {user: User; token: string}): string => `
+export const restore = ({
+  user,
+  token,
+}: {
+  user: User | UserDbObject
+  token: string
+}): string => `
   <h1 align='center'>
     Skyflux
   </h1>
@@ -17,7 +23,13 @@ export const restore = ({user, token}: {user: User; token: string}): string => `
   </br>  
 `
 
-export const confirm = ({user, token}: {user: User; token: string}): string => `
+export const confirm = ({
+  user,
+  token,
+}: {
+  user: User | UserDbObject
+  token: string
+}): string => `
 <div>
   <h1 align='center'>
     Skyflux

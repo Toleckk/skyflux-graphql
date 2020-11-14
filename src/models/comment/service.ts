@@ -1,26 +1,33 @@
 import Mongoose from 'mongoose'
-import {Post, PostDocument, PostService} from '@models/post'
-import {User} from '@models/user'
-import {ID} from '@models/types'
+import {
+  Comment,
+  CommentDbObject,
+  Post,
+  PostDbObject,
+  Scalars,
+  UserDbObject,
+} from '@models/types'
+import {PostService} from '@models/post'
 import {EventService} from '@models/event'
 import {isMongoId} from '@utils/isMongoId'
 import {pubsub} from '@pubsub'
 import {CommentModel} from './model'
-import {Comment, CommentDocument} from './types'
 import {commentCreated} from './events'
 
-export const createComment = async ({
-  post_id,
-  text,
-  user,
-}: {
-  post_id: string
-  text: string
-  user: User
-}): Promise<Partial<Comment> | null> => {
-  if (!(await PostService.getPostById({_id: post_id, user}))) return null
+export const createComment = async (
+  text: string,
+  post_id: string,
+  user: UserDbObject,
+): Promise<CommentDbObject | null> => {
+  if (!(await PostService.getPostById(post_id, user))) return null
 
-  const comment = await CommentModel.create({post_id, text, user_id: user._id})
+  const comment = await CommentModel.create<Omit<CommentDbObject, 'createdAt'>>(
+    {
+      post: post_id,
+      user: user._id,
+      text,
+    },
+  )
 
   await EventService.createEvent(commentCreated({comment, user}))
   await pubsub.publish('comment', {commentCreated: comment})
@@ -28,16 +35,13 @@ export const createComment = async ({
   return comment
 }
 
-export const deleteComment = async ({
-  _id,
-  user,
-}: {
-  _id: string
-  user: User
-}): Promise<CommentDocument | null> => {
+export const deleteComment = async (
+  _id: string,
+  user: UserDbObject,
+): Promise<CommentDbObject | null> => {
   const comment = await CommentModel.findById(_id)
 
-  if (!(comment && (await canDeleteComment({comment, user})))) return null
+  if (!(comment && (await canDeleteComment(comment, user)))) return null
 
   await comment.deleteOne()
   await EventService.deleteEvent(commentCreated({comment, user}))
@@ -48,69 +52,49 @@ export const deleteComment = async ({
   return comment
 }
 
-export const getCommentById = async ({
-  _id,
-}: {
-  _id: string | Mongoose.Types.ObjectId
-}): Promise<Partial<Comment> | null> => CommentModel.findById(_id)
+export const getCommentById = async (
+  _id: string | Mongoose.Types.ObjectId,
+): Promise<CommentDbObject | null> => CommentModel.findById(_id)
 
-export const getCommentsByPostId = async ({
-  post_id,
+export const getCommentsByPostId = async (
+  post_id: Scalars['ID'],
   first = 25,
   after = 'ffffffffffffffffffffffff',
-}: {
-  post_id: ID
-  first?: number
-  after?: ID
-}): Promise<CommentDocument[]> =>
-  CommentModel.find({post_id})
+): Promise<CommentDbObject[]> =>
+  CommentModel.find({post: post_id})
     .find(after ? {_id: {$lt: after}} : {})
     .sort({_id: -1})
     .limit(first + 1)
 
-export const resolveComment = ({
-  root,
-}: {
-  root:
-    | {comment: Partial<Comment>}
-    | {comment_id: Partial<Comment> | string | Mongoose.Types.ObjectId}
-}): Promise<Partial<Comment> | null> | Partial<Comment> => {
-  if ('comment' in root) return root.comment
+export const resolveComment = async (root: {
+  comment: Comment | CommentDbObject | Mongoose.Types.ObjectId | string
+}): Promise<Comment | CommentDbObject | null> => {
+  if (typeof root.comment === 'string' || isMongoId(root.comment))
+    return getCommentById(root.comment)
 
-  if (typeof root.comment_id !== 'string' && !isMongoId(root.comment_id))
-    return root.comment_id
-
-  return getCommentById({_id: root.comment_id})
+  return root.comment
 }
 
-export const countPostComments = async ({
-  post,
-}: {
-  post: Post
-}): Promise<number> => CommentModel.count({post_id: post._id})
+export const countPostComments = async (post: Post): Promise<number> =>
+  CommentModel.count({post_id: post._id})
 
-export const canDeleteComment = async ({
-  comment,
-  user,
-}: {
-  comment: Comment | CommentDocument
-  user: User
-}): Promise<boolean> => {
-  const userId = 'user_id' in comment ? comment.user_id : comment.user._id
+export const canDeleteComment = async (
+  comment: Comment | CommentDbObject,
+  user: UserDbObject,
+): Promise<boolean> => {
+  const userId = '_id' in comment.user ? comment.user._id : comment.user
   if (String(userId) === String(user._id)) return true
 
-  const post = await PostService.resolvePost({root: comment, user})
+  const post = await PostService.resolvePost(comment, user)
   if (!post) return false
 
-  const postOwnerId = 'user_id' in post ? post.user_id : post.user._id
+  const postOwnerId = '_id' in post.user ? post.user._id : post.user
 
   return String(postOwnerId) === String(user._id)
 }
 
-export const deleteCommentsByPost = async ({
-  post,
-}: {
-  post: PostDocument | Post
-}): Promise<void> => {
-  await CommentModel.deleteMany({post_id: post._id})
+export const deleteCommentsByPost = async (
+  post: PostDbObject | Post,
+): Promise<void> => {
+  await CommentModel.deleteMany({post: post._id})
 }

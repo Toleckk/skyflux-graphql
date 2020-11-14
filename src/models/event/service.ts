@@ -1,78 +1,64 @@
-import Mongoose from 'mongoose'
+import Mongoose, {Types} from 'mongoose'
 import {pubsub} from '@pubsub'
-import {ID} from '@models/types'
-import {User} from '@models/user'
+import {EventDbObject, User, UserDbObject} from '@models/types'
 import {ChannelService} from '@models/channel'
 import {EventModel} from '@models/event/model'
-import {Event, EventBody, EventKind} from './types'
 
-export const getEventsByUser = async ({
-  user,
+export const getEventsByUser = async (
+  user: User | UserDbObject,
   first = 25,
   after = 'ffffffffffffffffffffffff',
-}: {
-  user: User
-  first?: number
-  after?: string
-}): Promise<Event[]> =>
-  ChannelService.aggregateUserChannels({
-    user,
-    pipeline: [
-      {
-        $lookup: {
-          from: 'events',
-          let: {c: '$channelRegex', date: '$createdAt'},
-          as: 'events',
-          pipeline: [
-            {
-              $match: {
-                $expr: {
-                  $regexMatch: {
-                    input: '$channel',
-                    regex: '$$c',
-                  },
+): Promise<EventDbObject[]> =>
+  ChannelService.aggregateUserChannels(user, [
+    {
+      $lookup: {
+        from: 'events',
+        let: {c: '$channelRegex', date: '$createdAt'},
+        as: 'events',
+        pipeline: [
+          {
+            $match: {
+              $expr: {
+                $regexMatch: {
+                  input: '$channel',
+                  regex: '$$c',
                 },
               },
             },
-            {
-              $match: {
-                $expr: {
-                  $and: [
-                    {$lt: [{$cmp: ['$$date', '$createdAt']}, 1]},
-                    {$ne: ['$emitter_id', user._id]},
-                  ],
-                },
+          },
+          {
+            $match: {
+              $expr: {
+                $and: [
+                  {$lt: [{$cmp: ['$$date', '$createdAt']}, 1]},
+                  {$ne: ['$emitter_id', user._id]},
+                ],
               },
             },
-            {$sort: {_id: -1}},
-            {$limit: first + 1},
-          ],
-        },
+          },
+          {$sort: {_id: -1}},
+          {$limit: first + 1},
+        ],
       },
-      {$unwind: {path: '$events'}},
-      {$replaceRoot: {newRoot: '$events'}},
-      {$sort: {createdAt: -1}},
-      {$match: {_id: {$lt: Mongoose.Types.ObjectId(after)}}},
-      {$limit: first + 1},
-    ],
-  })
+    },
+    {$unwind: {path: '$events'}},
+    {$replaceRoot: {newRoot: '$events'}},
+    {$sort: {createdAt: -1}},
+    {$match: {_id: {$lt: Mongoose.Types.ObjectId(after)}}},
+    {$limit: first + 1},
+  ])
 
-export const createEvent = async <T extends EventBody>({
+export const createEvent = async ({
   channel,
   subj,
   kind,
   emitter,
-}: {
-  channel: string
-  subj: T
-  kind: EventKind<T>
-  emitter: User
-}): Promise<Partial<Event<T>>> => {
-  const event = await EventModel.create({
+}: Omit<EventDbObject, 'createdAt' | '_id'>): Promise<EventDbObject> => {
+  const event = await EventModel.create<Omit<EventDbObject, 'createdAt'>>({
     channel,
     subj,
     kind,
-    emitter_id: emitter._id,
+    emitter,
   })
 
   await pubsub.publish('event', {eventAdded: event})
@@ -80,15 +66,14 @@ export const createEvent = async <T extends EventBody>({
   return event as any
 }
 
-export const deleteEvent = async <T extends EventBody>({
+export const deleteEvent = async ({
   channel,
   subj,
   kind,
-}: {
-  channel: string
-  subj: T
-  kind: EventKind<T>
-}): Promise<ID | null> => {
+}: Omit<
+  EventDbObject,
+  'createdAt' | '_id'
+>): Promise<Types.ObjectId | null> => {
   const event = await EventModel.findOne({channel, subj, kind})
 
   if (!event) return null
@@ -99,8 +84,5 @@ export const deleteEvent = async <T extends EventBody>({
   return event._id
 }
 
-export const deleteEventsByChannel = async ({
-  channel,
-}: {
-  channel: string
-}): Promise<void> => void (await EventModel.deleteMany({channel}))
+export const deleteEventsByChannel = async (channel: string): Promise<void> =>
+  void (await EventModel.deleteMany({channel}))

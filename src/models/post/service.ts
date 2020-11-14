@@ -1,34 +1,27 @@
 import Mongoose from 'mongoose'
 import {isMongoId} from '@utils/isMongoId'
-import {ID} from '@models/types'
 import {pubsub} from '@pubsub'
-import {User, UserService} from '@models/user'
+import {Post, PostDbObject, User, UserDbObject} from '@models/types'
+import {UserService} from '@models/user'
 import {CommentService} from '@models/comment'
 import {LikeService} from '@models/like'
 import {ChannelService} from '@models/channel'
 import {SubService} from '@models/sub'
 import {makeSearchPipeline} from '@utils/makeSearchPipeline'
-import {Post, PostDocument} from './types'
 import {PostModel} from './model'
 
-export const createPost = async ({
-  text,
-  user,
-}: {
-  text: string
-  user: User
-}): Promise<Post | null> => {
-  const post = await PostModel.create({text, user_id: user._id})
-
-  await ChannelService.subscribeUserToChannel({
-    channel: `Comment_${post._id}`,
-    user,
+export const createPost = async (
+  text: string,
+  user: User | UserDbObject,
+): Promise<Post | null> => {
+  const post = await PostModel.create<Omit<PostDbObject, 'createdAt'>>({
+    text,
+    user: user._id,
   })
 
-  await ChannelService.subscribeUserToChannel({
-    channel: `Like_${post._id}`,
-    user,
-  })
+  await ChannelService.subscribeUserToChannel(user, `Comment_${post._id}`)
+
+  await ChannelService.subscribeUserToChannel(user, `Like_${post._id}`)
 
   const postWithUser = {
     ...post.toObject(),
@@ -42,15 +35,11 @@ export const createPost = async ({
   return postWithUser
 }
 
-export const getFeed = async ({
-  user,
-  after = 'ffffffffffffffffffffffff',
+export const getFeed = async (
+  user: User | UserDbObject,
   first = 25,
-}: {
-  user: User
-  after?: ID
-  first?: number
-}): Promise<Post[]> =>
+  after = 'ffffffffffffffffffffffff',
+): Promise<Post[]> =>
   PostModel.aggregate([
     {
       $lookup: {
@@ -91,24 +80,21 @@ export const getFeed = async ({
     {$limit: first + 1},
   ])
 
-export const deletePost = async ({
-  _id,
-  user,
-}: {
-  _id: string
-  user: User
-}): Promise<PostDocument | null> => {
-  const post = await PostModel.findOne({_id, user_id: user._id})
+export const deletePost = async (
+  _id: string,
+  user: User | UserDbObject,
+): Promise<PostDbObject | null> => {
+  const post = await PostModel.findOne({_id, user: user._id})
 
   if (!post) return null
 
   await post.deleteOne()
 
-  await CommentService.deleteCommentsByPost({post})
-  await ChannelService.deleteChannel({channel: `Comment_${post._id}`})
+  await CommentService.deleteCommentsByPost(post)
+  await ChannelService.deleteChannel(`Comment_${post._id}`)
 
-  await LikeService.deleteLikesByPost({post})
-  await ChannelService.deleteChannel({channel: `Like_${post._id}`})
+  await LikeService.deleteLikesByPost(post)
+  await ChannelService.deleteChannel(`Like_${post._id}`)
 
   const deletedPost = {...post.toObject(), user, deleted: true}
 
@@ -118,31 +104,23 @@ export const deletePost = async ({
   return deletedPost
 }
 
-export const getPostById = async ({
-  _id,
-  user,
-}: {
-  user?: User
-  _id: string | Mongoose.Types.ObjectId
-}): Promise<PostDocument | null> => {
+export const getPostById = async (
+  _id: string | Mongoose.Types.ObjectId,
+  user?: UserDbObject,
+): Promise<PostDbObject | null> => {
   const post = await PostModel.findById(_id)
 
   if (!post) return null
 
-  return canSeePost({user, post}).then(canSee => (canSee ? post : null))
+  return canSeePost(post, user).then(canSee => (canSee ? post : null))
 }
 
-export const getFoundPosts = async ({
-  text,
-  user,
-  after,
+export const getFoundPosts = async (
+  text: string,
+  user?: User | UserDbObject,
   first = 25,
-}: {
-  text: string
-  user?: User
-  after?: string
-  first?: number
-}): Promise<Post[]> => {
+  after?: string,
+): Promise<Post[]> => {
   const posts = await PostModel.aggregate([
     ...makeSearchPipeline({after, text, field: 'text'}),
     {
@@ -188,65 +166,47 @@ export const getFoundPosts = async ({
   }))
 }
 
-export const resolvePost = async ({
-  root,
-  user,
-}: {
-  user?: User
-  root:
-    | {post: Post | PostDocument}
-    | {post_id: Post | PostDocument | string | Mongoose.Types.ObjectId}
-}): Promise<PostDocument | Post | null> => {
-  if ('post' in root) return root.post
+export const resolvePost = async (
+  root: {post: Post | PostDbObject | Mongoose.Types.ObjectId | string},
+  user?: UserDbObject,
+): Promise<Post | PostDbObject> => {
+  if (typeof root.post === 'string' || isMongoId(root.post))
+    return getPostById(root.post, user) as Promise<Post | PostDbObject>
 
-  if (typeof root.post_id === 'string' || isMongoId(root.post_id))
-    return getPostById({_id: root.post_id, user})
-
-  return root.post_id
+  return root.post
 }
 
-export const getPostsByNickname = async ({
-  nickname,
-  user,
+export const getPostsByNickname = async (
+  nickname: string,
+  user?: User | UserDbObject,
   first = 25,
   after = 'ffffffffffffffffffffffff',
-}: {
-  nickname: string
-  user?: User
-  first?: number
-  after?: ID
-}): Promise<Partial<Post>[]> => {
-  const owner = await UserService.getUserByNickname({nickname})
+): Promise<PostDbObject[]> => {
+  const owner = await UserService.getUserByNickname(nickname)
 
   if (!owner) return []
 
-  const canSee = await canSeeUserPosts({owner, user})
+  const canSee = await canSeeUserPosts(owner, user)
 
   if (!canSee) return []
 
-  return PostModel.find({user_id: owner._id, _id: {$lt: after}})
+  return PostModel.find({user: owner._id, _id: {$lt: after}})
     .sort({_id: -1})
     .limit(first + 1)
 }
 
-export const canSeePost = async ({
-  user,
-  post,
-}: {
-  user?: User
-  post: Post | PostDocument
-}): Promise<boolean> => {
-  const owner = await UserService.resolveUser({root: post})
-  return canSeeUserPosts({user, owner})
+export const canSeePost = async (
+  post: Post | PostDbObject,
+  user?: UserDbObject,
+): Promise<boolean> => {
+  const owner = await UserService.resolveUser(post)
+  return canSeeUserPosts(owner, user)
 }
 
-export const canSeeUserPosts = async ({
-  owner,
-  user,
-}: {
-  owner?: User | null
-  user?: User | null
-}): Promise<boolean> => {
+export const canSeeUserPosts = async (
+  owner?: User | UserDbObject | null,
+  user?: User | UserDbObject | null,
+): Promise<boolean> => {
   if (!owner) return false
 
   if (!owner.private) return true
@@ -255,8 +215,8 @@ export const canSeeUserPosts = async ({
 
   if (String(owner._id) === String(user._id)) return true
 
-  return SubService.isSubscribedBy({from: user, to: owner})
+  return SubService.isSubscribedBy(owner, user)
 }
 
-export const countUserPosts = async ({user}: {user: User}): Promise<number> =>
+export const countUserPosts = async (user: User): Promise<number> =>
   PostModel.count({user_id: user._id})

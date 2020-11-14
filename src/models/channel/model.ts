@@ -1,9 +1,9 @@
-import Mongoose, {Model} from 'mongoose'
+import Mongoose, {Document, Model} from 'mongoose'
 import {ChannelDocument} from '@models/channel/types'
 
 const schema = new Mongoose.Schema(
   {
-    user_id: {
+    user: {
       type: Mongoose.Schema.Types.ObjectId,
       required: true,
       ref: 'User',
@@ -13,9 +13,9 @@ const schema = new Mongoose.Schema(
   {timestamps: {createdAt: true, updatedAt: false}},
 )
 
-schema.index({user_id: 1, channelRegex: 1}, {unique: true})
+schema.index({user: 1, channelRegex: 1}, {unique: true})
 
 export const ChannelModel = Mongoose.model<
-  ChannelDocument,
-  Model<ChannelDocument>
+  ChannelDocument & Document,
+  Model<ChannelDocument & Document>
 >('Channel', schema)

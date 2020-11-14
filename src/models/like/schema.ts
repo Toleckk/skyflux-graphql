@@ -1,14 +1,14 @@
 // language=GraphQL
 export const LikeSchema = `
-    type Like {
-        _id: ID!
-        post: Post!
-        user: User!
+    type Like @entity {
+        _id: ID! @id
+        post: Post! @link
+        user: User! @link
     }
 
     extend type Mutation {
-        createLike(post_id: ID!): Like!
-        deleteLike(post_id: ID!): Boolean
+        createLike(post_id: ID!): Like! @auth
+        deleteLike(post_id: ID!): Boolean @auth
     }
     
     extend type Subscription {

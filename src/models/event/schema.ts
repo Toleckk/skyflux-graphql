@@ -1,36 +1,32 @@
 // language=GraphQL
 export const EventSchema = `
-    type SubEvent {
-        createdAt: Date!
-        kind: String!
-        subj: SubEventBody!
+    enum EventType {
+        Sub, Comment, Like
     }
 
-    type SubEventBody {
-        sub: Sub!
+    type Event @entity(additionalFields: [
+        {path: "_id", type: "ObjectID"},
+        {path: "channel", type: "string"},
+        {path: "emitter", type: "ObjectID | UserDbObject"},
+    ]) {
+        createdAt: Date! @column
+        kind: EventType! @column
+        subj: EventBody! @embedded
     }
 
-    type CommentEvent {
-        createdAt: Date!
-        kind: String!
-        subj: CommentEventBody!
+    union EventBody @union = SubEventBody | CommentEventBody | LikeEventBody
+
+    type SubEventBody @entity(embedded: true) {
+        sub: Sub! @link
     }
 
-    type CommentEventBody {
-        comment: Comment!
-    }
-    
-    type LikeEvent {
-        createdAt: Date!
-        kind: String!
-        subj: LikeEventBody!
-    }
-    
-    type LikeEventBody {
-        like: Like!
+    type CommentEventBody @entity(embedded: true) {
+        comment: Comment! @link
     }
 
-    union Event = SubEvent | CommentEvent | LikeEvent
+    type LikeEventBody @entity(embedded: true) {
+        like: Like! @link
+    }
 
     type EventEdge implements Edge {
         cursor: ID!
@@ -41,13 +37,13 @@ export const EventSchema = `
         edges: [EventEdge]!
         pageInfo: PageInfo!
     }
-    
+
     extend type Query {
-        getEvents(first: Int, after: ID): EventConnection!
+        getEvents(first: Int!, after: ID): EventConnection! @auth
     }
-    
+
     extend type Subscription {
-        eventAdded: Event!
-        eventDeleted: Entity
+        eventAdded: Event! @auth
+        eventDeleted: Entity @auth
     }
 `

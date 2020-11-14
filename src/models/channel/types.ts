@@ -1,13 +1,13 @@
-import {Document} from 'mongoose'
-import {Entity, ID} from '@models/types'
-import {User} from '@models/user'
+import {Types} from 'mongoose'
+import {Scalars, User} from '@models/types'
 
-export interface Channel extends Entity {
+export interface Channel {
+  _id: Scalars['ID']
   user: User
   channelRegex: string
   createdAt?: Date
 }
 
-export interface ChannelDocument extends Omit<Channel, 'user'>, Document {
-  user_id: ID | User
+export interface ChannelDocument extends Omit<Channel, 'user' | '_id'> {
+  user: Types.ObjectId
 }

@@ -1,12 +1,12 @@
-import {Document} from 'mongoose'
-import {User} from '@models/user'
-import {Entity, ID} from '@models/types'
+import {Document, Types} from 'mongoose'
+import {Scalars, User} from '@models/types'
 
-export interface Reset extends Entity {
+export interface Reset {
+  _id: Scalars['ID']
   token: string
   user: User
 }
 
-export interface ResetDocument extends Omit<Reset, 'user'>, Document {
-  user_id: ID
+export interface ResetDocument extends Omit<Reset, 'user' | '_id'>, Document {
+  user: Types.ObjectId
 }

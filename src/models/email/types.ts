@@ -1,15 +1,15 @@
-import {Document} from 'mongoose'
-import {Entity, ID} from '@models/types'
-import {User} from '@models/user'
+import {Document, Types} from 'mongoose'
+import {Scalars, User} from '@models/types'
 
-export interface Email extends Entity {
+export interface Email {
+  _id: Scalars['ID']
   user: User
   token: string
   email: string
 }
 
-export interface EmailDocument extends Omit<Email, 'user'>, Document {
-  user_id: ID
+export interface EmailDocument extends Omit<Email, 'user' | '_id'>, Document {
+  user: Types.ObjectId
 }
 
 export interface Mailer {

@@ -1,64 +1,67 @@
-import {IResolvers} from 'graphql-tools'
 import {withFilter} from 'apollo-server'
-import {__, concat, pipe, prop} from 'ramda'
 import {pubsub} from '@pubsub'
-import {a, auth, injectArgs, injectRoot, paginate} from '@decorators'
+import {
+  CommentEventBodyResolvers,
+  EventBodyResolvers,
+  LikeEventBodyResolvers,
+  QueryResolvers,
+  Resolvers,
+  SubEventBodyResolvers,
+  SubscriptionResolvers,
+} from '@models/types'
 import {CommentService} from '@models/comment'
 import {LikeService} from '@models/like'
 import {SubService} from '@models/sub'
 import {ChannelService} from '@models/channel'
+import {paginate} from '@utils/paginate'
 import * as EventService from './service'
-import {Event} from './types'
 
-export const EventResolver: IResolvers = {
-  Query: {
-    getEvents: a([injectArgs(), auth(), paginate()])(
-      EventService.getEventsByUser,
-    ),
+export const EventResolver: Resolvers = {
+  EventBody: <EventBodyResolvers>{
+    __resolveType: root =>
+      'sub' in root
+        ? 'SubEventBody'
+        : 'comment' in root
+        ? 'CommentEventBody'
+        : 'LikeEventBody',
   },
-  Subscription: {
+  CommentEventBody: <CommentEventBodyResolvers>{
+    comment: root => CommentService.resolveComment(root),
+  },
+  SubEventBody: <SubEventBodyResolvers>{
+    sub: root => SubService.resolveSub(root),
+  },
+  LikeEventBody: <LikeEventBodyResolvers>{
+    like: root => LikeService.resolveLike(root),
+  },
+  Query: <QueryResolvers>{
+    getEvents: (_, {first, after}, {user}) =>
+      paginate((first, after) =>
+        EventService.getEventsByUser(user, first, after),
+      )(first, after),
+  },
+  Subscription: <SubscriptionResolvers>{
     eventAdded: {
       subscribe: withFilter(
         (): AsyncIterator<Event> => pubsub.asyncIterator('event'),
-        a([injectRoot(), auth()])(
-          ({root, user}) =>
-            String(root.eventAdded.emitter_id) !== String(user._id) &&
-            ChannelService.isUserSubscribedToChannel({
-              user,
-              channel: root.eventAdded.channel,
-            }),
-        ),
+        (root, _, {user}) =>
+          String(root.eventAdded.emitter_id) !== String(user._id) &&
+          ChannelService.isUserSubscribedToChannel(
+            root.eventAdded.channel,
+            user,
+          ),
       ),
     },
     eventDeleted: {
       subscribe: withFilter(
         (): AsyncIterator<Event> => pubsub.asyncIterator('event'),
-        a([injectRoot(), auth()])(
-          ({root, user}) =>
-            String(root.eventAdded.emitter_id) !== String(user._id) &&
-            ChannelService.isUserSubscribedToChannel({
-              user,
-              channel: root.eventDeleted.channel,
-            }),
-        ),
+        (root, _, {user}) =>
+          String(root.eventDeleted.emitter_id) !== String(user._id) &&
+          ChannelService.isUserSubscribedToChannel(
+            root.eventDeleted.channel,
+            user,
+          ),
       ),
     },
-  },
-  Event: {
-    __resolveType: pipe(
-      prop('kind') as (event: Event) => string,
-      concat(__, 'Event'),
-    ),
-  },
-  CommentEventBody: {
-    comment: a([injectRoot()])(({root}): any =>
-      CommentService.resolveComment({root}),
-    ),
-  },
-  SubEventBody: {
-    sub: a([injectRoot()])(({root}): any => SubService.resolveSub({root})),
-  },
-  LikeEventBody: {
-    like: a([injectRoot()])(({root}): any => LikeService.resolveLike({root})),
   },
 }

@@ -1,15 +1,15 @@
-import Mongoose, {Model} from 'mongoose'
-import {SubDocument} from '@models/sub/types'
+import Mongoose, {Document, Model} from 'mongoose'
+import {SubDbObject} from '@models/types'
 
 const schema = new Mongoose.Schema({
-  from_id: {type: Mongoose.Schema.Types.ObjectId, required: true, ref: 'User'},
-  to_id: {type: Mongoose.Schema.Types.ObjectId, required: true, ref: 'User'},
+  from: {type: Mongoose.Schema.Types.ObjectId, required: true, ref: 'User'},
+  to: {type: Mongoose.Schema.Types.ObjectId, required: true, ref: 'User'},
   accepted: {type: Mongoose.Schema.Types.Boolean, required: true},
 })
 
-schema.index({from_id: 1, to_id: 1}, {unique: true})
+schema.index({from: 1, to: 1}, {unique: true})
 
-export const SubModel = Mongoose.model<SubDocument, Model<SubDocument>>(
-  'Sub',
-  schema,
-)
+export const SubModel = Mongoose.model<
+  SubDbObject & Document,
+  Model<SubDbObject & Document>
+>('Sub', schema)

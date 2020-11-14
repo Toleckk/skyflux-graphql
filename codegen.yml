@@ -1,0 +1,16 @@
+overwrite: true
+schema: "./excluded/schema.graphql"
+documents: null
+generates:
+  src/models/types.ts:
+    plugins:
+      - add:
+          content: '/* eslint-disable */'
+      - typescript
+      - ./plugins/fix.js
+      - "typescript-resolvers"
+      - "typescript-mongodb"
+    config:
+      resolverTypeWrapperSignature: Promise<ResolverWithDbObject<T>> | ResolverWithDbObject<T>
+      contextType: "{user: UserDbObject, token: string}"
+      useIndexSignature: true

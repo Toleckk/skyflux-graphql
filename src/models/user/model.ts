@@ -1,6 +1,6 @@
-import Mongoose, {Model} from 'mongoose'
+import Mongoose, {Document, Model} from 'mongoose'
 import fuzzySearching from 'mongoose-fuzzy-searching'
-import {UserDocument} from './types'
+import {UserDbObject} from '@models/types'
 
 const Description = new Mongoose.Schema({
   about: Mongoose.Schema.Types.String,
@@ -23,7 +23,7 @@ const schema = new Mongoose.Schema({
 
 schema.plugin(fuzzySearching, {fields: ['nickname']})
 
-export const UserModel = Mongoose.model<UserDocument, Model<UserDocument>>(
-  'User',
-  schema,
-)
+export const UserModel = Mongoose.model<
+  UserDbObject & Document,
+  Model<UserDbObject & Document>
+>('User', schema)

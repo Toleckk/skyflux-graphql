@@ -1,21 +1,22 @@
 import Mongoose from 'mongoose'
 import {pubsub} from '@pubsub'
+import {
+  Like,
+  LikeDbObject,
+  Post,
+  PostDbObject,
+  UserDbObject,
+} from '@models/types'
 import {EventService} from '@models/event'
-import {Post, PostDocument} from '@models/post'
-import {User} from '@models/user'
 import {likeCreated} from '@models/like/events'
 import {isMongoId} from '@utils/isMongoId'
-import {Like, LikeDocument} from './types'
 import {LikeModel} from './model'
 
-export const deleteLike = async ({
-  post_id,
-  user,
-}: {
-  post_id: string
-  user: User
-}): Promise<boolean> => {
-  const like = await LikeModel.findOne({post_id, user_id: user._id})
+export const deleteLike = async (
+  post_id: string,
+  user: UserDbObject,
+): Promise<boolean> => {
+  const like = await LikeModel.findOne({post: post_id, user: user._id})
 
   if (!like) return false
 
@@ -26,22 +27,17 @@ export const deleteLike = async ({
   return true
 }
 
-export const deleteLikesByPost = async ({
-  post,
-}: {
-  post: PostDocument | Post
-}): Promise<void> => {
-  await LikeModel.deleteMany({post_id: post._id})
+export const deleteLikesByPost = async (
+  post: PostDbObject | Post,
+): Promise<void> => {
+  await LikeModel.deleteMany({post: post._id})
 }
 
-export const createLike = async ({
-  post_id,
-  user,
-}: {
-  post_id: string
-  user: User
-}): Promise<Partial<Like> | null> => {
-  const like = await LikeModel.create({post_id, user_id: user._id})
+export const createLike = async (
+  postId: string,
+  user: UserDbObject,
+): Promise<LikeDbObject | null> => {
+  const like = await LikeModel.create({post: postId, user: user._id})
 
   if (!like) return null
 
@@ -51,41 +47,30 @@ export const createLike = async ({
   return like
 }
 
-export const isPostLikedBy = async ({
-  post,
-  user,
-}: {
-  post: Post
-  user?: User
-}): Promise<boolean> => {
+export const isPostLikedBy = async (
+  post: Post,
+  user?: UserDbObject,
+): Promise<boolean> => {
   if (!user) return false
 
-  return LikeModel.exists({post_id: post._id, user_id: user._id})
+  return LikeModel.exists({post: post._id, user: user._id})
 }
 
-export const countPostLikes = async ({post}: {post: Post}): Promise<number> =>
-  LikeModel.count({post_id: post._id})
+export const countPostLikes = async (post: Post): Promise<number> =>
+  LikeModel.count({post: post._id})
 
-export const resolveLike = async ({
-  root,
-}: {
-  root:
-    | {like: LikeDocument}
-    | {like_id: LikeDocument | string | Mongoose.Types.ObjectId}
-}): Promise<LikeDocument | null> => {
-  if ('like' in root) return root.like
+export const resolveLike = async (root: {
+  like: Like | LikeDbObject | Mongoose.Types.ObjectId | string
+}): Promise<Like | LikeDbObject | null> => {
+  if (typeof root.like === 'string' || isMongoId(root.like))
+    return getLikeById(root.like)
 
-  if (typeof root.like_id !== 'string' && !isMongoId(root.like_id))
-    return root.like_id
-
-  return getLikeById({_id: root.like_id})
+  return root.like
 }
 
-export const getLikeById = async ({
-  _id,
-}: {
-  _id: string | Mongoose.Types.ObjectId
-}): Promise<LikeDocument | null> => {
+export const getLikeById = async (
+  _id: Mongoose.Types.ObjectId | string,
+): Promise<LikeDbObject | null> => {
   const like = await LikeModel.findById(_id)
   return like || null
 }

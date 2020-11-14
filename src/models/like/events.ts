@@ -1,16 +1,19 @@
-import {User} from '@models/user'
-import {Event, EventType, LikeEventBody} from '@models/event'
-import {LikeDocument} from './types'
+import {
+  EventDbObject,
+  EventType,
+  LikeDbObject,
+  UserDbObject,
+} from '@models/types'
 
 export const likeCreated = ({
   like,
   user,
 }: {
-  like: LikeDocument
-  user: User
-}): Omit<Event<LikeEventBody>, '_id'> => ({
-  channel: `Like_${like.post_id}`,
+  like: LikeDbObject
+  user: UserDbObject
+}): Omit<EventDbObject, '_id' | 'createdAt'> => ({
+  channel: `Like_${like.post}`,
   kind: EventType.Like,
-  subj: {like_id: like._id},
+  subj: {like: like._id},
   emitter: user,
 })

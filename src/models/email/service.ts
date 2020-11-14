@@ -3,7 +3,7 @@ import {v4} from 'uuid'
 import nodemailer from 'nodemailer'
 import SMTPConnection from 'nodemailer/lib/smtp-connection'
 import Mail from 'nodemailer/lib/mailer'
-import {User} from '@models/user'
+import {User, UserDbObject} from '@models/types'
 import {EmailDocument, Mailer} from '@models/email/types'
 import * as templates from './templates'
 import {EmailModel} from './model'
@@ -42,13 +42,10 @@ export const sendEmail = async <T extends keyof typeof templates>({
 }
 
 /** Creates new change email request */
-export const changeEmail = async ({
-  user,
-  email,
-}: {
-  user: User
-  email: string
-}): Promise<boolean> => {
+export const changeEmail = async (
+  email: string,
+  user: User | UserDbObject,
+): Promise<boolean> => {
   const token = v4()
 
   const session = await Mongoose.startSession()
@@ -60,28 +57,20 @@ export const changeEmail = async ({
       payload: {user, token},
     })
 
-    await EmailModel.create({user_id: user._id, email, token})
+    await EmailModel.create({user: user._id, email, token})
   })
 
   return true
 }
 
-export const deleteAllUserRequests = async ({
-  user,
-  options,
-}: {
-  user: User
-  options: ModelOptions
-}): Promise<boolean> => {
-  const {deletedCount} = await EmailModel.deleteMany(
-    {user_id: user._id},
-    options,
-  )
+export const deleteAllUserRequests = async (
+  user: User | UserDbObject,
+  options: ModelOptions,
+): Promise<boolean> => {
+  const {deletedCount} = await EmailModel.deleteMany({user: user._id}, options)
   return (deletedCount || 0) > 0
 }
 
-export const getRequestByToken = async ({
-  token,
-}: {
-  token: string
-}): Promise<EmailDocument | null> => EmailModel.findOne({token})
+export const getRequestByToken = async (
+  token: string,
+): Promise<EmailDocument | null> => EmailModel.findOne({token})

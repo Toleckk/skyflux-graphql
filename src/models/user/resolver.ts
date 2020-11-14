@@ -1,65 +1,48 @@
-import {IResolvers} from 'graphql-tools'
-import {prop} from 'ramda'
 import {
-  a,
-  auth,
-  date,
-  injectArgs,
-  injectRoot,
-  paginate,
-  validate,
-} from '@decorators'
+  MutationResolvers,
+  QueryResolvers,
+  Resolvers,
+  UserResolvers,
+} from '@models/types'
 import {SubService} from '@models/sub'
 import {PostService} from '@models/post'
-import {password} from '@validation'
+import {paginate} from '@utils/paginate'
 import * as UserService from './service'
 
-export const UserResolver: IResolvers = {
-  Mutation: {
-    createUser: a([injectArgs(), validate()])(UserService.createUser),
-    resetPassword: a([injectArgs(), validate()])(UserService.resetPassword),
-    updatePassword: a([
-      injectArgs(),
-      auth(),
-      validate({
-        schemas: {
-          newPassword: password,
-          oldPassword: password,
-        },
-      }),
-    ])(UserService.updatePassword),
-    updateNickname: a([injectArgs(), auth(), validate()])(
-      UserService.updateNickname,
-    ),
-    updateProfileInfo: a([
-      validate(),
-      auth(),
-      injectArgs(),
-      date({paths: [['description', 'birthday']]}),
-    ])(UserService.updateProfileInfo),
-    makeAccountPublic: a([auth()])(UserService.makePublic),
-    makeAccountPrivate: a([auth()])(UserService.makePrivate),
-    confirmEmail: a([injectArgs(), validate()])(UserService.confirmEmail),
+export const UserResolver: Resolvers = {
+  User: <UserResolvers>{
+    mySub: (to, _, {user}) => (user ? SubService.getSubFromTo(user, to) : null),
+    postsCount: root => PostService.countUserPosts(root),
+    subsCount: root => SubService.countSubs(root),
+    subscribersCount: root => SubService.countSubscribers(root),
   },
-  Query: {
-    me: a([auth({passOnly: true})])(prop('user')),
-    doesNicknameExist: a([injectArgs()])(UserService.doesNicknameExist),
-    getUserByNickname: a([injectArgs()])(UserService.getUserByNickname),
-    getSuggestions: a([injectArgs(), auth(), paginate()])(
-      UserService.getSuggestions,
-    ),
-    getFoundUsers: a([auth({passOnly: true}), injectArgs(), paginate()])(
-      UserService.getFoundUsers,
-    ),
+  Query: <QueryResolvers>{
+    me: (_, __, {user}) => user,
+    doesNicknameExist: (_, {nickname}) =>
+      UserService.doesNicknameExist(nickname),
+    getUserByNickname: (_, {nickname}) =>
+      UserService.getUserByNickname(nickname),
+    getSuggestions: (_, {first}, {user}) =>
+      paginate(first => UserService.getSuggestions(user, first))(first),
+    getFoundUsers: (_, {text, first, after}, {user}) =>
+      paginate((first, after) =>
+        UserService.getFoundUsers(text, user, first, after),
+      )(first, after),
   },
-  User: {
-    mySub: a([auth({passOnly: true}), injectRoot()])(({user, root}) =>
-      SubService.getSubFromTo({from: user, to: root}),
-    ),
-    postsCount: a([injectRoot({as: 'user'})])(PostService.countUserPosts),
-    subsCount: a([injectRoot({as: 'user'})])(SubService.countSubs),
-    subscribersCount: a([injectRoot({as: 'user'})])(
-      SubService.countSubscribers,
-    ),
+  Mutation: <MutationResolvers>{
+    createUser: (root, {user}) =>
+      UserService.createUser(user.email, user.password),
+    resetPassword: (root, {credentials}) =>
+      UserService.resetPassword(credentials.token, credentials.password),
+    updatePassword: (root, {credentials: {oldPassword, newPassword}}, {user}) =>
+      UserService.updatePassword(user, oldPassword, newPassword),
+    updateNickname: (root, {user: {nickname}}, {user}) =>
+      UserService.updateNickname(user, nickname),
+    updateProfileInfo: (root, {user: info}, {user}) =>
+      UserService.updateProfileInfo(user, info),
+    makeAccountPublic: (_, __, {user}) => UserService.makePublic(user),
+    makeAccountPrivate: (_, __, {user}) => UserService.makePrivate(user),
+    confirmEmail: (_, {credentials: {token}}) =>
+      UserService.confirmEmail(token),
   },
 }

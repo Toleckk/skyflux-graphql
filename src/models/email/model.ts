@@ -3,7 +3,7 @@ import {EmailDocument} from './types'
 
 const schema = new Mongoose.Schema(
   {
-    user_id: {
+    user: {
       type: Mongoose.Schema.Types.ObjectId,
       ref: 'User',
       required: true,

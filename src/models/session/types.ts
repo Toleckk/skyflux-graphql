@@ -1,12 +1,14 @@
-import {Document} from 'mongoose'
-import {User} from '@models/user'
-import {Entity, ID} from '@models/types'
+import {Document, Types} from 'mongoose'
+import {Scalars, User} from '@models/types'
 
-export interface Session extends Entity {
+export interface Session {
+  _id: Scalars['ID']
   user: User
   token: string
 }
 
-export interface SessionDocument extends Document, Omit<Session, 'user'> {
-  user_id: ID | User
+export interface SessionDocument
+  extends Document,
+    Omit<Session, 'user' | '_id'> {
+  user: Types.ObjectId
 }

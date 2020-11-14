@@ -1,16 +1,19 @@
-import {CommentEventBody, Event, EventType} from '@models/event'
-import {User} from '@models/user'
-import {CommentDocument} from './types'
+import {
+  CommentDbObject,
+  EventDbObject,
+  EventType,
+  UserDbObject,
+} from '@models/types'
 
 export const commentCreated = ({
   comment,
   user,
 }: {
-  comment: CommentDocument
-  user: User
-}): Omit<Event<CommentEventBody>, '_id'> => ({
-  channel: `Comment_${comment.post_id}`,
+  comment: CommentDbObject
+  user: UserDbObject
+}): Omit<EventDbObject, '_id' | 'createdAt'> => ({
+  channel: `Comment_${comment.post}`,
   kind: EventType.Comment,
-  subj: {comment_id: comment._id},
-  emitter: user,
+  subj: {comment: comment._id},
+  emitter: user._id,
 })

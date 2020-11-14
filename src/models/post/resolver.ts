@@ -1,89 +1,85 @@
-import {a, auth, injectArgs, injectRoot, paginate, validate} from '@decorators'
+import {withFilter} from 'apollo-server'
 import {UserService} from '@models/user'
 import {LikeService} from '@models/like'
-import {CommentDocument, CommentService} from '@models/comment'
+import {CommentService} from '@models/comment'
 import {pubsub} from '@pubsub'
-import {withFilter} from 'apollo-server'
-import {Post} from './types'
+import {
+  CommentDbObject,
+  DeletedPostResolvers,
+  MaybePostResolvers,
+  MutationResolvers,
+  PostResolvers,
+  QueryResolvers,
+  Resolvers,
+  SubscriptionResolvers,
+} from '@models/types'
+import {paginate} from '@utils/paginate'
 import * as PostService from './service'
 
-export const PostResolver = {
-  Query: {
-    getPostById: a([injectArgs(), auth({passOnly: true})])(
-      PostService.getPostById,
-    ),
-    getPostsByNickname: a([injectArgs(), paginate(), auth({passOnly: true})])(
-      PostService.getPostsByNickname,
-    ),
-    getFoundPosts: a([injectArgs(), paginate(), auth({passOnly: true})])(
-      PostService.getFoundPosts,
-    ),
-    getFeed: a([auth(), paginate(), injectArgs()])(PostService.getFeed),
+export const PostResolver: Resolvers = {
+  Post: <PostResolvers>{
+    user: root => UserService.resolveUser(root),
+    isLikedByMe: (root, _, {user}) => LikeService.isPostLikedBy(root, user),
+    likesCount: root => LikeService.countPostLikes(root),
+    commentsCount: root => CommentService.countPostComments(root),
+    comments: (root, {first, after}) =>
+      paginate(
+        async (first, after): Promise<CommentDbObject[]> =>
+          root
+            ? CommentService.getCommentsByPostId(root._id, first, after)
+            : [],
+      )(first, after),
   },
-  Subscription: {
+  DeletedPost: <DeletedPostResolvers>{
+    user: root => UserService.resolveUser(root),
+  },
+  Query: <QueryResolvers>{
+    getPostById: (_, {_id}, {user}) => PostService.getPostById(_id, user),
+    getPostsByNickname: (_, {nickname, first, after}, {user}) =>
+      paginate((first, after) =>
+        PostService.getPostsByNickname(nickname, user, first, after),
+      )(first, after),
+    getFoundPosts: (_, {text, first, after}, {user}) =>
+      paginate((first, after) =>
+        PostService.getFoundPosts(text, user, first, after),
+      )(first, after),
+    getFeed: (_, {first, after}, {user}) =>
+      paginate((first, after) => PostService.getFeed(user, first, after))(
+        first,
+        after,
+      ),
+  },
+  Mutation: <MutationResolvers>{
+    createPost: (_, {post}, {user}) => PostService.createPost(post.text, user),
+    deletePost: (_, {_id}, {user}) => PostService.deletePost(_id, user),
+  },
+  Subscription: <SubscriptionResolvers>{
     postCreated: {
       subscribe: withFilter(
-        (): AsyncIterator<Post> => pubsub.asyncIterator('post'),
-        async (
-          {postCreated}: {postCreated: Post},
-          {nickname},
-          {user},
-        ): Promise<boolean> =>
+        () => pubsub.asyncIterator('post'),
+        async ({postCreated}, {nickname}, {user}): Promise<boolean> =>
           postCreated.user.nickname === nickname &&
-          PostService.canSeePost({user, post: postCreated}),
+          PostService.canSeePost(postCreated, user),
       ),
     },
     postDeleted: {
       subscribe: withFilter(
-        (): AsyncIterator<Post> => pubsub.asyncIterator('post'),
-        async (
-          {postDeleted}: {postDeleted: Post},
-          {nickname},
-          {user},
-        ): Promise<boolean> =>
+        () => pubsub.asyncIterator('post'),
+        async ({postDeleted}, {nickname}, {user}): Promise<boolean> =>
           postDeleted.user.nickname === nickname &&
-          PostService.canSeePost({user, post: postDeleted}),
+          PostService.canSeePost(postDeleted, user),
       ),
     },
     postUpdated: {
       subscribe: withFilter(
-        (): AsyncIterator<Post> => pubsub.asyncIterator('post'),
-        async (
-          {postUpdated}: {postUpdated: Post},
-          {nickname},
-          {user},
-        ): Promise<boolean> =>
+        () => pubsub.asyncIterator('post'),
+        async ({postUpdated}, {nickname}, {user}): Promise<boolean> =>
           postUpdated.user.nickname === nickname &&
-          PostService.canSeePost({user, post: postUpdated}),
+          PostService.canSeePost(postUpdated, user),
       ),
     },
   },
-  Mutation: {
-    createPost: a([injectArgs(), auth(), validate()])(PostService.createPost),
-    deletePost: a([injectArgs(), auth()])(PostService.deletePost),
-  },
-  Post: {
-    user: a([injectRoot()])(({root}) => UserService.resolveUser({root})),
-    isLikedByMe: a([injectRoot({as: 'post'}), auth({passOnly: true})])(
-      LikeService.isPostLikedBy,
-    ),
-    likesCount: a([injectRoot({as: 'post'})])(LikeService.countPostLikes),
-    commentsCount: a([injectRoot({as: 'post'})])(({post}) =>
-      CommentService.countPostComments({post}),
-    ),
-    comments: a([paginate(), injectRoot(), injectArgs()])(
-      async ({root, after, first, ...rest}): Promise<CommentDocument[]> => {
-        console.log(rest, after, first)
-        if (root === null) return []
-        return CommentService.getCommentsByPostId({
-          post_id: root._id,
-          after: after,
-          first: first,
-        })
-      },
-    ),
-  },
-  DeletedPost: {
-    user: a([injectRoot()])(({root}) => UserService.resolveUser({root})),
+  MaybePost: <MaybePostResolvers>{
+    __resolveType: root => ('deleted' in root ? 'DeletedPost' : 'Post'),
   },
 }

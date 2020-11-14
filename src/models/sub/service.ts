@@ -1,29 +1,25 @@
 import Mongoose from 'mongoose'
 import {pubsub} from '@pubsub'
-import {ID} from '@models/types'
 import {EventService} from '@models/event'
-import {User, UserDocument, UserService} from '@models/user'
+import {UserService} from '@models/user'
 import {isMongoId} from '@utils/isMongoId'
+import {Scalars, Sub, SubDbObject, User, UserDbObject} from '@models/types'
 import {subRequested} from './events'
-import {Sub, SubDocument} from './types'
 import {SubModel} from './model'
 
-export const createSub = async ({
-  nickname,
-  user,
-}: {
-  nickname: string
-  user: User
-}): Promise<Partial<Sub> | null> => {
+export const createSub = async (
+  nickname: string,
+  user: UserDbObject,
+): Promise<SubDbObject | null> => {
   if (user.nickname === nickname) return null
 
-  const to = await UserService.getUserByNickname({nickname})
+  const to = await UserService.getUserByNickname(nickname)
 
   if (!to) return null
 
   const sub = await SubModel.create({
-    from_id: user._id,
-    to_id: to._id,
+    from: user._id,
+    to: to._id,
     accepted: !to.private,
   })
 
@@ -39,53 +35,39 @@ export const createSub = async ({
   }
 }
 
-export const deleteSub = async ({
-  nickname,
-  user,
-}: {
-  nickname: string
-  user: User
-}): Promise<SubDocument | null> => {
-  const to = await UserService.getUserByNickname({nickname})
+export const deleteSub = async (
+  nickname: string,
+  user: UserDbObject,
+): Promise<SubDbObject | null> => {
+  const to = await UserService.getUserByNickname(nickname)
 
   if (!to) return null
 
-  const sub = await SubModel.findOne({from_id: user._id, to_id: to._id})
+  const sub = await SubModel.findOne({from: user._id, to: to._id})
 
   if (!sub) return null
 
-  return remove({user, sub})
+  return remove(sub, user)
 }
 
-export const getSubById = async ({
-  _id,
-}: {
-  _id: string | Mongoose.Types.ObjectId
-}): Promise<SubDocument | null> => SubModel.findById(_id)
+export const getSubById = async (
+  _id: string | Mongoose.Types.ObjectId,
+): Promise<SubDbObject | null> => SubModel.findById(_id)
 
-export const resolveSub = async ({
-  root,
-}: {
-  root:
-    | {sub: Partial<Sub>}
-    | {sub_id: Partial<Sub> | string | Mongoose.Types.ObjectId}
-}): Promise<Partial<Sub> | null> => {
-  if ('sub' in root) return root.sub
+export const resolveSub = async (root: {
+  sub: Sub | SubDbObject | Mongoose.Types.ObjectId | string
+}): Promise<Sub | SubDbObject | null> => {
+  if (typeof root.sub === 'string' || isMongoId(root.sub))
+    return getSubById(root.sub)
 
-  if (typeof root.sub_id !== 'string' && !isMongoId(root.sub_id))
-    return root.sub_id
-
-  return getSubById({_id: root.sub_id})
+  return root.sub
 }
 
-export const acceptSub = async ({
-  user,
-  sub_id,
-}: {
-  user: User
-  sub_id: ID
-}): Promise<Partial<Sub> | null> => {
-  const sub = await SubModel.findOne({_id: sub_id, to_id: user._id})
+export const acceptSub = async (
+  _id: Scalars['ID'],
+  user: UserDbObject,
+): Promise<SubDbObject | null> => {
+  const sub = await SubModel.findOne({_id, to: user._id})
 
   if (!sub) return null
 
@@ -97,70 +79,57 @@ export const acceptSub = async ({
   return sub
 }
 
-export const isSubscribedBy = async ({
-  from,
-  to,
-}: {
-  from?: User
-  to: User
-}): Promise<boolean> => {
+export const isSubscribedBy = async (
+  to: User | UserDbObject,
+  from?: User | UserDbObject,
+): Promise<boolean> => {
   if (!from) return false
 
   return SubModel.exists({
-    from_id: from._id,
-    to_id: to._id,
+    from: from._id,
+    to: to._id,
     accepted: true,
   })
 }
 
-export const countSubs = async ({user}: {user: User}): Promise<number> =>
-  SubModel.count({from_id: user._id, accepted: true})
+export const countSubs = async (user: User): Promise<number> =>
+  SubModel.count({from: user._id, accepted: true})
 
-export const countSubscribers = async ({user}: {user: User}): Promise<number> =>
-  SubModel.count({to_id: user._id, accepted: true})
+export const countSubscribers = async (user: User): Promise<number> =>
+  SubModel.count({to: user._id, accepted: true})
 
-export const countSubRequests = async ({user}: {user: User}): Promise<number> =>
-  user.private ? SubModel.count({to_id: user._id, accepted: false}) : 0
+export const countSubRequests = async (user: UserDbObject): Promise<number> =>
+  user.private ? SubModel.count({to: user._id, accepted: false}) : 0
 
-export const getSubRequests = async ({
-  user,
+export const getSubRequests = async (
+  user: UserDbObject,
   first = 25,
   after = 'ffffffffffffffffffffffff',
-}: {
-  user: User
-  first?: number
-  after?: ID
-}): Promise<SubDocument[]> =>
+): Promise<SubDbObject[]> =>
   SubModel.find({
     accepted: false,
-    to_id: user._id,
+    to: user._id,
     _id: {$lt: Mongoose.Types.ObjectId(after)},
   })
     .sort({_id: -1})
     .limit(first + 1)
 
-export const declineSub = async ({
-  _id,
-  user,
-}: {
-  _id: ID
-  user: User
-}): Promise<SubDocument | null> => {
-  const sub = await getSubById({_id})
+export const declineSub = async (
+  _id: Scalars['ID'],
+  user: UserDbObject,
+): Promise<SubDbObject | null> => {
+  const sub = await getSubById(_id)
 
-  if (!sub || String(sub.to_id) !== String(user._id)) return null
+  if (!sub || String(sub.to) !== String(user._id)) return null
 
-  return remove({user, sub})
+  return remove(sub, user)
 }
 
-export const remove = async ({
-  sub,
-  user,
-}: {
-  sub: SubDocument
-  user: User
-}): Promise<SubDocument> => {
-  await sub.deleteOne()
+export const remove = async (
+  sub: SubDbObject,
+  user: UserDbObject,
+): Promise<SubDbObject> => {
+  await SubModel.deleteOne({_id: sub._id})
 
   await EventService.deleteEvent(subRequested({sub, user}))
   await pubsub.publish('sub', {subDeleted: sub})
@@ -168,11 +137,7 @@ export const remove = async ({
   return sub
 }
 
-export const getSubFromTo = async ({
-  from,
-  to,
-}: {
-  from?: User | UserDocument
-  to: User | UserDocument
-}): Promise<SubDocument | null> =>
-  from ? SubModel.findOne({from_id: from._id, to_id: to._id}) : null
+export const getSubFromTo = async (
+  from: User | UserDbObject,
+  to: User | UserDbObject,
+): Promise<SubDbObject | null> => SubModel.findOne({from: from._id, to: to._id})

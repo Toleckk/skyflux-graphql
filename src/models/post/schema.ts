@@ -1,14 +1,14 @@
 // language=GraphQL
 export const PostSchema = `
-    type Post {
-        _id: ID!
-        text: String!
-        createdAt: Date!
-        user: User!
+    type Post @entity {
+        _id: ID! @id
+        text: String! @column
+        createdAt: Date! @column
+        user: User! @link
         isLikedByMe: Boolean!
         likesCount: Int!
         commentsCount: Int!
-        comments(first: Int, after: ID): CommentConnection!
+        comments(first: Int!, after: ID): CommentConnection!
     }
     
     type PostEdge implements Edge {
@@ -31,9 +31,18 @@ export const PostSchema = `
 
     extend type Query {
         getPostById(_id: ID!): Post
-        getPostsByNickname(nickname: String!, first: Int, after: ID): PostConnection!
-        getFoundPosts(text: String!, first: Int, after: ID): PostConnection!
-        getFeed(first: Int, after: ID): PostConnection!
+        getPostsByNickname(nickname: String!, first: Int!, after: ID): PostConnection!
+        getFoundPosts(text: String!, first: Int!, after: ID): PostConnection!
+        getFeed(first: Int!, after: ID): PostConnection! @auth
+    }
+    
+    input CreatePost {
+        text: String! @constraint(minLength: 1, maxLength: 120)
+    }
+
+    extend type Mutation {
+        createPost(post: CreatePost!): Post! @auth
+        deletePost(_id: ID!): DeletedPost @auth
     }
     
     extend type Subscription {
@@ -41,10 +50,5 @@ export const PostSchema = `
         postDeleted(nickname: String): DeletedPost
 
         postUpdated(nickname: String!): MaybePost!
-    }
-
-    extend type Mutation {
-        createPost(text: String!): Post!
-        deletePost(_id: ID!): DeletedPost
     }
 `

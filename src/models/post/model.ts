@@ -1,11 +1,11 @@
-import Mongoose, {Model} from 'mongoose'
+import Mongoose, {Document, Model} from 'mongoose'
 import fuzzySearching from 'mongoose-fuzzy-searching'
-import {PostDocument} from './types'
+import {PostDbObject} from '@models/types'
 
 const schema = new Mongoose.Schema(
   {
     text: {type: Mongoose.Schema.Types.String, required: true},
-    user_id: {
+    user: {
       type: Mongoose.Schema.Types.ObjectId,
       required: true,
       ref: 'User',
@@ -16,7 +16,7 @@ const schema = new Mongoose.Schema(
 
 schema.plugin(fuzzySearching, {fields: ['text']})
 
-export const PostModel = Mongoose.model<PostDocument, Model<PostDocument>>(
-  'Post',
-  schema,
-)
+export const PostModel = Mongoose.model<
+  PostDbObject & Document,
+  Model<PostDbObject & Document>
+>('Post', schema)

@@ -1,11 +1,11 @@
 // language=GraphQL
 export const CommentSchema = `
-    type Comment {
-        _id: ID!
-        text: String!
-        user: User!
-        post: Post!
-        createdAt: Date!
+    type Comment @entity {
+        _id: ID! @id
+        text: String! @column
+        user: User! @link
+        post: Post! @link
+        createdAt: Date! @column
     }
 
     type CommentEdge implements Edge {
@@ -23,17 +23,22 @@ export const CommentSchema = `
         post: Post!
     }
 
+    extend type Query {
+        getCommentsByPostId(post_id: ID!, first: Int!, after: ID): CommentConnection
+    }
+
+    input CreateComment {
+        post_id: ID!
+        text: String! @constraint(minLength: 1, maxLength: 120)
+    }
+
     extend type Mutation {
-        createComment(post_id: ID!, text: String!): Comment!
-        deleteComment(_id: ID!): DeletedComment
+        createComment(comment: CreateComment!): Comment! @auth
+        deleteComment(_id: ID!): DeletedComment @auth
     }
 
     extend type Subscription {
         commentCreated(post_id: ID!): Comment!
         commentDeleted(post_id: ID!): DeletedComment
-    }
-
-    extend type Query {
-        getCommentsByPostId(post_id: ID!, first: Int, after: ID): CommentConnection
     }
 `

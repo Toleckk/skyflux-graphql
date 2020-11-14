@@ -1,51 +1,53 @@
 import {withFilter} from 'apollo-server'
-import {a, auth, injectArgs, injectRoot, paginate, validate} from '@decorators'
 import {pubsub} from '@pubsub'
 import {UserService} from '@models/user'
 import {PostService} from '@models/post'
-import {Comment} from './types'
+import {
+  CommentResolvers,
+  DeletedCommentResolvers,
+  MutationResolvers,
+  QueryResolvers,
+  Resolvers,
+  SubscriptionResolvers,
+} from '@models/types'
+import {paginate} from '@utils/paginate'
 import * as CommentService from './service'
 
 const subscribe = (name: string) =>
   withFilter(
     (): AsyncIterator<Comment> => pubsub.asyncIterator('comment'),
-    a([auth({passOnly: true}), injectRoot(), injectArgs()])(
-      async ({root: {[name]: root}, post_id, user}): Promise<boolean> =>
-        PostService.resolvePost({root, user}).then(
-          post => !!post && String(post._id) === post_id,
-        ),
-    ),
+    async ({[name]: root}, {post_id}, {user}): Promise<boolean> =>
+      PostService.resolvePost(root, user).then(
+        post => !!post && String(post._id) === post_id,
+      ),
   )
 
-export const CommentResolver = {
-  Mutation: {
-    createComment: a([injectArgs(), auth(), validate()])(
-      CommentService.createComment,
-    ),
-    deleteComment: a([injectArgs(), auth()])(CommentService.deleteComment),
+export const CommentResolver: Resolvers = {
+  Comment: <CommentResolvers>{
+    user: comment => UserService.resolveUser(comment),
+    post: (comment, _, {user}) => PostService.resolvePost(comment, user),
   },
-  Subscription: {
+  DeletedComment: <DeletedCommentResolvers>{
+    post: (comment, _, {user}) => PostService.resolvePost(comment, user),
+  },
+  Query: <QueryResolvers>{
+    getCommentsByPostId: (_, {post_id, first, after}) =>
+      paginate((first, after) =>
+        CommentService.getCommentsByPostId(post_id, first, after),
+      )(first, after),
+  },
+  Mutation: <MutationResolvers>{
+    createComment: (_, {comment: {text, post_id}}, {user}) =>
+      CommentService.createComment(text, post_id, user),
+    deleteComment: (_, {_id}, {user}) =>
+      CommentService.deleteComment(_id, user),
+  },
+  Subscription: <SubscriptionResolvers>{
     commentCreated: {
       subscribe: subscribe('commentCreated'),
     },
     commentDeleted: {
       subscribe: subscribe('commentDeleted'),
     },
-  },
-  Query: {
-    getCommentsByPostId: a([injectArgs(), paginate()])(
-      CommentService.getCommentsByPostId,
-    ),
-  },
-  Comment: {
-    user: a([injectRoot()])(({root}) => UserService.resolveUser({root})),
-    post: a([injectRoot(), auth({passOnly: true})])(({root, user}) =>
-      PostService.resolvePost({root, user}),
-    ),
-  },
-  DeletedComment: {
-    post: a([injectRoot(), auth({passOnly: true})])(({root, user}) =>
-      PostService.resolvePost({root, user}),
-    ),
   },
 }
