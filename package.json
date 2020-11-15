@@ -4,7 +4,7 @@
   "main": "src/index.ts",
   "license": "AGPL-3.0-only",
   "scripts": {
-    "dev": "ts-node-dev -r dotenv/config -r tsconfig-paths/register src/index.ts",
+    "dev": "yarn codegen && ts-node-dev -r dotenv/config -r tsconfig-paths/register src/index.ts",
     "start": "yarn build && yarn prod",
     "prod": "node -r dotenv/config -r ./scripts/prod-paths lib/index.js",
     "build": "yarn codegen && tsc",
