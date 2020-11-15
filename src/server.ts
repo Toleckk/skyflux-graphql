@@ -1,10 +1,9 @@
 import Mongoose from 'mongoose'
 import {ApolloServer} from 'apollo-server'
 import {makeExecutableSchema} from 'graphql-tools'
-import {constraintDirective} from 'graphql-constraint-directive'
 import {SessionService} from '@models/session'
 import {map} from 'ramda'
-import {AuthDirective} from '@directives'
+import {AuthDirective, ValidateDirective} from '@directives'
 import {typeDefs} from './typeDefs'
 import {resolvers} from './resolvers'
 
@@ -19,8 +18,8 @@ const schema = makeExecutableSchema({
   resolvers,
   schemaDirectives: {
     auth: AuthDirective,
+    validate: ValidateDirective,
   },
-  schemaTransforms: [constraintDirective()],
 })
 
 const server = new ApolloServer({

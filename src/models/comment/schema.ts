@@ -1,4 +1,6 @@
 // language=GraphQL
+import {text} from '@validation'
+
 export const CommentSchema = `
     type Comment @entity {
         _id: ID! @id
@@ -29,7 +31,7 @@ export const CommentSchema = `
 
     input CreateComment {
         post_id: ID!
-        text: String! @constraint(minLength: 1, maxLength: 120)
+        text: String! @validate(pattern: "${text.p}", error: "${text.e}")
     }
 
     extend type Mutation {

@@ -1,3 +1,5 @@
+import {text} from '@validation'
+
 // language=GraphQL
 export const PostSchema = `
     type Post @entity {
@@ -10,12 +12,12 @@ export const PostSchema = `
         commentsCount: Int!
         comments(first: Int!, after: ID): CommentConnection!
     }
-    
+
     type PostEdge implements Edge {
         cursor: ID!
         node: Post!
     }
-    
+
     type PostConnection implements Connection {
         pageInfo: PageInfo!
         edges: [PostEdge]!
@@ -35,16 +37,16 @@ export const PostSchema = `
         getFoundPosts(text: String!, first: Int!, after: ID): PostConnection!
         getFeed(first: Int!, after: ID): PostConnection! @auth
     }
-    
+
     input CreatePost {
-        text: String! @constraint(minLength: 1, maxLength: 120)
+        text: String! @validate(pattern: "${text.p}", error: "${text.e}")
     }
 
     extend type Mutation {
         createPost(post: CreatePost!): Post! @auth
         deletePost(_id: ID!): DeletedPost @auth
     }
-    
+
     extend type Subscription {
         postCreated(nickname: String): Post!
         postDeleted(nickname: String): DeletedPost

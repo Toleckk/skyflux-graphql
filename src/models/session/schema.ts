@@ -3,8 +3,8 @@ import {login, password} from '@validation'
 // language=GraphQL
 export const SessionSchema = `
     input CreateSession {
-        login: String! @constraint(pattern: "${login}")
-        password: String! @constraint(pattern: "${password}")
+        login: String! @validate(pattern: "${login.p}", error: "${login.e}")
+        password: String! @validate(pattern: "${password.p}", error: "${password.e}")
     }
 
     extend type Mutation {

@@ -19,6 +19,7 @@ export type Scalars = {
   Int: number
   Float: number
   Date: any
+  ValidatedString: any
 }
 
 export type Comment = {
@@ -694,6 +695,7 @@ export type ResolversTypes = ResolversObject<{
   DescrpitionInput: DescrpitionInput
   ConfirmEmail: ConfirmEmail
   Date: ResolverTypeWrapper<Scalars['Date']>
+  ValidatedString: ResolverTypeWrapper<Scalars['ValidatedString']>
   AdditionalEntityFields: AdditionalEntityFields
   Entity: ResolverTypeWrapper<Entity>
   Edge:
@@ -759,6 +761,7 @@ export type ResolversParentTypes = ResolversObject<{
   DescrpitionInput: DescrpitionInput
   ConfirmEmail: ConfirmEmail
   Date: Scalars['Date']
+  ValidatedString: Scalars['ValidatedString']
   AdditionalEntityFields: AdditionalEntityFields
   Entity: Entity
   Edge:
@@ -776,6 +779,18 @@ export type ResolversParentTypes = ResolversObject<{
     | ResolversParentTypes['UserConnection']
 }>
 
+export type ValidateDirectiveArgs = {
+  pattern?: Maybe<Scalars['String']>
+  error?: Maybe<Scalars['String']>
+}
+
+export type ValidateDirectiveResolver<
+  Result,
+  Parent,
+  ContextType = {user: UserDbObject; token: string},
+  Args = ValidateDirectiveArgs
+> = DirectiveResolverFn<Result, Parent, ContextType, Args>
+
 export type AuthDirectiveArgs = {}
 
 export type AuthDirectiveResolver<
@@ -783,30 +798,6 @@ export type AuthDirectiveResolver<
   Parent,
   ContextType = {user: UserDbObject; token: string},
   Args = AuthDirectiveArgs
-> = DirectiveResolverFn<Result, Parent, ContextType, Args>
-
-export type ConstraintDirectiveArgs = {
-  minLength?: Maybe<Scalars['Int']>
-  maxLength?: Maybe<Scalars['Int']>
-  startsWith?: Maybe<Scalars['String']>
-  endsWith?: Maybe<Scalars['String']>
-  contains?: Maybe<Scalars['String']>
-  notContains?: Maybe<Scalars['String']>
-  pattern?: Maybe<Scalars['String']>
-  format?: Maybe<Scalars['String']>
-  min?: Maybe<Scalars['Int']>
-  max?: Maybe<Scalars['Int']>
-  exclusiveMin?: Maybe<Scalars['Int']>
-  exclusiveMax?: Maybe<Scalars['Int']>
-  multipleOf?: Maybe<Scalars['Int']>
-  uniqueTypeName?: Maybe<Scalars['String']>
-}
-
-export type ConstraintDirectiveResolver<
-  Result,
-  Parent,
-  ContextType = {user: UserDbObject; token: string},
-  Args = ConstraintDirectiveArgs
 > = DirectiveResolverFn<Result, Parent, ContextType, Args>
 
 export type UnionDirectiveArgs = {
@@ -1445,6 +1436,11 @@ export interface DateScalarConfig
   name: 'Date'
 }
 
+export interface ValidatedStringScalarConfig
+  extends GraphQLScalarTypeConfig<ResolversTypes['ValidatedString'], any> {
+  name: 'ValidatedString'
+}
+
 export type EntityResolvers<
   ContextType = {user: UserDbObject; token: string},
   ParentType extends ResolversParentTypes['Entity'] = ResolversParentTypes['Entity']
@@ -1529,6 +1525,7 @@ export type Resolvers<
   UserEdge?: UserEdgeResolvers<ContextType>
   UserConnection?: UserConnectionResolvers<ContextType>
   Date?: GraphQLScalarType
+  ValidatedString?: GraphQLScalarType
   Entity?: EntityResolvers<ContextType>
   Edge?: EdgeResolvers<ContextType>
   PageInfo?: PageInfoResolvers<ContextType>
@@ -1545,8 +1542,8 @@ export type IResolvers<
 export type DirectiveResolvers<
   ContextType = {user: UserDbObject; token: string}
 > = ResolversObject<{
+  validate?: ValidateDirectiveResolver<any, any, ContextType>
   auth?: AuthDirectiveResolver<any, any, ContextType>
-  constraint?: ConstraintDirectiveResolver<any, any, ContextType>
   union?: UnionDirectiveResolver<any, any, ContextType>
   abstractEntity?: AbstractEntityDirectiveResolver<any, any, ContextType>
   entity?: EntityDirectiveResolver<any, any, ContextType>

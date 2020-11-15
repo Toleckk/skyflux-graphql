@@ -9,32 +9,18 @@ import {EventSchema} from '@models/event'
 // language=GraphQL
 const Schema = `
     scalar Date
+    scalar ValidatedString
 
     type Mutation
     type Query
     type Subscription
 
-    directive @auth on FIELD_DEFINITION
-
-    directive @constraint (
-        # String constraints
-        minLength: Int
-        maxLength: Int
-        startsWith: String
-        endsWith: String
-        contains: String
-        notContains: String
+    directive @validate(
         pattern: String
-        format: String
+        error: String
+    ) on INPUT_FIELD_DEFINITION | ARGUMENT_DEFINITION
 
-        # Number constraints
-        min: Int
-        max: Int
-        exclusiveMin: Int
-        exclusiveMax: Int
-        multipleOf: Int
-        uniqueTypeName: String
-    ) on INPUT_FIELD_DEFINITION | FIELD_DEFINITION
+    directive @auth on FIELD_DEFINITION
 
     directive @union(discriminatorField: String, additionalFields: [AdditionalEntityFields]) on UNION
     directive @abstractEntity(discriminatorField: String!, additionalFields: [AdditionalEntityFields]) on INTERFACE

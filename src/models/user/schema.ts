@@ -1,4 +1,13 @@
-import {avatarUrl, email, nickname, password} from '@validation'
+import {
+  about,
+  avatarUrl,
+  date,
+  email,
+  from,
+  nickname,
+  password,
+  token,
+} from '@validation'
 // language=GraphQL
 export const UserSchema = `
     type User @entity(additionalFields: [
@@ -33,7 +42,7 @@ export const UserSchema = `
     }
 
     extend type Query {
-        me: User @auth
+        me: User
         getUserByNickname(nickname: String!): User
         doesNicknameExist(nickname: String!): Boolean!
         getSuggestions(first: Int!): UserConnection!
@@ -41,37 +50,37 @@ export const UserSchema = `
     }
 
     input CreateUser {
-        email: String! @constraint(pattern: "${email}")
-        password: String! @constraint(pattern: "${password}")
+        email: String! @validate(pattern: "${email.p}", error: "${email.e}")
+        password: String! @validate(pattern: "${password.p}", error: "${password.e}")
     }
 
     input ResetPassword {
-        token: String! @constraint(minLength: 36, maxLength: 36)
-        password: String! @constraint(pattern: "${password}")
+        token: String! @validate(pattern: "${token.p}", error: "${token.e}")
+        password: String! @validate(pattern: "${password.p}", error: "${token.e}")
     }
 
     input UpdatePassword {
-        oldPassword: String! @constraint(pattern: "${password}")
-        newPassword: String! @constraint(pattern: "${password}")
+        oldPassword: String! @validate(pattern: "${password.p}", error: "${password.e}")
+        newPassword: String! @validate(pattern: "${password.p}", error: "${password.e}")
     }
 
     input UpdateNickname {
-        nickname: String! @constraint(pattern: "${nickname}")
+        nickname: String! @validate(pattern: "${nickname.p}", error: "${nickname.e}")
     }
 
     input UpdateProfileInfo {
-        avatar: String @constraint(pattern: "${avatarUrl}")
+        avatar: String @validate(pattern: "${avatarUrl.p}", error: "${avatarUrl.e}")
         description: DescrpitionInput!
     }
 
     input DescrpitionInput {
-        birthday: String @constraint(format: "date")
-        about: String @constraint(maxLength: 120)
-        from: String @constraint(maxLength: 36)
+        birthday: String @validate(pattern: "${date.p}", error: "${date.e}")
+        about: String @validate(pattern: "${about.p}", error: "${about.e}")
+        from: String @validate(pattern: "${from.p}", error: "${from.e}")
     }
 
     input ConfirmEmail {
-        token: String! @constraint(minLength: 36, maxLength: 36)
+        token: String! @validate(pattern: "${token.p}", error: "${token.e}")
     }
 
     extend type Mutation {
