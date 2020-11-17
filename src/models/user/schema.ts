@@ -23,6 +23,7 @@ export const UserSchema = `
         postsCount: Int!
         subsCount: Int!
         subscribersCount: Int!
+        posts(first: Int!, after: ID): PostConnection!
     }
 
     type Description @entity(embedded: true){

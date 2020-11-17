@@ -401,6 +401,12 @@ export type User = {
   postsCount: Scalars['Int']
   subsCount: Scalars['Int']
   subscribersCount: Scalars['Int']
+  posts: PostConnection
+}
+
+export type UserPostsArgs = {
+  first: Scalars['Int']
+  after?: Maybe<Scalars['ID']>
 }
 
 export type Description = {
@@ -1396,6 +1402,12 @@ export type UserResolvers<
   postsCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>
   subsCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>
   subscribersCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>
+  posts?: Resolver<
+    ResolversTypes['PostConnection'],
+    ParentType,
+    ContextType,
+    RequireFields<UserPostsArgs, 'first'>
+  >
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }>
 

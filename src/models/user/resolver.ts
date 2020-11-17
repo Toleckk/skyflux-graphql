@@ -15,6 +15,10 @@ export const UserResolver: Resolvers = {
     postsCount: root => PostService.countUserPosts(root),
     subsCount: root => SubService.countSubs(root),
     subscribersCount: root => SubService.countSubscribers(root),
+    posts: (root, {first, after}, {user}) =>
+      paginate((first, after) =>
+        PostService.getPostsByNickname(root.nickname, user, first, after),
+      )(first, after),
   },
   Query: <QueryResolvers>{
     me: (_, __, {user}) => user,
