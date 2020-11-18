@@ -34,16 +34,16 @@ export const PostResolver: Resolvers = {
     user: root => UserService.resolveUser(root),
   },
   Query: <QueryResolvers>{
-    getPostById: (_, {_id}, {user}) => PostService.getPostById(_id, user),
-    getPostsByNickname: (_, {nickname, first, after}, {user}) =>
+    post: (_, {_id}, {user}) => PostService.getPostById(_id, user),
+    userPosts: (_, {nickname, first, after}, {user}) =>
       paginate((first, after) =>
         PostService.getPostsByNickname(nickname, user, first, after),
       )(first, after),
-    getFoundPosts: (_, {text, first, after}, {user}) =>
+    posts: (_, {query, first, after}, {user}) =>
       paginate((first, after) =>
-        PostService.getFoundPosts(text, user, first, after),
+        PostService.getFoundPosts(query, user, first, after),
       )(first, after),
-    getFeed: (_, {first, after}, {user}) =>
+    feed: (_, {first, after}, {user}) =>
       paginate((first, after) => PostService.getFeed(user, first, after))(
         first,
         after,

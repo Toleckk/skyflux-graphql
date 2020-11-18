@@ -24,8 +24,8 @@ export const SubSchema = `
     }
 
     extend type Query {
-        getSubRequests(first: Int!, after: ID): SubConnection! @auth
-        getSubRequestsCount: Int! @auth
+        subRequests(first: Int!, after: ID): SubConnection! @auth
+        subRequestsCount: Int! @auth
     }
 
     extend type Mutation {

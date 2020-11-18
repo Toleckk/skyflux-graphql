@@ -51,74 +51,74 @@ export type DeletedComment = {
 
 export type Query = {
   __typename?: 'Query'
+  comments: CommentConnection
   doesNicknameExist: Scalars['Boolean']
-  getCommentsByPostId?: Maybe<CommentConnection>
-  getEvents: EventConnection
-  getFeed: PostConnection
-  getFoundPosts: PostConnection
-  getFoundUsers?: Maybe<UserConnection>
-  getPostById?: Maybe<Post>
-  getPostsByNickname: PostConnection
-  getSubRequests: SubConnection
-  getSubRequestsCount: Scalars['Int']
-  getSuggestions: UserConnection
-  getUserByNickname?: Maybe<User>
+  events: EventConnection
+  feed: PostConnection
   me?: Maybe<User>
+  post?: Maybe<Post>
+  posts: PostConnection
+  subRequests: SubConnection
+  subRequestsCount: Scalars['Int']
+  suggestions: UserConnection
+  user?: Maybe<User>
+  userPosts: PostConnection
+  users?: Maybe<UserConnection>
+}
+
+export type QueryCommentsArgs = {
+  post_id: Scalars['ID']
+  first: Scalars['Int']
+  after?: Maybe<Scalars['ID']>
 }
 
 export type QueryDoesNicknameExistArgs = {
   nickname: Scalars['String']
 }
 
-export type QueryGetCommentsByPostIdArgs = {
-  post_id: Scalars['ID']
+export type QueryEventsArgs = {
   first: Scalars['Int']
   after?: Maybe<Scalars['ID']>
 }
 
-export type QueryGetEventsArgs = {
+export type QueryFeedArgs = {
   first: Scalars['Int']
   after?: Maybe<Scalars['ID']>
 }
 
-export type QueryGetFeedArgs = {
-  first: Scalars['Int']
-  after?: Maybe<Scalars['ID']>
-}
-
-export type QueryGetFoundPostsArgs = {
-  text: Scalars['String']
-  first: Scalars['Int']
-  after?: Maybe<Scalars['ID']>
-}
-
-export type QueryGetFoundUsersArgs = {
-  text: Scalars['String']
-  first: Scalars['Int']
-  after?: Maybe<Scalars['ID']>
-}
-
-export type QueryGetPostByIdArgs = {
+export type QueryPostArgs = {
   _id: Scalars['ID']
 }
 
-export type QueryGetPostsByNicknameArgs = {
+export type QueryPostsArgs = {
+  query: Scalars['String']
+  first: Scalars['Int']
+  after?: Maybe<Scalars['ID']>
+}
+
+export type QuerySubRequestsArgs = {
+  first: Scalars['Int']
+  after?: Maybe<Scalars['ID']>
+}
+
+export type QuerySuggestionsArgs = {
+  first: Scalars['Int']
+}
+
+export type QueryUserArgs = {
+  nickname: Scalars['String']
+}
+
+export type QueryUserPostsArgs = {
   nickname: Scalars['String']
   first: Scalars['Int']
   after?: Maybe<Scalars['ID']>
 }
 
-export type QueryGetSubRequestsArgs = {
+export type QueryUsersArgs = {
+  query: Scalars['String']
   first: Scalars['Int']
   after?: Maybe<Scalars['ID']>
-}
-
-export type QueryGetSuggestionsArgs = {
-  first: Scalars['Int']
-}
-
-export type QueryGetUserByNicknameArgs = {
-  nickname: Scalars['String']
 }
 
 export type CreateComment = {
@@ -659,8 +659,8 @@ export type ResolversTypes = ResolversObject<{
   CommentConnection: ResolverTypeWrapper<CommentConnection>
   DeletedComment: ResolverTypeWrapper<DeletedComment>
   Query: ResolverTypeWrapper<{}>
-  Boolean: ResolverTypeWrapper<Scalars['Boolean']>
   Int: ResolverTypeWrapper<Scalars['Int']>
+  Boolean: ResolverTypeWrapper<Scalars['Boolean']>
   CreateComment: CreateComment
   Mutation: ResolverTypeWrapper<{}>
   Subscription: ResolverTypeWrapper<{}>
@@ -728,8 +728,8 @@ export type ResolversParentTypes = ResolversObject<{
   CommentConnection: CommentConnection
   DeletedComment: DeletedComment
   Query: {}
-  Boolean: Scalars['Boolean']
   Int: Scalars['Int']
+  Boolean: Scalars['Boolean']
   CreateComment: CreateComment
   Mutation: {}
   Subscription: {}
@@ -934,74 +934,74 @@ export type QueryResolvers<
   ContextType = {user: UserDbObject; token: string},
   ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']
 > = ResolversObject<{
+  comments?: Resolver<
+    ResolversTypes['CommentConnection'],
+    ParentType,
+    ContextType,
+    RequireFields<QueryCommentsArgs, 'post_id' | 'first'>
+  >
   doesNicknameExist?: Resolver<
     ResolversTypes['Boolean'],
     ParentType,
     ContextType,
     RequireFields<QueryDoesNicknameExistArgs, 'nickname'>
   >
-  getCommentsByPostId?: Resolver<
-    Maybe<ResolversTypes['CommentConnection']>,
-    ParentType,
-    ContextType,
-    RequireFields<QueryGetCommentsByPostIdArgs, 'post_id' | 'first'>
-  >
-  getEvents?: Resolver<
+  events?: Resolver<
     ResolversTypes['EventConnection'],
     ParentType,
     ContextType,
-    RequireFields<QueryGetEventsArgs, 'first'>
+    RequireFields<QueryEventsArgs, 'first'>
   >
-  getFeed?: Resolver<
+  feed?: Resolver<
     ResolversTypes['PostConnection'],
     ParentType,
     ContextType,
-    RequireFields<QueryGetFeedArgs, 'first'>
+    RequireFields<QueryFeedArgs, 'first'>
   >
-  getFoundPosts?: Resolver<
-    ResolversTypes['PostConnection'],
-    ParentType,
-    ContextType,
-    RequireFields<QueryGetFoundPostsArgs, 'text' | 'first'>
-  >
-  getFoundUsers?: Resolver<
-    Maybe<ResolversTypes['UserConnection']>,
-    ParentType,
-    ContextType,
-    RequireFields<QueryGetFoundUsersArgs, 'text' | 'first'>
-  >
-  getPostById?: Resolver<
+  me?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType>
+  post?: Resolver<
     Maybe<ResolversTypes['Post']>,
     ParentType,
     ContextType,
-    RequireFields<QueryGetPostByIdArgs, '_id'>
+    RequireFields<QueryPostArgs, '_id'>
   >
-  getPostsByNickname?: Resolver<
+  posts?: Resolver<
     ResolversTypes['PostConnection'],
     ParentType,
     ContextType,
-    RequireFields<QueryGetPostsByNicknameArgs, 'nickname' | 'first'>
+    RequireFields<QueryPostsArgs, 'query' | 'first'>
   >
-  getSubRequests?: Resolver<
+  subRequests?: Resolver<
     ResolversTypes['SubConnection'],
     ParentType,
     ContextType,
-    RequireFields<QueryGetSubRequestsArgs, 'first'>
+    RequireFields<QuerySubRequestsArgs, 'first'>
   >
-  getSubRequestsCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>
-  getSuggestions?: Resolver<
+  subRequestsCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>
+  suggestions?: Resolver<
     ResolversTypes['UserConnection'],
     ParentType,
     ContextType,
-    RequireFields<QueryGetSuggestionsArgs, 'first'>
+    RequireFields<QuerySuggestionsArgs, 'first'>
   >
-  getUserByNickname?: Resolver<
+  user?: Resolver<
     Maybe<ResolversTypes['User']>,
     ParentType,
     ContextType,
-    RequireFields<QueryGetUserByNicknameArgs, 'nickname'>
+    RequireFields<QueryUserArgs, 'nickname'>
   >
-  me?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType>
+  userPosts?: Resolver<
+    ResolversTypes['PostConnection'],
+    ParentType,
+    ContextType,
+    RequireFields<QueryUserPostsArgs, 'nickname' | 'first'>
+  >
+  users?: Resolver<
+    Maybe<ResolversTypes['UserConnection']>,
+    ParentType,
+    ContextType,
+    RequireFields<QueryUsersArgs, 'query' | 'first'>
+  >
 }>
 
 export type MutationResolvers<

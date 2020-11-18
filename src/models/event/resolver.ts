@@ -35,7 +35,7 @@ export const EventResolver: Resolvers = {
     like: root => LikeService.resolveLike(root),
   },
   Query: <QueryResolvers>{
-    getEvents: (_, {first, after}, {user}) =>
+    events: (_, {first, after}, {user}) =>
       paginate((first, after) =>
         EventService.getEventsByUser(user, first, after),
       )(first, after),

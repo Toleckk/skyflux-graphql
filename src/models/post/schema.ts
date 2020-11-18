@@ -32,10 +32,10 @@ export const PostSchema = `
     union MaybePost = Post | DeletedPost
 
     extend type Query {
-        getPostById(_id: ID!): Post
-        getPostsByNickname(nickname: String!, first: Int!, after: ID): PostConnection!
-        getFoundPosts(text: String!, first: Int!, after: ID): PostConnection!
-        getFeed(first: Int!, after: ID): PostConnection! @auth
+        post(_id: ID!): Post
+        userPosts(nickname: String!, first: Int!, after: ID): PostConnection!
+        posts(query: String!, first: Int!, after: ID): PostConnection!
+        feed(first: Int!, after: ID): PostConnection! @auth
     }
 
     input CreatePost {

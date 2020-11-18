@@ -30,12 +30,12 @@ export const SubResolver: Resolvers = {
     to: root => UserService.resolveUser({user: root.to}),
   },
   Query: <QueryResolvers>{
-    getSubRequests: (_, {first, after}, {user}) =>
+    subRequests: (_, {first, after}, {user}) =>
       paginate((first, after) => SubService.getSubRequests(user, first, after))(
         first,
         after,
       ),
-    getSubRequestsCount: (_, __, {user}) => SubService.countSubRequests(user),
+    subRequestsCount: (_, __, {user}) => SubService.countSubRequests(user),
   },
   Mutation: <MutationResolvers>{
     createSub: (_, {nickname}, {user}) => SubService.createSub(nickname, user),

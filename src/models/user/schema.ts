@@ -44,10 +44,10 @@ export const UserSchema = `
 
     extend type Query {
         me: User
-        getUserByNickname(nickname: String!): User
+        user(nickname: String!): User
+        users(query: String!, first: Int!, after: ID): UserConnection
+        suggestions(first: Int!): UserConnection!
         doesNicknameExist(nickname: String!): Boolean!
-        getSuggestions(first: Int!): UserConnection!
-        getFoundUsers(text: String!, first: Int!, after: ID): UserConnection
     }
 
     input CreateUser {

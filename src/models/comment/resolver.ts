@@ -31,7 +31,7 @@ export const CommentResolver: Resolvers = {
     post: (comment, _, {user}) => PostService.resolvePost(comment, user),
   },
   Query: <QueryResolvers>{
-    getCommentsByPostId: (_, {post_id, first, after}) =>
+    comments: (_, {post_id, first, after}) =>
       paginate((first, after) =>
         CommentService.getCommentsByPostId(post_id, first, after),
       )(first, after),

@@ -39,7 +39,7 @@ export const EventSchema = `
     }
 
     extend type Query {
-        getEvents(first: Int!, after: ID): EventConnection! @auth
+        events(first: Int!, after: ID): EventConnection! @auth
     }
 
     extend type Subscription {

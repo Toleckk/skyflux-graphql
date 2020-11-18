@@ -24,13 +24,12 @@ export const UserResolver: Resolvers = {
     me: (_, __, {user}) => user,
     doesNicknameExist: (_, {nickname}) =>
       UserService.doesNicknameExist(nickname),
-    getUserByNickname: (_, {nickname}) =>
-      UserService.getUserByNickname(nickname),
-    getSuggestions: (_, {first}, {user}) =>
+    user: (_, {nickname}) => UserService.getUserByNickname(nickname),
+    suggestions: (_, {first}, {user}) =>
       paginate(first => UserService.getSuggestions(user, first))(first),
-    getFoundUsers: (_, {text, first, after}, {user}) =>
+    users: (_, {query, first, after}, {user}) =>
       paginate((first, after) =>
-        UserService.getFoundUsers(text, user, first, after),
+        UserService.getFoundUsers(query, user, first, after),
       )(first, after),
   },
   Mutation: <MutationResolvers>{
