@@ -82,6 +82,7 @@ export const validateAll: ValidateAll = (args, schema) => {
 
       if (
         typeof value === 'string' &&
+        params &&
         'pattern' in params &&
         params.pattern instanceof RegExp
       )
@@ -89,7 +90,7 @@ export const validateAll: ValidateAll = (args, schema) => {
           ? undefined
           : params.error || 'Validation failed'
 
-      if (typeof value === 'object' && !('pattern' in params))
+      if (typeof value === 'object' && !(params && 'pattern' in params))
         return validateAll(value, params as ValidateDirectiveConfig)
     }, args),
   )
