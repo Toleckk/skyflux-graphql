@@ -31,7 +31,7 @@ export const getEventsByUser = async (
               $expr: {
                 $and: [
                   {$lt: [{$cmp: ['$$date', '$createdAt']}, 1]},
-                  {$ne: ['$emitter_id', user._id]},
+                  {$ne: ['$emitter', user._id]},
                 ],
               },
             },
@@ -61,7 +61,7 @@ export const createEvent = async ({
     emitter,
   })
 
-  await pubsub.publish('event', {eventAdded: event})
+  await pubsub.publish('event', {eventUpdated: event})
 
   return event as any
 }
@@ -78,8 +78,14 @@ export const deleteEvent = async ({
 
   if (!event) return null
 
-  await pubsub.publish('event', {eventDeleted: event})
   await event.deleteOne()
+
+  const deletedEvent = {
+    ...event.toObject(),
+    deleted: true,
+  }
+
+  await pubsub.publish('event', {eventUpdated: deletedEvent})
 
   return event._id
 }

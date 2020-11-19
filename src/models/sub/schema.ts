@@ -21,7 +21,10 @@ export const SubSchema = `
         _id: ID!
         from: User!
         to: User!
+        deleted: Boolean!
     }
+    
+    union MaybeSub = Sub | DeletedSub 
 
     extend type Query {
         subRequests(first: Int!, after: ID): SubConnection! @auth
@@ -36,8 +39,6 @@ export const SubSchema = `
     }
 
     extend type Subscription {
-        subAccepted: Sub! @auth
-        subRequestCreated: Sub! @auth
-        subDeleted: DeletedSub @auth
+        subUpdated: MaybeSub!
     }
 `

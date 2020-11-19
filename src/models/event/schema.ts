@@ -9,6 +9,7 @@ export const EventSchema = `
         {path: "channel", type: "string"},
         {path: "emitter", type: "ObjectID | UserDbObject"},
     ]) {
+        _id: ID! @id
         createdAt: Date! @column
         kind: EventType! @column
         subj: EventBody! @embedded
@@ -28,6 +29,13 @@ export const EventSchema = `
         like: Like! @link
     }
 
+    type DeletedEvent {
+        _id: ID!
+        deleted: Boolean!
+    }
+
+    union MaybeEvent = Event | DeletedEvent
+
     type EventEdge implements Edge {
         cursor: ID!
         node: Event!
@@ -43,7 +51,6 @@ export const EventSchema = `
     }
 
     extend type Subscription {
-        eventAdded: Event! @auth
-        eventDeleted: Entity @auth
+        eventUpdated: MaybeEvent! @auth
     }
 `

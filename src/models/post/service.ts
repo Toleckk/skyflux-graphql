@@ -28,8 +28,6 @@ export const createPost = async (
     user,
   }
 
-  await pubsub.publish('post', {postCreated: postWithUser})
-
   await pubsub.publish('post', {postUpdated: postWithUser})
 
   return postWithUser
@@ -44,15 +42,15 @@ export const getFeed = async (
     {
       $lookup: {
         from: 'subs',
-        let: {user: '$user_id'},
+        let: {user: '$user'},
         pipeline: [
           {
             $match: {
               $expr: {
                 $and: [
-                  {$eq: ['$to_id', '$$user']},
+                  {$eq: ['$to', '$$user']},
                   {$eq: ['$accepted', true]},
-                  {$eq: ['$from_id', user._id]},
+                  {$eq: ['$from', user._id]},
                 ],
               },
             },
@@ -67,7 +65,7 @@ export const getFeed = async (
           $and: [
             {
               $or: [
-                {$eq: ['$user_id', user._id]},
+                {$eq: ['$user', user._id]},
                 {$eq: [{$size: '$receivers'}, 1]},
               ],
             },
@@ -98,7 +96,6 @@ export const deletePost = async (
 
   const deletedPost = {...post.toObject(), user, deleted: true}
 
-  await pubsub.publish('post', {postDeleted: deletedPost})
   await pubsub.publish('post', {postUpdated: deletedPost})
 
   return deletedPost
@@ -126,7 +123,7 @@ export const getFoundPosts = async (
     {
       $lookup: {
         from: 'users',
-        localField: 'user_id',
+        localField: 'user',
         foreignField: '_id',
         as: 'user',
       },
@@ -140,7 +137,7 @@ export const getFoundPosts = async (
       $lookup: {
         from: 'subs',
         localField: 'user._id',
-        foreignField: 'to_id',
+        foreignField: 'to',
         as: 'subs',
       },
     },
@@ -151,7 +148,7 @@ export const getFoundPosts = async (
           ...(user
             ? [
                 {'user._id': user._id},
-                {subs: {$elemMatch: {from_id: user._id, accepted: true}}},
+                {subs: {$elemMatch: {from: user._id, accepted: true}}},
               ]
             : []),
         ],
@@ -219,4 +216,4 @@ export const canSeeUserPosts = async (
 }
 
 export const countUserPosts = async (user: User): Promise<number> =>
-  PostModel.count({user_id: user._id})
+  PostModel.count({user: user._id})

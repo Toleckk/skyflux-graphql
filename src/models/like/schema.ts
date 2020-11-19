@@ -5,14 +5,22 @@ export const LikeSchema = `
         post: Post! @link
         user: User! @link
     }
+    
+    type DeletedLike {
+        _id: ID!
+        post: Post!
+        user: User!
+        deleted: Boolean!
+    }
+    
+    union MaybeLike = Like | DeletedLike 
 
     extend type Mutation {
         createLike(post_id: ID!): Like! @auth
-        deleteLike(post_id: ID!): Boolean @auth
+        deleteLike(post_id: ID!): DeletedLike! @auth
     }
     
     extend type Subscription {
-        likeCreated(post_id: ID!): Like!
-        likeDeleted(post_id: ID!): Like!
+        likeUpdated(post_id: ID!): MaybeLike!
     }
 `

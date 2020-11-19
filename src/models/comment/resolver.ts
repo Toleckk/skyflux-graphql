@@ -5,6 +5,7 @@ import {PostService} from '@models/post'
 import {
   CommentResolvers,
   DeletedCommentResolvers,
+  MaybeCommentResolvers,
   MutationResolvers,
   QueryResolvers,
   Resolvers,
@@ -13,15 +14,6 @@ import {
 import {paginate} from '@utils/paginate'
 import * as CommentService from './service'
 
-const subscribe = (name: string) =>
-  withFilter(
-    (): AsyncIterator<Comment> => pubsub.asyncIterator('comment'),
-    async ({[name]: root}, {post_id}, {user}): Promise<boolean> =>
-      PostService.resolvePost(root, user).then(
-        post => !!post && String(post._id) === post_id,
-      ),
-  )
-
 export const CommentResolver: Resolvers = {
   Comment: <CommentResolvers>{
     user: comment => UserService.resolveUser(comment),
@@ -29,6 +21,10 @@ export const CommentResolver: Resolvers = {
   },
   DeletedComment: <DeletedCommentResolvers>{
     post: (comment, _, {user}) => PostService.resolvePost(comment, user),
+  },
+  MaybeComment: <MaybeCommentResolvers>{
+    __resolveType: parent =>
+      'deleted' in parent ? 'DeletedComment' : 'Comment',
   },
   Query: <QueryResolvers>{
     comments: (_, {post_id, first, after}) =>
@@ -43,11 +39,14 @@ export const CommentResolver: Resolvers = {
       CommentService.deleteComment(_id, user),
   },
   Subscription: <SubscriptionResolvers>{
-    commentCreated: {
-      subscribe: subscribe('commentCreated'),
-    },
-    commentDeleted: {
-      subscribe: subscribe('commentDeleted'),
+    commentUpdated: {
+      subscribe: withFilter(
+        (): AsyncIterator<Comment> => pubsub.asyncIterator('comment'),
+        async ({commentUpdated}, {post_id}, {user}): Promise<boolean> =>
+          PostService.resolvePost(commentUpdated, user).then(
+            post => !!post && String(post._id) === post_id,
+          ),
+      ),
     },
   },
 }

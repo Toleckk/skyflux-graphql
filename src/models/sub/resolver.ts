@@ -3,6 +3,7 @@ import {pubsub} from '@pubsub'
 import {UserService} from '@models/user'
 import {
   DeletedSubResolvers,
+  MaybeSubResolvers,
   MutationResolvers,
   QueryResolvers,
   Resolvers,
@@ -12,14 +13,6 @@ import {
 import {paginate} from '@utils/paginate'
 import * as SubService from './service'
 
-const createSubscribeFn = (name: string) =>
-  withFilter(
-    () => pubsub.asyncIterator('sub'),
-    (root, _, {user}) =>
-      String(root[name]?.to?._id || root[name]?.to_id) === String(user._id) ||
-      String(root[name]?.from?._id || root[name]?.from_id) === String(user._id),
-  )
-
 export const SubResolver: Resolvers = {
   Sub: <SubResolvers>{
     from: root => UserService.resolveUser({user: root.from}),
@@ -28,6 +21,9 @@ export const SubResolver: Resolvers = {
   DeletedSub: <DeletedSubResolvers>{
     from: root => UserService.resolveUser({user: root.from}),
     to: root => UserService.resolveUser({user: root.to}),
+  },
+  MaybeSub: <MaybeSubResolvers>{
+    __resolveType: sub => ('deleted' in sub ? 'DeletedSub' : 'Sub'),
   },
   Query: <QueryResolvers>{
     subRequests: (_, {first, after}, {user}) =>
@@ -44,14 +40,15 @@ export const SubResolver: Resolvers = {
     declineSub: (_, {_id}, {user}) => SubService.declineSub(_id, user),
   },
   Subscription: <SubscriptionResolvers>{
-    subAccepted: {
-      subscribe: createSubscribeFn('subAccepted'),
-    },
-    subRequestCreated: {
-      subscribe: createSubscribeFn('subRequestCreated'),
-    },
-    subDeleted: {
-      subscribe: createSubscribeFn('subDeleted'),
+    subUpdated: {
+      subscribe: withFilter(
+        () => pubsub.asyncIterator('sub'),
+        ({subUpdated}, _, {user}) =>
+          subUpdated &&
+          (subUpdated.accepted ||
+            UserService.isUsersEqual(subUpdated.from, user) ||
+            UserService.isUsersEqual(subUpdated.to, user)),
+      ),
     },
   },
 }

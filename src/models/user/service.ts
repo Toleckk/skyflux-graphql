@@ -207,7 +207,7 @@ export const getSuggestions = async (
       $lookup: {
         from: 'posts',
         localField: '_id',
-        foreignField: 'user_id',
+        foreignField: 'user',
         as: 'posts',
       },
     },
@@ -223,4 +223,39 @@ export const resolveUser = async (root: {
     return getUserById(root.user)
 
   return root.user
+}
+
+export const isUsersEqual = (
+  userA:
+    | User
+    | UserDbObject
+    | Mongoose.Types.ObjectId
+    | string
+    | null
+    | undefined,
+  userB:
+    | User
+    | UserDbObject
+    | Mongoose.Types.ObjectId
+    | string
+    | null
+    | undefined,
+): boolean => {
+  if ((userA && !userB) || (userB && !userA)) return false
+
+  if (!userA && !userB) return true
+
+  if (userA === userB) return true
+
+  if (isMongoId(userA) || typeof userA === 'string') {
+    if (isMongoId(userB) || typeof userB === 'string')
+      return String(userA) === String(userB)
+
+    return String(userA) === String(userB?._id)
+  }
+
+  if (isMongoId(userB) || typeof userB === 'string')
+    return String(userA?._id) === String(userB)
+
+  return String(userA?._id) === String(userB?._id)
 }

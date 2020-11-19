@@ -48,9 +48,6 @@ export const PostSchema = `
     }
 
     extend type Subscription {
-        postCreated(nickname: String): Post!
-        postDeleted(nickname: String): DeletedPost
-
         postUpdated(nickname: String!): MaybePost!
     }
 `

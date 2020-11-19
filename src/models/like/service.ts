@@ -1,6 +1,7 @@
 import Mongoose from 'mongoose'
 import {pubsub} from '@pubsub'
 import {
+  DeletedLike,
   Like,
   LikeDbObject,
   Post,
@@ -8,23 +9,33 @@ import {
   UserDbObject,
 } from '@models/types'
 import {EventService} from '@models/event'
-import {likeCreated} from '@models/like/events'
+import {PostService} from '@models/post'
 import {isMongoId} from '@utils/isMongoId'
 import {LikeModel} from './model'
+import {likeCreated} from './events'
 
 export const deleteLike = async (
   post_id: string,
   user: UserDbObject,
-): Promise<boolean> => {
+): Promise<DeletedLike | null> => {
   const like = await LikeModel.findOne({post: post_id, user: user._id})
 
-  if (!like) return false
+  if (!like) return null
 
   await like.deleteOne()
-  await EventService.deleteEvent(likeCreated({like, user}))
-  await pubsub.publish('like', {likeDeleted: like})
 
-  return true
+  const deletedLike: DeletedLike = {
+    ...like.toObject(),
+    user,
+    deleted: true,
+  }
+
+  await Promise.all([
+    EventService.deleteEvent(likeCreated({like, user})),
+    pubsub.publish('like', {likeUpdated: like}),
+  ])
+
+  return deletedLike
 }
 
 export const deleteLikesByPost = async (
@@ -36,13 +47,25 @@ export const deleteLikesByPost = async (
 export const createLike = async (
   postId: string,
   user: UserDbObject,
-): Promise<LikeDbObject | null> => {
-  const like = await LikeModel.create({post: postId, user: user._id})
+): Promise<LikeDbObject | Like | null> => {
+  const post = await PostService.getPostById(postId, user)
 
-  if (!like) return null
+  if (!post) return null
 
-  await EventService.createEvent(likeCreated({like, user}))
-  await pubsub.publish('like', {likeCreated: like})
+  const likeDocument = await LikeModel.create({post: post._id, user: user._id})
+
+  if (!likeDocument) return null
+
+  const like: Like = {
+    ...likeDocument.toObject(),
+    user,
+    post,
+  }
+
+  await Promise.all([
+    EventService.createEvent(likeCreated({like, user})),
+    pubsub.publish('like', {likeUpdated: like}),
+  ])
 
   return like
 }

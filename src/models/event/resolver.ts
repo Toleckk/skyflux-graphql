@@ -4,6 +4,7 @@ import {
   CommentEventBodyResolvers,
   EventBodyResolvers,
   LikeEventBodyResolvers,
+  MaybeEventResolvers,
   QueryResolvers,
   Resolvers,
   SubEventBodyResolvers,
@@ -17,6 +18,9 @@ import {paginate} from '@utils/paginate'
 import * as EventService from './service'
 
 export const EventResolver: Resolvers = {
+  MaybeEvent: <MaybeEventResolvers>{
+    __resolveType: parent => ('deleted' in parent ? 'DeletedEvent' : 'Event'),
+  },
   EventBody: <EventBodyResolvers>{
     __resolveType: root =>
       'sub' in root
@@ -41,24 +45,14 @@ export const EventResolver: Resolvers = {
       )(first, after),
   },
   Subscription: <SubscriptionResolvers>{
-    eventAdded: {
+    eventUpdated: {
       subscribe: withFilter(
         (): AsyncIterator<Event> => pubsub.asyncIterator('event'),
         (root, _, {user}) =>
-          String(root.eventAdded.emitter_id) !== String(user._id) &&
+          root.eventUpdated &&
+          String(root.eventUpdated.emitter) !== String(user._id) &&
           ChannelService.isUserSubscribedToChannel(
-            root.eventAdded.channel,
-            user,
-          ),
-      ),
-    },
-    eventDeleted: {
-      subscribe: withFilter(
-        (): AsyncIterator<Event> => pubsub.asyncIterator('event'),
-        (root, _, {user}) =>
-          String(root.eventDeleted.emitter_id) !== String(user._id) &&
-          ChannelService.isUserSubscribedToChannel(
-            root.eventDeleted.channel,
+            root.eventUpdated.channel,
             user,
           ),
       ),

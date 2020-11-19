@@ -47,6 +47,7 @@ export type DeletedComment = {
   __typename?: 'DeletedComment'
   _id: Scalars['ID']
   post: Post
+  deleted: Scalars['Boolean']
 }
 
 export type Query = {
@@ -140,7 +141,7 @@ export type Mutation = {
   declineSub?: Maybe<DeletedSub>
   deleteComment?: Maybe<DeletedComment>
   deleteCurrentSession?: Maybe<Scalars['Boolean']>
-  deleteLike?: Maybe<Scalars['Boolean']>
+  deleteLike: DeletedLike
   deletePost?: Maybe<DeletedPost>
   deleteSub?: Maybe<DeletedSub>
   makeAccountPrivate: User
@@ -223,44 +224,23 @@ export type MutationUpdateProfileInfoArgs = {
   user: UpdateProfileInfo
 }
 
+export type MaybeComment = Comment | DeletedComment
+
 export type Subscription = {
   __typename?: 'Subscription'
-  commentCreated: Comment
-  commentDeleted?: Maybe<DeletedComment>
-  eventAdded: Event
-  eventDeleted?: Maybe<Entity>
-  likeCreated: Like
-  likeDeleted: Like
-  postCreated: Post
-  postDeleted?: Maybe<DeletedPost>
+  commentUpdated: MaybeComment
+  eventUpdated: MaybeEvent
+  likeUpdated: MaybeLike
   postUpdated: MaybePost
-  subAccepted: Sub
-  subDeleted?: Maybe<DeletedSub>
-  subRequestCreated: Sub
+  subUpdated: MaybeSub
 }
 
-export type SubscriptionCommentCreatedArgs = {
+export type SubscriptionCommentUpdatedArgs = {
   post_id: Scalars['ID']
 }
 
-export type SubscriptionCommentDeletedArgs = {
+export type SubscriptionLikeUpdatedArgs = {
   post_id: Scalars['ID']
-}
-
-export type SubscriptionLikeCreatedArgs = {
-  post_id: Scalars['ID']
-}
-
-export type SubscriptionLikeDeletedArgs = {
-  post_id: Scalars['ID']
-}
-
-export type SubscriptionPostCreatedArgs = {
-  nickname?: Maybe<Scalars['String']>
-}
-
-export type SubscriptionPostDeletedArgs = {
-  nickname?: Maybe<Scalars['String']>
 }
 
 export type SubscriptionPostUpdatedArgs = {
@@ -275,6 +255,7 @@ export enum EventType {
 
 export type Event = {
   __typename?: 'Event'
+  _id: Scalars['ID']
   createdAt: Scalars['Date']
   kind: EventType
   subj: EventBody
@@ -297,6 +278,14 @@ export type LikeEventBody = {
   like: Like
 }
 
+export type DeletedEvent = {
+  __typename?: 'DeletedEvent'
+  _id: Scalars['ID']
+  deleted: Scalars['Boolean']
+}
+
+export type MaybeEvent = Event | DeletedEvent
+
 export type EventEdge = Edge & {
   __typename?: 'EventEdge'
   cursor: Scalars['ID']
@@ -315,6 +304,16 @@ export type Like = {
   post: Post
   user: User
 }
+
+export type DeletedLike = {
+  __typename?: 'DeletedLike'
+  _id: Scalars['ID']
+  post: Post
+  user: User
+  deleted: Scalars['Boolean']
+}
+
+export type MaybeLike = Like | DeletedLike
 
 export type Post = {
   __typename?: 'Post'
@@ -388,7 +387,10 @@ export type DeletedSub = {
   _id: Scalars['ID']
   from: User
   to: User
+  deleted: Scalars['Boolean']
 }
+
+export type MaybeSub = Sub | DeletedSub
 
 export type User = {
   __typename?: 'User'
@@ -658,11 +660,12 @@ export type ResolversTypes = ResolversObject<{
   CommentEdge: ResolverTypeWrapper<CommentEdge>
   CommentConnection: ResolverTypeWrapper<CommentConnection>
   DeletedComment: ResolverTypeWrapper<DeletedComment>
+  Boolean: ResolverTypeWrapper<Scalars['Boolean']>
   Query: ResolverTypeWrapper<{}>
   Int: ResolverTypeWrapper<Scalars['Int']>
-  Boolean: ResolverTypeWrapper<Scalars['Boolean']>
   CreateComment: CreateComment
   Mutation: ResolverTypeWrapper<{}>
+  MaybeComment: ResolversTypes['Comment'] | ResolversTypes['DeletedComment']
   Subscription: ResolverTypeWrapper<{}>
   EventType: EventType
   Event: ResolverTypeWrapper<
@@ -675,9 +678,13 @@ export type ResolversTypes = ResolversObject<{
   SubEventBody: ResolverTypeWrapper<SubEventBody>
   CommentEventBody: ResolverTypeWrapper<CommentEventBody>
   LikeEventBody: ResolverTypeWrapper<LikeEventBody>
+  DeletedEvent: ResolverTypeWrapper<DeletedEvent>
+  MaybeEvent: ResolversTypes['Event'] | ResolversTypes['DeletedEvent']
   EventEdge: ResolverTypeWrapper<EventEdge>
   EventConnection: ResolverTypeWrapper<EventConnection>
   Like: ResolverTypeWrapper<Like>
+  DeletedLike: ResolverTypeWrapper<DeletedLike>
+  MaybeLike: ResolversTypes['Like'] | ResolversTypes['DeletedLike']
   Post: ResolverTypeWrapper<Post>
   PostEdge: ResolverTypeWrapper<PostEdge>
   PostConnection: ResolverTypeWrapper<PostConnection>
@@ -689,6 +696,7 @@ export type ResolversTypes = ResolversObject<{
   SubEdge: ResolverTypeWrapper<SubEdge>
   SubConnection: ResolverTypeWrapper<SubConnection>
   DeletedSub: ResolverTypeWrapper<DeletedSub>
+  MaybeSub: ResolversTypes['Sub'] | ResolversTypes['DeletedSub']
   User: ResolverTypeWrapper<User>
   Description: ResolverTypeWrapper<Description>
   UserEdge: ResolverTypeWrapper<UserEdge>
@@ -727,11 +735,14 @@ export type ResolversParentTypes = ResolversObject<{
   CommentEdge: CommentEdge
   CommentConnection: CommentConnection
   DeletedComment: DeletedComment
+  Boolean: Scalars['Boolean']
   Query: {}
   Int: Scalars['Int']
-  Boolean: Scalars['Boolean']
   CreateComment: CreateComment
   Mutation: {}
+  MaybeComment:
+    | ResolversParentTypes['Comment']
+    | ResolversParentTypes['DeletedComment']
   Subscription: {}
   Event: Omit<Event, 'subj'> & {subj: ResolversParentTypes['EventBody']}
   EventBody:
@@ -741,9 +752,15 @@ export type ResolversParentTypes = ResolversObject<{
   SubEventBody: SubEventBody
   CommentEventBody: CommentEventBody
   LikeEventBody: LikeEventBody
+  DeletedEvent: DeletedEvent
+  MaybeEvent:
+    | ResolversParentTypes['Event']
+    | ResolversParentTypes['DeletedEvent']
   EventEdge: EventEdge
   EventConnection: EventConnection
   Like: Like
+  DeletedLike: DeletedLike
+  MaybeLike: ResolversParentTypes['Like'] | ResolversParentTypes['DeletedLike']
   Post: Post
   PostEdge: PostEdge
   PostConnection: PostConnection
@@ -755,6 +772,7 @@ export type ResolversParentTypes = ResolversObject<{
   SubEdge: SubEdge
   SubConnection: SubConnection
   DeletedSub: DeletedSub
+  MaybeSub: ResolversParentTypes['Sub'] | ResolversParentTypes['DeletedSub']
   User: User
   Description: Description
   UserEdge: UserEdge
@@ -927,6 +945,7 @@ export type DeletedCommentResolvers<
 > = ResolversObject<{
   _id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>
   post?: Resolver<ResolversTypes['Post'], ParentType, ContextType>
+  deleted?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }>
 
@@ -1080,7 +1099,7 @@ export type MutationResolvers<
     ContextType
   >
   deleteLike?: Resolver<
-    Maybe<ResolversTypes['Boolean']>,
+    ResolversTypes['DeletedLike'],
     ParentType,
     ContextType,
     RequireFields<MutationDeleteLikeArgs, 'post_id'>
@@ -1125,63 +1144,40 @@ export type MutationResolvers<
   >
 }>
 
+export type MaybeCommentResolvers<
+  ContextType = {user: UserDbObject; token: string},
+  ParentType extends ResolversParentTypes['MaybeComment'] = ResolversParentTypes['MaybeComment']
+> = ResolversObject<{
+  __resolveType: TypeResolveFn<
+    'Comment' | 'DeletedComment',
+    ParentType,
+    ContextType
+  >
+}>
+
 export type SubscriptionResolvers<
   ContextType = {user: UserDbObject; token: string},
   ParentType extends ResolversParentTypes['Subscription'] = ResolversParentTypes['Subscription']
 > = ResolversObject<{
-  commentCreated?: SubscriptionResolver<
-    ResolversTypes['Comment'],
-    'commentCreated',
+  commentUpdated?: SubscriptionResolver<
+    ResolversTypes['MaybeComment'],
+    'commentUpdated',
     ParentType,
     ContextType,
-    RequireFields<SubscriptionCommentCreatedArgs, 'post_id'>
+    RequireFields<SubscriptionCommentUpdatedArgs, 'post_id'>
   >
-  commentDeleted?: SubscriptionResolver<
-    Maybe<ResolversTypes['DeletedComment']>,
-    'commentDeleted',
-    ParentType,
-    ContextType,
-    RequireFields<SubscriptionCommentDeletedArgs, 'post_id'>
-  >
-  eventAdded?: SubscriptionResolver<
-    ResolversTypes['Event'],
-    'eventAdded',
+  eventUpdated?: SubscriptionResolver<
+    ResolversTypes['MaybeEvent'],
+    'eventUpdated',
     ParentType,
     ContextType
   >
-  eventDeleted?: SubscriptionResolver<
-    Maybe<ResolversTypes['Entity']>,
-    'eventDeleted',
-    ParentType,
-    ContextType
-  >
-  likeCreated?: SubscriptionResolver<
-    ResolversTypes['Like'],
-    'likeCreated',
+  likeUpdated?: SubscriptionResolver<
+    ResolversTypes['MaybeLike'],
+    'likeUpdated',
     ParentType,
     ContextType,
-    RequireFields<SubscriptionLikeCreatedArgs, 'post_id'>
-  >
-  likeDeleted?: SubscriptionResolver<
-    ResolversTypes['Like'],
-    'likeDeleted',
-    ParentType,
-    ContextType,
-    RequireFields<SubscriptionLikeDeletedArgs, 'post_id'>
-  >
-  postCreated?: SubscriptionResolver<
-    ResolversTypes['Post'],
-    'postCreated',
-    ParentType,
-    ContextType,
-    RequireFields<SubscriptionPostCreatedArgs, never>
-  >
-  postDeleted?: SubscriptionResolver<
-    Maybe<ResolversTypes['DeletedPost']>,
-    'postDeleted',
-    ParentType,
-    ContextType,
-    RequireFields<SubscriptionPostDeletedArgs, never>
+    RequireFields<SubscriptionLikeUpdatedArgs, 'post_id'>
   >
   postUpdated?: SubscriptionResolver<
     ResolversTypes['MaybePost'],
@@ -1190,21 +1186,9 @@ export type SubscriptionResolvers<
     ContextType,
     RequireFields<SubscriptionPostUpdatedArgs, 'nickname'>
   >
-  subAccepted?: SubscriptionResolver<
-    ResolversTypes['Sub'],
-    'subAccepted',
-    ParentType,
-    ContextType
-  >
-  subDeleted?: SubscriptionResolver<
-    Maybe<ResolversTypes['DeletedSub']>,
-    'subDeleted',
-    ParentType,
-    ContextType
-  >
-  subRequestCreated?: SubscriptionResolver<
-    ResolversTypes['Sub'],
-    'subRequestCreated',
+  subUpdated?: SubscriptionResolver<
+    ResolversTypes['MaybeSub'],
+    'subUpdated',
     ParentType,
     ContextType
   >
@@ -1214,6 +1198,7 @@ export type EventResolvers<
   ContextType = {user: UserDbObject; token: string},
   ParentType extends ResolversParentTypes['Event'] = ResolversParentTypes['Event']
 > = ResolversObject<{
+  _id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>
   createdAt?: Resolver<ResolversTypes['Date'], ParentType, ContextType>
   kind?: Resolver<ResolversTypes['EventType'], ParentType, ContextType>
   subj?: Resolver<ResolversTypes['EventBody'], ParentType, ContextType>
@@ -1255,6 +1240,26 @@ export type LikeEventBodyResolvers<
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }>
 
+export type DeletedEventResolvers<
+  ContextType = {user: UserDbObject; token: string},
+  ParentType extends ResolversParentTypes['DeletedEvent'] = ResolversParentTypes['DeletedEvent']
+> = ResolversObject<{
+  _id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>
+  deleted?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
+}>
+
+export type MaybeEventResolvers<
+  ContextType = {user: UserDbObject; token: string},
+  ParentType extends ResolversParentTypes['MaybeEvent'] = ResolversParentTypes['MaybeEvent']
+> = ResolversObject<{
+  __resolveType: TypeResolveFn<
+    'Event' | 'DeletedEvent',
+    ParentType,
+    ContextType
+  >
+}>
+
 export type EventEdgeResolvers<
   ContextType = {user: UserDbObject; token: string},
   ParentType extends ResolversParentTypes['EventEdge'] = ResolversParentTypes['EventEdge']
@@ -1285,6 +1290,24 @@ export type LikeResolvers<
   post?: Resolver<ResolversTypes['Post'], ParentType, ContextType>
   user?: Resolver<ResolversTypes['User'], ParentType, ContextType>
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
+}>
+
+export type DeletedLikeResolvers<
+  ContextType = {user: UserDbObject; token: string},
+  ParentType extends ResolversParentTypes['DeletedLike'] = ResolversParentTypes['DeletedLike']
+> = ResolversObject<{
+  _id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>
+  post?: Resolver<ResolversTypes['Post'], ParentType, ContextType>
+  user?: Resolver<ResolversTypes['User'], ParentType, ContextType>
+  deleted?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
+}>
+
+export type MaybeLikeResolvers<
+  ContextType = {user: UserDbObject; token: string},
+  ParentType extends ResolversParentTypes['MaybeLike'] = ResolversParentTypes['MaybeLike']
+> = ResolversObject<{
+  __resolveType: TypeResolveFn<'Like' | 'DeletedLike', ParentType, ContextType>
 }>
 
 export type PostResolvers<
@@ -1386,7 +1409,15 @@ export type DeletedSubResolvers<
   _id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>
   from?: Resolver<ResolversTypes['User'], ParentType, ContextType>
   to?: Resolver<ResolversTypes['User'], ParentType, ContextType>
+  deleted?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
+}>
+
+export type MaybeSubResolvers<
+  ContextType = {user: UserDbObject; token: string},
+  ParentType extends ResolversParentTypes['MaybeSub'] = ResolversParentTypes['MaybeSub']
+> = ResolversObject<{
+  __resolveType: TypeResolveFn<'Sub' | 'DeletedSub', ParentType, ContextType>
 }>
 
 export type UserResolvers<
@@ -1514,15 +1545,20 @@ export type Resolvers<
   DeletedComment?: DeletedCommentResolvers<ContextType>
   Query?: QueryResolvers<ContextType>
   Mutation?: MutationResolvers<ContextType>
+  MaybeComment?: MaybeCommentResolvers<ContextType>
   Subscription?: SubscriptionResolvers<ContextType>
   Event?: EventResolvers<ContextType>
   EventBody?: EventBodyResolvers<ContextType>
   SubEventBody?: SubEventBodyResolvers<ContextType>
   CommentEventBody?: CommentEventBodyResolvers<ContextType>
   LikeEventBody?: LikeEventBodyResolvers<ContextType>
+  DeletedEvent?: DeletedEventResolvers<ContextType>
+  MaybeEvent?: MaybeEventResolvers<ContextType>
   EventEdge?: EventEdgeResolvers<ContextType>
   EventConnection?: EventConnectionResolvers<ContextType>
   Like?: LikeResolvers<ContextType>
+  DeletedLike?: DeletedLikeResolvers<ContextType>
+  MaybeLike?: MaybeLikeResolvers<ContextType>
   Post?: PostResolvers<ContextType>
   PostEdge?: PostEdgeResolvers<ContextType>
   PostConnection?: PostConnectionResolvers<ContextType>
@@ -1532,6 +1568,7 @@ export type Resolvers<
   SubEdge?: SubEdgeResolvers<ContextType>
   SubConnection?: SubConnectionResolvers<ContextType>
   DeletedSub?: DeletedSubResolvers<ContextType>
+  MaybeSub?: MaybeSubResolvers<ContextType>
   User?: UserResolvers<ContextType>
   Description?: DescriptionResolvers<ContextType>
   UserEdge?: UserEdgeResolvers<ContextType>
@@ -1583,10 +1620,10 @@ export type CommentDbObject = {
 }
 
 export type EventDbObject = {
+  _id: ObjectID
   createdAt: any
   kind: string
   subj: EventBodyDbObject
-  _id: ObjectID
   channel: string
   emitter: ObjectID | UserDbObject
 }

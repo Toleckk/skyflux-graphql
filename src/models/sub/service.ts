@@ -10,29 +10,29 @@ import {SubModel} from './model'
 export const createSub = async (
   nickname: string,
   user: UserDbObject,
-): Promise<SubDbObject | null> => {
+): Promise<SubDbObject | Sub | null> => {
   if (user.nickname === nickname) return null
 
   const to = await UserService.getUserByNickname(nickname)
 
   if (!to) return null
 
-  const sub = await SubModel.create({
+  const subDocument = await SubModel.create({
     from: user._id,
     to: to._id,
     accepted: !to.private,
   })
 
-  await EventService.createEvent(subRequested({sub, user}))
-  await pubsub.publish('sub', {
-    [to.private ? 'subRequestCreated' : 'subAccepted']: sub,
-  })
-
-  return {
-    ...sub.toObject(),
+  const sub: Sub = {
+    ...subDocument.toObject(),
     to,
     from: user,
   }
+
+  await EventService.createEvent(subRequested({sub, user}))
+  await pubsub.publish('sub', {subUpdated: sub})
+
+  return sub
 }
 
 export const deleteSub = async (
@@ -47,12 +47,15 @@ export const deleteSub = async (
 
   if (!sub) return null
 
-  return remove(sub, user)
+  return remove(sub.toObject(), user)
 }
 
 export const getSubById = async (
   _id: string | Mongoose.Types.ObjectId,
-): Promise<SubDbObject | null> => SubModel.findById(_id)
+): Promise<SubDbObject | null> => {
+  const sub = await SubModel.findById(_id)
+  return sub?.toObject()
+}
 
 export const resolveSub = async (root: {
   sub: Sub | SubDbObject | Mongoose.Types.ObjectId | string
@@ -67,14 +70,20 @@ export const acceptSub = async (
   _id: Scalars['ID'],
   user: UserDbObject,
 ): Promise<SubDbObject | null> => {
-  const sub = await SubModel.findOne({_id, to: user._id})
+  const subDocument = await SubModel.findOne({_id, to: user._id})
 
-  if (!sub) return null
+  if (!subDocument) return null
 
-  sub.accepted = true
-  await sub.save()
+  subDocument.accepted = true
+  await subDocument.save()
+
+  const sub = {
+    ...subDocument.toObject(),
+    to: user,
+  }
 
   await pubsub.publish('sub', {subAccepted: sub})
+  await pubsub.publish('sub', {subUpdated: sub})
 
   return sub
 }
@@ -128,13 +137,18 @@ export const declineSub = async (
 export const remove = async (
   sub: SubDbObject,
   user: UserDbObject,
-): Promise<SubDbObject> => {
+): Promise<SubDbObject & {deleted: boolean}> => {
   await SubModel.deleteOne({_id: sub._id})
 
-  await EventService.deleteEvent(subRequested({sub, user}))
-  await pubsub.publish('sub', {subDeleted: sub})
+  const deletedSub = {
+    ...sub,
+    deleted: true,
+  }
 
-  return sub
+  await EventService.deleteEvent(subRequested({sub: deletedSub, user}))
+  await pubsub.publish('sub', {subUpdated: deletedSub})
+
+  return deletedSub
 }
 
 export const getSubFromTo = async (

@@ -8,7 +8,7 @@ export const aggregateUserChannels = <T extends any = any>(
   user: User | UserDbObject,
   pipeline: any[] = [],
 ): Aggregate<T[]> =>
-  ChannelModel.aggregate([{$match: {user_id: user._id}}, ...pipeline])
+  ChannelModel.aggregate([{$match: {user: user._id}}, ...pipeline])
 
 export const subscribeUserToChannel = async (
   user: User | UserDbObject,

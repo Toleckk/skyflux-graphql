@@ -54,22 +54,6 @@ export const PostResolver: Resolvers = {
     deletePost: (_, {_id}, {user}) => PostService.deletePost(_id, user),
   },
   Subscription: <SubscriptionResolvers>{
-    postCreated: {
-      subscribe: withFilter(
-        () => pubsub.asyncIterator('post'),
-        async ({postCreated}, {nickname}, {user}): Promise<boolean> =>
-          postCreated.user.nickname === nickname &&
-          PostService.canSeePost(postCreated, user),
-      ),
-    },
-    postDeleted: {
-      subscribe: withFilter(
-        () => pubsub.asyncIterator('post'),
-        async ({postDeleted}, {nickname}, {user}): Promise<boolean> =>
-          postDeleted.user.nickname === nickname &&
-          PostService.canSeePost(postDeleted, user),
-      ),
-    },
     postUpdated: {
       subscribe: withFilter(
         () => pubsub.asyncIterator('post'),

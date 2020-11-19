@@ -23,6 +23,7 @@ export const CommentSchema = `
     type DeletedComment {
         _id: ID!
         post: Post!
+        deleted: Boolean!
     }
 
     extend type Query {
@@ -38,9 +39,10 @@ export const CommentSchema = `
         createComment(comment: CreateComment!): Comment! @auth
         deleteComment(_id: ID!): DeletedComment @auth
     }
+    
+    union MaybeComment = Comment | DeletedComment
 
     extend type Subscription {
-        commentCreated(post_id: ID!): Comment!
-        commentDeleted(post_id: ID!): DeletedComment
+        commentUpdated(post_id: ID!): MaybeComment!
     }
 `

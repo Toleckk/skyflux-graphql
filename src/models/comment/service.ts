@@ -18,19 +18,31 @@ export const createComment = async (
   text: string,
   post_id: string,
   user: UserDbObject,
-): Promise<CommentDbObject | null> => {
-  if (!(await PostService.getPostById(post_id, user))) return null
+): Promise<CommentDbObject | Comment | null> => {
+  const post = await PostService.getPostById(post_id, user)
 
-  const comment = await CommentModel.create<Omit<CommentDbObject, 'createdAt'>>(
-    {
-      post: post_id,
-      user: user._id,
-      text,
-    },
-  )
+  if (!post) return null
 
-  await EventService.createEvent(commentCreated({comment, user}))
-  await pubsub.publish('comment', {commentCreated: comment})
+  const commentDoc = await CommentModel.create<
+    Omit<CommentDbObject, 'createdAt'>
+  >({
+    post: post._id,
+    user: user._id,
+    text,
+  })
+
+  if (!commentDoc) return null
+
+  const comment: Comment = {
+    ...commentDoc.toObject(),
+    user,
+    post,
+  }
+
+  await Promise.all([
+    EventService.createEvent(commentCreated({comment, user})),
+    pubsub.publish('comment', {commentUpdated: comment}),
+  ])
 
   return comment
 }
@@ -38,18 +50,24 @@ export const createComment = async (
 export const deleteComment = async (
   _id: string,
   user: UserDbObject,
-): Promise<CommentDbObject | null> => {
+): Promise<(CommentDbObject & {deleted: true}) | null> => {
   const comment = await CommentModel.findById(_id)
 
   if (!(comment && (await canDeleteComment(comment, user)))) return null
 
   await comment.deleteOne()
-  await EventService.deleteEvent(commentCreated({comment, user}))
-  await pubsub.publish('comment', {
-    commentDeleted: comment,
-  })
 
-  return comment
+  const deletedComment = {
+    ...comment.toObject(),
+    deleted: true,
+  }
+
+  await Promise.all([
+    EventService.deleteEvent(commentCreated({comment, user})),
+    pubsub.publish('comment', {commentUpdated: deletedComment}),
+  ])
+
+  return deletedComment
 }
 
 export const getCommentById = async (
@@ -76,7 +94,7 @@ export const resolveComment = async (root: {
 }
 
 export const countPostComments = async (post: Post): Promise<number> =>
-  CommentModel.count({post_id: post._id})
+  CommentModel.count({post: post._id})
 
 export const canDeleteComment = async (
   comment: Comment | CommentDbObject,
