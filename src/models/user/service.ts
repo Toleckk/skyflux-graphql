@@ -8,6 +8,7 @@ import {generateNickname} from '@utils/generateNickname'
 import {isMongoId} from '@utils/isMongoId'
 import {makeSearchPipeline} from '@utils/makeSearchPipeline'
 import {toUTCDate} from '@utils/toUtcDate'
+import {pubsub} from '@pubsub'
 
 /** Creates a new user with passed email and password and generated nickname */
 export const createUser = async (
@@ -24,9 +25,11 @@ export const createUser = async (
     description: {},
   })
 
-  await EmailService.changeEmail(user.email, user)
-
-  await ChannelService.subscribeUserToChannel(user, `Sub_${user._id}`)
+  await Promise.all([
+    EmailService.changeEmail(user.email, user),
+    ChannelService.subscribeUserToChannel(user, `Sub_${user._id}`),
+    pubsub.publish('user', {userUpdated: user}),
+  ])
 
   return user
 }
@@ -85,6 +88,7 @@ export const updateProfileInfo = async (
     birthday: info.description.birthday && toUTCDate(info.description.birthday),
   }
   await userDoc.save()
+  await pubsub.publish('user', {userUpdated: userDoc})
 
   return userDoc
 }
@@ -119,6 +123,9 @@ export const setPrivate = async (
   await UserModel.updateOne({_id: user._id}, {private: isPrivate}, options)
 
   user.private = isPrivate
+
+  await pubsub.publish('user', {userUpdated: user})
+
   return user
 }
 
@@ -132,6 +139,7 @@ export const updateNickname = async (
   await UserModel.updateOne({_id: user._id}, {nickname})
 
   user.nickname = nickname
+  await pubsub.publish('user', {userUpdated: user})
   return user
 }
 

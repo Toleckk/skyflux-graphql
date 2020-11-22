@@ -1,12 +1,15 @@
+import {withFilter} from 'apollo-server'
 import {
   MutationResolvers,
   QueryResolvers,
   Resolvers,
+  SubscriptionResolvers,
   UserResolvers,
 } from '@models/types'
 import {SubService} from '@models/sub'
 import {PostService} from '@models/post'
 import {paginate} from '@utils/paginate'
+import {pubsub} from '@pubsub'
 import * as UserService from './service'
 
 export const UserResolver: Resolvers = {
@@ -47,5 +50,13 @@ export const UserResolver: Resolvers = {
     makeAccountPrivate: (_, __, {user}) => UserService.makePrivate(user),
     confirmEmail: (_, {credentials: {token}}) =>
       UserService.confirmEmail(token),
+  },
+  Subscription: <SubscriptionResolvers>{
+    userUpdated: {
+      subscribe: withFilter(
+        () => pubsub.asyncIterator('user'),
+        ({userUpdated}, {nickname}) => userUpdated?.nickname === nickname,
+      ),
+    },
   },
 }

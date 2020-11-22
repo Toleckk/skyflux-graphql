@@ -14,7 +14,7 @@ export const SubSchema = `
 
     type SubConnection implements Connection {
         pageInfo: PageInfo!
-        edges: [SubEdge]!
+        edges: [SubEdge!]!
     }
 
     type DeletedSub {

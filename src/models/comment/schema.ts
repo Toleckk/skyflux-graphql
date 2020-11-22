@@ -16,7 +16,7 @@ export const CommentSchema = `
     }
 
     type CommentConnection implements Connection {
-        edges: [CommentEdge]!
+        edges: [CommentEdge!]!
         pageInfo: PageInfo!
     }
 

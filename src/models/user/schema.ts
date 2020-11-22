@@ -39,7 +39,7 @@ export const UserSchema = `
 
     type UserConnection implements Connection{
         pageInfo: PageInfo!
-        edges: [UserEdge]!
+        edges: [UserEdge!]!
     }
 
     extend type Query {
@@ -71,10 +71,10 @@ export const UserSchema = `
 
     input UpdateProfileInfo {
         avatar: String @validate(pattern: "${avatarUrl.p}", error: "${avatarUrl.e}")
-        description: DescrpitionInput!
+        description: DescriptionInput!
     }
 
-    input DescrpitionInput {
+    input DescriptionInput {
         birthday: String @validate(pattern: "${date.p}", error: "${date.e}")
         about: String @validate(pattern: "${about.p}", error: "${about.e}")
         from: String @validate(pattern: "${from.p}", error: "${from.e}")
@@ -93,5 +93,11 @@ export const UserSchema = `
         makeAccountPublic: User! @auth
         makeAccountPrivate: User! @auth
         confirmEmail(credentials: ConfirmEmail!): Boolean!
+    }
+
+    extend type Subscription {
+        userUpdated(
+            nickname: String! @validate(pattern: "${nickname.p}", error: "${nickname.e}")
+        ): User!
     }
 `

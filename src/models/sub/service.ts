@@ -29,8 +29,12 @@ export const createSub = async (
     from: user,
   }
 
-  await EventService.createEvent(subRequested({sub, user}))
-  await pubsub.publish('sub', {subUpdated: sub})
+  await Promise.all([
+    EventService.createEvent(subRequested({sub, user})),
+    pubsub.publish('sub', {subUpdated: sub}),
+    to.private ? Promise.resolve() : pubsub.publish('user', to),
+    to.private ? Promise.resolve() : pubsub.publish('user', user),
+  ])
 
   return sub
 }
@@ -47,7 +51,17 @@ export const deleteSub = async (
 
   if (!sub) return null
 
-  return remove(sub.toObject(), user)
+  const removingSub = {...sub.toObject(), to, from: user}
+
+  const removedSub = await remove(removingSub, user)
+
+  if (sub.accepted)
+    await Promise.all([
+      pubsub.publish('user', {userUpdated: to}),
+      pubsub.publish('user', {userUpdated: user}),
+    ])
+
+  return removedSub
 }
 
 export const getSubById = async (
@@ -77,13 +91,18 @@ export const acceptSub = async (
   subDocument.accepted = true
   await subDocument.save()
 
+  const from = await UserService.getUserById(subDocument.from)
+
   const sub = {
     ...subDocument.toObject(),
     to: user,
   }
 
-  await pubsub.publish('sub', {subAccepted: sub})
-  await pubsub.publish('sub', {subUpdated: sub})
+  await Promise.all([
+    pubsub.publish('sub', {subUpdated: sub}),
+    pubsub.publish('user', {userUpdated: user}),
+    pubsub.publish('user', {userUpdated: from}),
+  ])
 
   return sub
 }

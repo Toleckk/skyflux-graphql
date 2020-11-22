@@ -42,7 +42,7 @@ export const EventSchema = `
     }
 
     type EventConnection implements Connection {
-        edges: [EventEdge]!
+        edges: [EventEdge!]!
         pageInfo: PageInfo!
     }
 

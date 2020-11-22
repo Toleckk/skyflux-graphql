@@ -20,7 +20,7 @@ export const PostSchema = `
 
     type PostConnection implements Connection {
         pageInfo: PageInfo!
-        edges: [PostEdge]!
+        edges: [PostEdge!]!
     }
 
     type DeletedPost {

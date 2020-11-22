@@ -28,7 +28,10 @@ export const createPost = async (
     user,
   }
 
-  await pubsub.publish('post', {postUpdated: postWithUser})
+  await Promise.all([
+    pubsub.publish('post', {postUpdated: postWithUser}),
+    pubsub.publish('user', {userUpdated: user}),
+  ])
 
   return postWithUser
 }
@@ -96,7 +99,10 @@ export const deletePost = async (
 
   const deletedPost = {...post.toObject(), user, deleted: true}
 
-  await pubsub.publish('post', {postUpdated: deletedPost})
+  await Promise.all([
+    pubsub.publish('post', {postUpdated: deletedPost}),
+    pubsub.publish('user', {userUpdated: user}),
+  ])
 
   return deletedPost
 }

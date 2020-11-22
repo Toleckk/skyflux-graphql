@@ -39,7 +39,7 @@ export type CommentEdge = Edge & {
 
 export type CommentConnection = Connection & {
   __typename?: 'CommentConnection'
-  edges: Array<Maybe<CommentEdge>>
+  edges: Array<CommentEdge>
   pageInfo: PageInfo
 }
 
@@ -233,6 +233,7 @@ export type Subscription = {
   likeUpdated: MaybeLike
   postUpdated: MaybePost
   subUpdated: MaybeSub
+  userUpdated: User
 }
 
 export type SubscriptionCommentUpdatedArgs = {
@@ -244,6 +245,10 @@ export type SubscriptionLikeUpdatedArgs = {
 }
 
 export type SubscriptionPostUpdatedArgs = {
+  nickname: Scalars['String']
+}
+
+export type SubscriptionUserUpdatedArgs = {
   nickname: Scalars['String']
 }
 
@@ -294,7 +299,7 @@ export type EventEdge = Edge & {
 
 export type EventConnection = Connection & {
   __typename?: 'EventConnection'
-  edges: Array<Maybe<EventEdge>>
+  edges: Array<EventEdge>
   pageInfo: PageInfo
 }
 
@@ -341,7 +346,7 @@ export type PostEdge = Edge & {
 export type PostConnection = Connection & {
   __typename?: 'PostConnection'
   pageInfo: PageInfo
-  edges: Array<Maybe<PostEdge>>
+  edges: Array<PostEdge>
 }
 
 export type DeletedPost = {
@@ -379,7 +384,7 @@ export type SubEdge = Edge & {
 export type SubConnection = Connection & {
   __typename?: 'SubConnection'
   pageInfo: PageInfo
-  edges: Array<Maybe<SubEdge>>
+  edges: Array<SubEdge>
 }
 
 export type DeletedSub = {
@@ -427,7 +432,7 @@ export type UserEdge = Edge & {
 export type UserConnection = Connection & {
   __typename?: 'UserConnection'
   pageInfo: PageInfo
-  edges: Array<Maybe<UserEdge>>
+  edges: Array<UserEdge>
 }
 
 export type CreateUser = {
@@ -451,10 +456,10 @@ export type UpdateNickname = {
 
 export type UpdateProfileInfo = {
   avatar?: Maybe<Scalars['String']>
-  description: DescrpitionInput
+  description: DescriptionInput
 }
 
-export type DescrpitionInput = {
+export type DescriptionInput = {
   birthday?: Maybe<Scalars['String']>
   about?: Maybe<Scalars['String']>
   from?: Maybe<Scalars['String']>
@@ -706,7 +711,7 @@ export type ResolversTypes = ResolversObject<{
   UpdatePassword: UpdatePassword
   UpdateNickname: UpdateNickname
   UpdateProfileInfo: UpdateProfileInfo
-  DescrpitionInput: DescrpitionInput
+  DescriptionInput: DescriptionInput
   ConfirmEmail: ConfirmEmail
   Date: ResolverTypeWrapper<Scalars['Date']>
   ValidatedString: ResolverTypeWrapper<Scalars['ValidatedString']>
@@ -782,7 +787,7 @@ export type ResolversParentTypes = ResolversObject<{
   UpdatePassword: UpdatePassword
   UpdateNickname: UpdateNickname
   UpdateProfileInfo: UpdateProfileInfo
-  DescrpitionInput: DescrpitionInput
+  DescriptionInput: DescriptionInput
   ConfirmEmail: ConfirmEmail
   Date: Scalars['Date']
   ValidatedString: Scalars['ValidatedString']
@@ -931,7 +936,7 @@ export type CommentConnectionResolvers<
   ParentType extends ResolversParentTypes['CommentConnection'] = ResolversParentTypes['CommentConnection']
 > = ResolversObject<{
   edges?: Resolver<
-    Array<Maybe<ResolversTypes['CommentEdge']>>,
+    Array<ResolversTypes['CommentEdge']>,
     ParentType,
     ContextType
   >
@@ -1192,6 +1197,13 @@ export type SubscriptionResolvers<
     ParentType,
     ContextType
   >
+  userUpdated?: SubscriptionResolver<
+    ResolversTypes['User'],
+    'userUpdated',
+    ParentType,
+    ContextType,
+    RequireFields<SubscriptionUserUpdatedArgs, 'nickname'>
+  >
 }>
 
 export type EventResolvers<
@@ -1273,11 +1285,7 @@ export type EventConnectionResolvers<
   ContextType = {user: UserDbObject; token: string},
   ParentType extends ResolversParentTypes['EventConnection'] = ResolversParentTypes['EventConnection']
 > = ResolversObject<{
-  edges?: Resolver<
-    Array<Maybe<ResolversTypes['EventEdge']>>,
-    ParentType,
-    ContextType
-  >
+  edges?: Resolver<Array<ResolversTypes['EventEdge']>, ParentType, ContextType>
   pageInfo?: Resolver<ResolversTypes['PageInfo'], ParentType, ContextType>
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }>
@@ -1344,11 +1352,7 @@ export type PostConnectionResolvers<
   ParentType extends ResolversParentTypes['PostConnection'] = ResolversParentTypes['PostConnection']
 > = ResolversObject<{
   pageInfo?: Resolver<ResolversTypes['PageInfo'], ParentType, ContextType>
-  edges?: Resolver<
-    Array<Maybe<ResolversTypes['PostEdge']>>,
-    ParentType,
-    ContextType
-  >
+  edges?: Resolver<Array<ResolversTypes['PostEdge']>, ParentType, ContextType>
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }>
 
@@ -1394,11 +1398,7 @@ export type SubConnectionResolvers<
   ParentType extends ResolversParentTypes['SubConnection'] = ResolversParentTypes['SubConnection']
 > = ResolversObject<{
   pageInfo?: Resolver<ResolversTypes['PageInfo'], ParentType, ContextType>
-  edges?: Resolver<
-    Array<Maybe<ResolversTypes['SubEdge']>>,
-    ParentType,
-    ContextType
-  >
+  edges?: Resolver<Array<ResolversTypes['SubEdge']>, ParentType, ContextType>
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }>
 
@@ -1466,11 +1466,7 @@ export type UserConnectionResolvers<
   ParentType extends ResolversParentTypes['UserConnection'] = ResolversParentTypes['UserConnection']
 > = ResolversObject<{
   pageInfo?: Resolver<ResolversTypes['PageInfo'], ParentType, ContextType>
-  edges?: Resolver<
-    Array<Maybe<ResolversTypes['UserEdge']>>,
-    ParentType,
-    ContextType
-  >
+  edges?: Resolver<Array<ResolversTypes['UserEdge']>, ParentType, ContextType>
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }>
 
