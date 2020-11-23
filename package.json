@@ -14,7 +14,7 @@
     "pretty-quick": "pretty-quick --pattern \"**/*.*(js|ts)",
     "lint": "eslint src",
     "test": "jest",
-    "codegen": "node scripts/combineSchema && graphql-codegen --config codegen.yml && node scripts/fixUndefinedIndexInGeneratedTypes && rm -rf ./excluded && yarn prettier ./src/models/types.ts --write"
+    "codegen": "node scripts/combineSchema && graphql-codegen --config codegen.yml && node scripts/fixUndefinedIndexInGeneratedTypes && rm -rf ./excluded"
   },
   "dependencies": {
     "@graphql-codegen/add": "^2.0.1",
