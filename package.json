@@ -14,6 +14,12 @@
     "codegen": "node scripts/combineSchema && graphql-codegen --config codegen.yml && node scripts/fixUndefinedIndexInGeneratedTypes && rm -rf ./excluded && yarn prettier ./src/models/types.ts --write"
   },
   "dependencies": {
+    "@graphql-codegen/add": "^2.0.1",
+    "@graphql-codegen/cli": "1.19.1",
+    "@graphql-codegen/introspection": "1.18.0",
+    "@graphql-codegen/typescript": "1.17.11",
+    "@graphql-codegen/typescript-mongodb": "1.17.8",
+    "@graphql-codegen/typescript-resolvers": "1.17.10",
     "@types/ioredis": "^4.17.7",
     "@types/jest": "^26.0.14",
     "@types/mongoose": "^5.7.36",
@@ -37,12 +43,6 @@
     "uuid": "^8.3.0"
   },
   "devDependencies": {
-    "@graphql-codegen/add": "^2.0.1",
-    "@graphql-codegen/cli": "1.19.1",
-    "@graphql-codegen/introspection": "1.18.0",
-    "@graphql-codegen/typescript": "1.17.11",
-    "@graphql-codegen/typescript-mongodb": "1.17.8",
-    "@graphql-codegen/typescript-resolvers": "1.17.10",
     "@typescript-eslint/eslint-plugin": "^4.1.0",
     "@typescript-eslint/parser": "^4.1.0",
     "eslint": "^7.8.1",
