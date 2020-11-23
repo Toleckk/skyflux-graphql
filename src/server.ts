@@ -60,6 +60,7 @@ const server = new ApolloServer({
   subscriptions: {
     path: '/',
   },
+  introspection: true,
   playground: {
     subscriptionEndpoint: '/',
   },
