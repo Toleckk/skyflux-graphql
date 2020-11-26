@@ -14,3 +14,4 @@ generates:
       resolverTypeWrapperSignature: Promise<ResolverWithDbObject<T>> | ResolverWithDbObject<T>
       contextType: "{user: UserDbObject, token: string}"
       useIndexSignature: true
+      skipTypename: true

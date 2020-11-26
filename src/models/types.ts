@@ -4,6 +4,7 @@ import {
   GraphQLScalarType,
   GraphQLScalarTypeConfig,
 } from 'graphql'
+
 export type Maybe<T> = T | null
 export type Exact<T extends {[key: string]: unknown}> = {[K in keyof T]: T[K]}
 export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>
@@ -23,7 +24,6 @@ export type Scalars = {
 }
 
 export type Comment = {
-  __typename?: 'Comment'
   _id: Scalars['ID']
   text: Scalars['String']
   user: User
@@ -32,26 +32,22 @@ export type Comment = {
 }
 
 export type CommentEdge = Edge & {
-  __typename?: 'CommentEdge'
   cursor: Scalars['ID']
   node: Comment
 }
 
 export type CommentConnection = Connection & {
-  __typename?: 'CommentConnection'
   edges: Array<CommentEdge>
   pageInfo: PageInfo
 }
 
 export type DeletedComment = {
-  __typename?: 'DeletedComment'
   _id: Scalars['ID']
   post: Post
   deleted: Scalars['Boolean']
 }
 
 export type Query = {
-  __typename?: 'Query'
   comments: CommentConnection
   doesNicknameExist: Scalars['Boolean']
   events: EventConnection
@@ -128,7 +124,6 @@ export type CreateComment = {
 }
 
 export type Mutation = {
-  __typename?: 'Mutation'
   acceptSub: Sub
   confirmEmail: Scalars['Boolean']
   createComment: Comment
@@ -227,7 +222,6 @@ export type MutationUpdateProfileInfoArgs = {
 export type MaybeComment = Comment | DeletedComment
 
 export type Subscription = {
-  __typename?: 'Subscription'
   commentUpdated: MaybeComment
   eventUpdated: MaybeEvent
   likeUpdated: MaybeLike
@@ -259,7 +253,6 @@ export enum EventType {
 }
 
 export type Event = {
-  __typename?: 'Event'
   _id: Scalars['ID']
   createdAt: Scalars['Date']
   kind: EventType
@@ -269,22 +262,18 @@ export type Event = {
 export type EventBody = SubEventBody | CommentEventBody | LikeEventBody
 
 export type SubEventBody = {
-  __typename?: 'SubEventBody'
   sub: Sub
 }
 
 export type CommentEventBody = {
-  __typename?: 'CommentEventBody'
   comment: Comment
 }
 
 export type LikeEventBody = {
-  __typename?: 'LikeEventBody'
   like: Like
 }
 
 export type DeletedEvent = {
-  __typename?: 'DeletedEvent'
   _id: Scalars['ID']
   deleted: Scalars['Boolean']
 }
@@ -292,26 +281,22 @@ export type DeletedEvent = {
 export type MaybeEvent = Event | DeletedEvent
 
 export type EventEdge = Edge & {
-  __typename?: 'EventEdge'
   cursor: Scalars['ID']
   node: Event
 }
 
 export type EventConnection = Connection & {
-  __typename?: 'EventConnection'
   edges: Array<EventEdge>
   pageInfo: PageInfo
 }
 
 export type Like = {
-  __typename?: 'Like'
   _id: Scalars['ID']
   post: Post
   user: User
 }
 
 export type DeletedLike = {
-  __typename?: 'DeletedLike'
   _id: Scalars['ID']
   post: Post
   user: User
@@ -321,7 +306,6 @@ export type DeletedLike = {
 export type MaybeLike = Like | DeletedLike
 
 export type Post = {
-  __typename?: 'Post'
   _id: Scalars['ID']
   text: Scalars['String']
   createdAt: Scalars['Date']
@@ -338,19 +322,16 @@ export type PostCommentsArgs = {
 }
 
 export type PostEdge = Edge & {
-  __typename?: 'PostEdge'
   cursor: Scalars['ID']
   node: Post
 }
 
 export type PostConnection = Connection & {
-  __typename?: 'PostConnection'
   pageInfo: PageInfo
   edges: Array<PostEdge>
 }
 
 export type DeletedPost = {
-  __typename?: 'DeletedPost'
   _id: Scalars['ID']
   deleted: Scalars['Boolean']
   user: User
@@ -368,7 +349,6 @@ export type CreateSession = {
 }
 
 export type Sub = {
-  __typename?: 'Sub'
   _id: Scalars['ID']
   from: User
   to: User
@@ -376,19 +356,16 @@ export type Sub = {
 }
 
 export type SubEdge = Edge & {
-  __typename?: 'SubEdge'
   cursor: Scalars['ID']
   node: Sub
 }
 
 export type SubConnection = Connection & {
-  __typename?: 'SubConnection'
   pageInfo: PageInfo
   edges: Array<SubEdge>
 }
 
 export type DeletedSub = {
-  __typename?: 'DeletedSub'
   _id: Scalars['ID']
   from: User
   to: User
@@ -398,7 +375,6 @@ export type DeletedSub = {
 export type MaybeSub = Sub | DeletedSub
 
 export type User = {
-  __typename?: 'User'
   _id: Scalars['ID']
   nickname: Scalars['String']
   avatar?: Maybe<Scalars['String']>
@@ -417,20 +393,17 @@ export type UserPostsArgs = {
 }
 
 export type Description = {
-  __typename?: 'Description'
   birthday?: Maybe<Scalars['Date']>
   about?: Maybe<Scalars['String']>
   from?: Maybe<Scalars['String']>
 }
 
 export type UserEdge = Edge & {
-  __typename?: 'UserEdge'
   cursor: Scalars['ID']
   node: User
 }
 
 export type UserConnection = Connection & {
-  __typename?: 'UserConnection'
   pageInfo: PageInfo
   edges: Array<UserEdge>
 }
@@ -475,7 +448,6 @@ export type AdditionalEntityFields = {
 }
 
 export type Entity = {
-  __typename?: 'Entity'
   _id: Scalars['ID']
 }
 
@@ -484,7 +456,6 @@ export type Edge = {
 }
 
 export type PageInfo = {
-  __typename?: 'PageInfo'
   startCursor?: Maybe<Scalars['ID']>
   endCursor?: Maybe<Scalars['ID']>
   hasNextPage: Scalars['Boolean']
@@ -1607,6 +1578,7 @@ export type IDirectiveResolvers<
   ContextType = {user: UserDbObject; token: string}
 > = DirectiveResolvers<ContextType>
 import {ObjectID} from 'mongodb'
+
 export type CommentDbObject = {
   _id: ObjectID
   text: string
