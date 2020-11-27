@@ -8,7 +8,7 @@ import {generateNickname} from '@utils/generateNickname'
 import {isMongoId} from '@utils/isMongoId'
 import {makeSearchPipeline} from '@utils/makeSearchPipeline'
 import {toUTCDate} from '@utils/toUtcDate'
-import {pubsub} from '@pubsub'
+import {notifyUserChanged} from '@models/user/subscriptions'
 
 /** Creates a new user with passed email and password and generated nickname */
 export const createUser = async (
@@ -28,7 +28,7 @@ export const createUser = async (
   await Promise.all([
     EmailService.changeEmail(user.email, user),
     ChannelService.subscribeUserToChannel(user, `Sub_${user._id}`),
-    pubsub.publish('user', {userUpdated: user}),
+    notifyUserChanged(user),
   ])
 
   return user
@@ -88,7 +88,8 @@ export const updateProfileInfo = async (
     birthday: info.description.birthday && toUTCDate(info.description.birthday),
   }
   await userDoc.save()
-  await pubsub.publish('user', {userUpdated: userDoc})
+
+  notifyUserChanged(userDoc)
 
   return userDoc
 }
@@ -124,7 +125,7 @@ export const setPrivate = async (
 
   user.private = isPrivate
 
-  await pubsub.publish('user', {userUpdated: user})
+  notifyUserChanged(user)
 
   return user
 }
@@ -139,7 +140,9 @@ export const updateNickname = async (
   await UserModel.updateOne({_id: user._id}, {nickname})
 
   user.nickname = nickname
-  await pubsub.publish('user', {userUpdated: user})
+
+  notifyUserChanged(user)
+
   return user
 }
 
@@ -231,39 +234,4 @@ export const resolveUser = async (root: {
     return getUserById(root.user)
 
   return root.user
-}
-
-export const isUsersEqual = (
-  userA:
-    | User
-    | UserDbObject
-    | Mongoose.Types.ObjectId
-    | string
-    | null
-    | undefined,
-  userB:
-    | User
-    | UserDbObject
-    | Mongoose.Types.ObjectId
-    | string
-    | null
-    | undefined,
-): boolean => {
-  if ((userA && !userB) || (userB && !userA)) return false
-
-  if (!userA && !userB) return true
-
-  if (userA === userB) return true
-
-  if (isMongoId(userA) || typeof userA === 'string') {
-    if (isMongoId(userB) || typeof userB === 'string')
-      return String(userA) === String(userB)
-
-    return String(userA) === String(userB?._id)
-  }
-
-  if (isMongoId(userB) || typeof userB === 'string')
-    return String(userA?._id) === String(userB)
-
-  return String(userA?._id) === String(userB?._id)
 }

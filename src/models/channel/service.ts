@@ -18,7 +18,7 @@ export const subscribeUserToChannel = async (
 
 export const isUserSubscribedToChannel = async (
   channel: string,
-  user: User,
+  user: User | UserDbObject,
 ): Promise<boolean> => {
   const [{count}] = await aggregateUserChannels<{count: number}>(user, [
     {

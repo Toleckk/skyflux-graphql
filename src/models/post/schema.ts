@@ -48,6 +48,8 @@ export const PostSchema = `
     }
 
     extend type Subscription {
-        postUpdated(nickname: String!): MaybePost!
+        postUpdated(_id: ID!): MaybePost!
+        postsUpdated(ownerId: ID!): MaybePost!
+        feedUpdated: MaybePost!
     }
 `

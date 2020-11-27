@@ -1,8 +1,8 @@
 import Mongoose, {Types} from 'mongoose'
-import {pubsub} from '@pubsub'
 import {EventDbObject, User, UserDbObject} from '@models/types'
 import {ChannelService} from '@models/channel'
 import {EventModel} from '@models/event/model'
+import {notifyEventChanged} from '@models/event/subscriptions'
 
 export const getEventsByUser = async (
   user: User | UserDbObject,
@@ -61,9 +61,9 @@ export const createEvent = async ({
     emitter,
   })
 
-  await pubsub.publish('event', {eventUpdated: event})
+  notifyEventChanged(event)
 
-  return event as any
+  return event
 }
 
 export const deleteEvent = async ({
@@ -85,7 +85,7 @@ export const deleteEvent = async ({
     deleted: true,
   }
 
-  await pubsub.publish('event', {eventUpdated: deletedEvent})
+  notifyEventChanged(deletedEvent)
 
   return event._id
 }

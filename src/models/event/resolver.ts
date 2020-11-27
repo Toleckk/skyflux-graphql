@@ -13,9 +13,9 @@ import {
 import {CommentService} from '@models/comment'
 import {LikeService} from '@models/like'
 import {SubService} from '@models/sub'
-import {ChannelService} from '@models/channel'
 import {paginate} from '@utils/paginate'
 import * as EventService from './service'
+import {filterEventUpdated} from './subscriptions'
 
 export const EventResolver: Resolvers = {
   MaybeEvent: <MaybeEventResolvers>{
@@ -48,13 +48,7 @@ export const EventResolver: Resolvers = {
     eventUpdated: {
       subscribe: withFilter(
         (): AsyncIterator<Event> => pubsub.asyncIterator('event'),
-        (root, _, {user}) =>
-          root.eventUpdated &&
-          String(root.eventUpdated.emitter) !== String(user._id) &&
-          ChannelService.isUserSubscribedToChannel(
-            root.eventUpdated.channel,
-            user,
-          ),
+        filterEventUpdated,
       ),
     },
   },

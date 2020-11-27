@@ -15,6 +15,11 @@ import {
 } from '@models/types'
 import {paginate} from '@utils/paginate'
 import * as PostService from './service'
+import {
+  filterFeedUpdated,
+  filterPostsUpdated,
+  filterPostUpdated,
+} from './subscriptions'
 
 export const PostResolver: Resolvers = {
   Post: <PostResolvers>{
@@ -57,9 +62,19 @@ export const PostResolver: Resolvers = {
     postUpdated: {
       subscribe: withFilter(
         () => pubsub.asyncIterator('post'),
-        async ({postUpdated}, {nickname}, {user}): Promise<boolean> =>
-          postUpdated.user.nickname === nickname &&
-          PostService.canSeePost(postUpdated, user),
+        filterPostUpdated,
+      ),
+    },
+    postsUpdated: {
+      subscribe: withFilter(
+        () => pubsub.asyncIterator('post'),
+        filterPostsUpdated,
+      ),
+    },
+    feedUpdated: {
+      subscribe: withFilter(
+        () => pubsub.asyncIterator('post'),
+        filterFeedUpdated,
       ),
     },
   },

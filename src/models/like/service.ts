@@ -1,5 +1,4 @@
 import Mongoose from 'mongoose'
-import {pubsub} from '@pubsub'
 import {
   DeletedLike,
   Like,
@@ -13,6 +12,7 @@ import {PostService} from '@models/post'
 import {isMongoId} from '@utils/isMongoId'
 import {LikeModel} from './model'
 import {likeCreated} from './events'
+import {notifyLikeChanged} from './subscriptions'
 
 export const deleteLike = async (
   post_id: string,
@@ -30,10 +30,8 @@ export const deleteLike = async (
     deleted: true,
   }
 
-  await Promise.all([
-    EventService.deleteEvent(likeCreated({like, user})),
-    pubsub.publish('like', {likeUpdated: like}),
-  ])
+  EventService.deleteEvent(likeCreated({like, user}))
+  notifyLikeChanged(like)
 
   return deletedLike
 }
@@ -62,10 +60,8 @@ export const createLike = async (
     post,
   }
 
-  await Promise.all([
-    EventService.createEvent(likeCreated({like, user})),
-    pubsub.publish('like', {likeUpdated: like}),
-  ])
+  EventService.createEvent(likeCreated({like, user}))
+  notifyLikeChanged(like)
 
   return like
 }
@@ -80,7 +76,7 @@ export const isPostLikedBy = async (
 }
 
 export const countPostLikes = async (post: Post): Promise<number> =>
-  LikeModel.count({post: post._id})
+  LikeModel.countDocuments({post: post._id})
 
 export const resolveLike = async (root: {
   like: Like | LikeDbObject | Mongoose.Types.ObjectId | string

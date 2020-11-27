@@ -224,9 +224,11 @@ export type MaybeComment = Comment | DeletedComment
 export type Subscription = {
   commentUpdated: MaybeComment
   eventUpdated: MaybeEvent
+  feedUpdated: MaybePost
   likeUpdated: MaybeLike
   postUpdated: MaybePost
-  subUpdated: MaybeSub
+  postsUpdated: MaybePost
+  subsUpdated: MaybeSub
   userUpdated: User
 }
 
@@ -239,11 +241,20 @@ export type SubscriptionLikeUpdatedArgs = {
 }
 
 export type SubscriptionPostUpdatedArgs = {
-  nickname: Scalars['String']
+  _id: Scalars['ID']
+}
+
+export type SubscriptionPostsUpdatedArgs = {
+  ownerId: Scalars['ID']
+}
+
+export type SubscriptionSubsUpdatedArgs = {
+  from?: Maybe<Scalars['ID']>
+  to?: Maybe<Scalars['ID']>
 }
 
 export type SubscriptionUserUpdatedArgs = {
-  nickname: Scalars['String']
+  _id: Scalars['ID']
 }
 
 export enum EventType {
@@ -1148,6 +1159,12 @@ export type SubscriptionResolvers<
     ParentType,
     ContextType
   >
+  feedUpdated?: SubscriptionResolver<
+    ResolversTypes['MaybePost'],
+    'feedUpdated',
+    ParentType,
+    ContextType
+  >
   likeUpdated?: SubscriptionResolver<
     ResolversTypes['MaybeLike'],
     'likeUpdated',
@@ -1160,20 +1177,28 @@ export type SubscriptionResolvers<
     'postUpdated',
     ParentType,
     ContextType,
-    RequireFields<SubscriptionPostUpdatedArgs, 'nickname'>
+    RequireFields<SubscriptionPostUpdatedArgs, '_id'>
   >
-  subUpdated?: SubscriptionResolver<
-    ResolversTypes['MaybeSub'],
-    'subUpdated',
+  postsUpdated?: SubscriptionResolver<
+    ResolversTypes['MaybePost'],
+    'postsUpdated',
     ParentType,
-    ContextType
+    ContextType,
+    RequireFields<SubscriptionPostsUpdatedArgs, 'ownerId'>
+  >
+  subsUpdated?: SubscriptionResolver<
+    ResolversTypes['MaybeSub'],
+    'subsUpdated',
+    ParentType,
+    ContextType,
+    RequireFields<SubscriptionSubsUpdatedArgs, never>
   >
   userUpdated?: SubscriptionResolver<
     ResolversTypes['User'],
     'userUpdated',
     ParentType,
     ContextType,
-    RequireFields<SubscriptionUserUpdatedArgs, 'nickname'>
+    RequireFields<SubscriptionUserUpdatedArgs, '_id'>
   >
 }>
 

@@ -11,6 +11,7 @@ import {
   SubscriptionResolvers,
 } from '@models/types'
 import * as LikeService from './service'
+import {filterLikeUpdated} from './subscriptions'
 
 export const LikeResolver: IResolvers = {
   Like: <LikeResolvers>{
@@ -32,10 +33,7 @@ export const LikeResolver: IResolvers = {
     likeUpdated: {
       subscribe: withFilter(
         () => pubsub.asyncIterator('like'),
-        async ({likeUpdated: root}, {post_id}, {user}) =>
-          PostService.resolvePost(root, user).then(
-            post => !!post && String(post._id) === String(post_id),
-          ),
+        filterLikeUpdated,
       ),
     },
   },

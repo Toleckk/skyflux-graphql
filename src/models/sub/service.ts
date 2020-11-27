@@ -1,11 +1,18 @@
 import Mongoose from 'mongoose'
-import {pubsub} from '@pubsub'
 import {EventService} from '@models/event'
 import {UserService} from '@models/user'
 import {isMongoId} from '@utils/isMongoId'
-import {Scalars, Sub, SubDbObject, User, UserDbObject} from '@models/types'
+import {
+  DeletedSub,
+  Scalars,
+  Sub,
+  SubDbObject,
+  User,
+  UserDbObject,
+} from '@models/types'
 import {subRequested} from './events'
 import {SubModel} from './model'
+import {notifySubChanged} from './subscriptions'
 
 export const createSub = async (
   nickname: string,
@@ -29,39 +36,10 @@ export const createSub = async (
     from: user,
   }
 
-  await Promise.all([
-    EventService.createEvent(subRequested({sub, user})),
-    pubsub.publish('sub', {subUpdated: sub}),
-    to.private ? Promise.resolve() : pubsub.publish('user', to),
-    to.private ? Promise.resolve() : pubsub.publish('user', user),
-  ])
+  EventService.createEvent(subRequested({sub, user}))
+  notifySubChanged(sub)
 
   return sub
-}
-
-export const deleteSub = async (
-  nickname: string,
-  user: UserDbObject,
-): Promise<SubDbObject | null> => {
-  const to = await UserService.getUserByNickname(nickname)
-
-  if (!to) return null
-
-  const sub = await SubModel.findOne({from: user._id, to: to._id})
-
-  if (!sub) return null
-
-  const removingSub = {...sub.toObject(), to, from: user}
-
-  const removedSub = await remove(removingSub, user)
-
-  if (sub.accepted)
-    await Promise.all([
-      pubsub.publish('user', {userUpdated: to}),
-      pubsub.publish('user', {userUpdated: user}),
-    ])
-
-  return removedSub
 }
 
 export const getSubById = async (
@@ -96,13 +74,10 @@ export const acceptSub = async (
   const sub = {
     ...subDocument.toObject(),
     to: user,
+    from,
   }
 
-  await Promise.all([
-    pubsub.publish('sub', {subUpdated: sub}),
-    pubsub.publish('user', {userUpdated: user}),
-    pubsub.publish('user', {userUpdated: from}),
-  ])
+  notifySubChanged(sub)
 
   return sub
 }
@@ -121,13 +96,13 @@ export const isSubscribedBy = async (
 }
 
 export const countSubs = async (user: User): Promise<number> =>
-  SubModel.count({from: user._id, accepted: true})
+  SubModel.countDocuments({from: user._id, accepted: true})
 
 export const countSubscribers = async (user: User): Promise<number> =>
-  SubModel.count({to: user._id, accepted: true})
+  SubModel.countDocuments({to: user._id, accepted: true})
 
 export const countSubRequests = async (user: UserDbObject): Promise<number> =>
-  user.private ? SubModel.count({to: user._id, accepted: false}) : 0
+  user.private ? SubModel.countDocuments({to: user._id, accepted: false}) : 0
 
 export const getSubRequests = async (
   user: UserDbObject,
@@ -142,6 +117,28 @@ export const getSubRequests = async (
     .sort({_id: -1})
     .limit(first + 1)
 
+export const getSubFromTo = async (
+  from: User | UserDbObject,
+  to: User | UserDbObject,
+): Promise<SubDbObject | null> => SubModel.findOne({from: from._id, to: to._id})
+
+export const deleteSub = async (
+  nickname: string,
+  user: UserDbObject,
+): Promise<SubDbObject | null> => {
+  const to = await UserService.getUserByNickname(nickname)
+
+  if (!to) return null
+
+  const sub = await SubModel.findOne({from: user._id, to: to._id})
+
+  if (!sub) return null
+
+  const removingSub = {...sub.toObject(), to, from: user}
+
+  return remove(removingSub, user)
+}
+
 export const declineSub = async (
   _id: Scalars['ID'],
   user: UserDbObject,
@@ -153,10 +150,10 @@ export const declineSub = async (
   return remove(sub, user)
 }
 
-export const remove = async (
-  sub: SubDbObject,
+export const remove = async <T extends Sub | SubDbObject | DeletedSub>(
+  sub: T,
   user: UserDbObject,
-): Promise<SubDbObject & {deleted: boolean}> => {
+): Promise<T & {deleted: boolean}> => {
   await SubModel.deleteOne({_id: sub._id})
 
   const deletedSub = {
@@ -164,13 +161,8 @@ export const remove = async (
     deleted: true,
   }
 
-  await EventService.deleteEvent(subRequested({sub: deletedSub, user}))
-  await pubsub.publish('sub', {subUpdated: deletedSub})
+  EventService.deleteEvent(subRequested({sub: deletedSub, user}))
+  notifySubChanged(deletedSub)
 
   return deletedSub
 }
-
-export const getSubFromTo = async (
-  from: User | UserDbObject,
-  to: User | UserDbObject,
-): Promise<SubDbObject | null> => SubModel.findOne({from: from._id, to: to._id})

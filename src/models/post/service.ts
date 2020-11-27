@@ -1,6 +1,5 @@
 import Mongoose from 'mongoose'
 import {isMongoId} from '@utils/isMongoId'
-import {pubsub} from '@pubsub'
 import {Post, PostDbObject, User, UserDbObject} from '@models/types'
 import {UserService} from '@models/user'
 import {CommentService} from '@models/comment'
@@ -8,7 +7,9 @@ import {LikeService} from '@models/like'
 import {ChannelService} from '@models/channel'
 import {SubService} from '@models/sub'
 import {makeSearchPipeline} from '@utils/makeSearchPipeline'
+import {areEntitiesEqual} from '@utils/areEntitiesEqual'
 import {PostModel} from './model'
+import {notifyPostChanged} from './subscriptions'
 
 export const createPost = async (
   text: string,
@@ -28,10 +29,7 @@ export const createPost = async (
     user,
   }
 
-  await Promise.all([
-    pubsub.publish('post', {postUpdated: postWithUser}),
-    pubsub.publish('user', {userUpdated: user}),
-  ])
+  notifyPostChanged(postWithUser)
 
   return postWithUser
 }
@@ -99,10 +97,7 @@ export const deletePost = async (
 
   const deletedPost = {...post.toObject(), user, deleted: true}
 
-  await Promise.all([
-    pubsub.publish('post', {postUpdated: deletedPost}),
-    pubsub.publish('user', {userUpdated: user}),
-  ])
+  notifyPostChanged(deletedPost)
 
   return deletedPost
 }
@@ -110,10 +105,13 @@ export const deletePost = async (
 export const getPostById = async (
   _id: string | Mongoose.Types.ObjectId,
   user?: UserDbObject,
+  ignoreUser?: boolean,
 ): Promise<PostDbObject | null> => {
   const post = await PostModel.findById(_id)
 
   if (!post) return null
+
+  if (ignoreUser) return post
 
   return canSeePost(post, user).then(canSee => (canSee ? post : null))
 }
@@ -172,9 +170,12 @@ export const getFoundPosts = async (
 export const resolvePost = async (
   root: {post: Post | PostDbObject | Mongoose.Types.ObjectId | string},
   user?: UserDbObject,
+  ignoreUser?: boolean,
 ): Promise<Post | PostDbObject> => {
   if (typeof root.post === 'string' || isMongoId(root.post))
-    return getPostById(root.post, user) as Promise<Post | PostDbObject>
+    return getPostById(root.post, user, ignoreUser) as Promise<
+      Post | PostDbObject
+    >
 
   return root.post
 }
@@ -200,7 +201,7 @@ export const getPostsByNickname = async (
 
 export const canSeePost = async (
   post: Post | PostDbObject,
-  user?: UserDbObject,
+  user: UserDbObject | undefined,
 ): Promise<boolean> => {
   const owner = await UserService.resolveUser(post)
   return canSeeUserPosts(owner, user)
@@ -222,4 +223,15 @@ export const canSeeUserPosts = async (
 }
 
 export const countUserPosts = async (user: User): Promise<number> =>
-  PostModel.count({user: user._id})
+  PostModel.countDocuments({user: user._id})
+
+export const isInFeed = async (
+  post: Post | PostDbObject,
+  user: User | UserDbObject,
+): Promise<boolean> => {
+  if (areEntitiesEqual(post.user, user)) return true
+
+  const owner = await UserService.resolveUser(post)
+
+  return !!owner && SubService.isSubscribedBy(owner, user)
+}

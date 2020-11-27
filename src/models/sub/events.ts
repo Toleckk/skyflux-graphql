@@ -1,5 +1,6 @@
 import {ObjectID} from 'mongodb'
 import {
+  DeletedSub,
   EventDbObject,
   EventType,
   Sub,
@@ -11,7 +12,7 @@ export const subRequested = ({
   sub,
   user,
 }: {
-  sub: SubDbObject | Sub
+  sub: SubDbObject | Sub | DeletedSub
   user: UserDbObject
 }): Omit<EventDbObject, '_id' | 'createdAt'> => ({
   kind: EventType.Sub,

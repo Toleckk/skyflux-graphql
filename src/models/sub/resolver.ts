@@ -12,6 +12,7 @@ import {
 } from '@models/types'
 import {paginate} from '@utils/paginate'
 import * as SubService from './service'
+import {filterSubsUpdated} from './subscriptions'
 
 export const SubResolver: Resolvers = {
   Sub: <SubResolvers>{
@@ -40,14 +41,10 @@ export const SubResolver: Resolvers = {
     declineSub: (_, {_id}, {user}) => SubService.declineSub(_id, user),
   },
   Subscription: <SubscriptionResolvers>{
-    subUpdated: {
+    subsUpdated: {
       subscribe: withFilter(
         () => pubsub.asyncIterator('sub'),
-        ({subUpdated}, _, {user}) =>
-          subUpdated &&
-          (subUpdated.accepted ||
-            UserService.isUsersEqual(subUpdated.from, user) ||
-            UserService.isUsersEqual(subUpdated.to, user)),
+        filterSubsUpdated,
       ),
     },
   },

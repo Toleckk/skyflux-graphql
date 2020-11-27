@@ -39,6 +39,6 @@ export const SubSchema = `
     }
 
     extend type Subscription {
-        subUpdated: MaybeSub!
+        subsUpdated(from: ID, to: ID): MaybeSub!
     }
 `

@@ -96,8 +96,6 @@ export const UserSchema = `
     }
 
     extend type Subscription {
-        userUpdated(
-            nickname: String! @validate(pattern: "${nickname.p}", error: "${nickname.e}")
-        ): User!
+        userUpdated(_id: ID!): User!
     }
 `

@@ -11,6 +11,7 @@ import {PostService} from '@models/post'
 import {paginate} from '@utils/paginate'
 import {pubsub} from '@pubsub'
 import * as UserService from './service'
+import {filterUserUpdated} from './subscriptions'
 
 export const UserResolver: Resolvers = {
   User: <UserResolvers>{
@@ -55,7 +56,7 @@ export const UserResolver: Resolvers = {
     userUpdated: {
       subscribe: withFilter(
         () => pubsub.asyncIterator('user'),
-        ({userUpdated}, {nickname}) => userUpdated?.nickname === nickname,
+        filterUserUpdated,
       ),
     },
   },

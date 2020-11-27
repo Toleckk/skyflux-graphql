@@ -10,9 +10,9 @@ import {
 import {PostService} from '@models/post'
 import {EventService} from '@models/event'
 import {isMongoId} from '@utils/isMongoId'
-import {pubsub} from '@pubsub'
 import {CommentModel} from './model'
 import {commentCreated} from './events'
+import {notifyCommentChanged} from './subscriptions'
 
 export const createComment = async (
   text: string,
@@ -39,10 +39,8 @@ export const createComment = async (
     post,
   }
 
-  await Promise.all([
-    EventService.createEvent(commentCreated({comment, user})),
-    pubsub.publish('comment', {commentUpdated: comment}),
-  ])
+  EventService.createEvent(commentCreated({comment, user}))
+  notifyCommentChanged(comment)
 
   return comment
 }
@@ -62,10 +60,8 @@ export const deleteComment = async (
     deleted: true,
   }
 
-  await Promise.all([
-    EventService.deleteEvent(commentCreated({comment, user})),
-    pubsub.publish('comment', {commentUpdated: deletedComment}),
-  ])
+  EventService.deleteEvent(commentCreated({comment, user}))
+  notifyCommentChanged(deletedComment)
 
   return deletedComment
 }
@@ -94,7 +90,7 @@ export const resolveComment = async (root: {
 }
 
 export const countPostComments = async (post: Post): Promise<number> =>
-  CommentModel.count({post: post._id})
+  CommentModel.countDocuments({post: post._id})
 
 export const canDeleteComment = async (
   comment: Comment | CommentDbObject,
