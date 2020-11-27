@@ -1,15 +1,15 @@
 import {IResolvers} from 'graphql-tools'
 import {withFilter} from 'apollo-server'
-import {pubsub} from '@pubsub'
-import {UserService} from '@models/user'
-import {PostService} from '@models/post'
+import {pubsub} from '@skyflux/api/pubsub'
+import {UserService} from '@skyflux/api/models/user'
+import {PostService} from '@skyflux/api/models/post'
 import {
   DeletedLikeResolvers,
   LikeResolvers,
   MaybeLikeResolvers,
   MutationResolvers,
   SubscriptionResolvers,
-} from '@models/types'
+} from '@skyflux/api/models/types'
 import * as LikeService from './service'
 import {filterLikeUpdated} from './subscriptions'
 

@@ -1,5 +1,5 @@
 import Mongoose, {Document, Model} from 'mongoose'
-import {ChannelDocument} from '@models/channel/types'
+import {ChannelDocument} from '@skyflux/api/models/channel/types'
 
 const schema = new Mongoose.Schema(
   {

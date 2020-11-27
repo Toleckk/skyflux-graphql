@@ -1,14 +1,14 @@
-import {pubsub} from '@pubsub'
+import {pubsub} from '@skyflux/api/pubsub'
 import {
   Post,
   PostDbObject,
   SubscriptionPostsUpdatedArgs,
   SubscriptionPostUpdatedArgs,
   UserDbObject,
-} from '@models/types'
-import {notifyUserChanged, UserService} from '@models/user'
-import {PostService} from '@models/post'
-import {areEntitiesEqual} from '@utils/areEntitiesEqual'
+} from '@skyflux/api/models/types'
+import {notifyUserChanged, UserService} from '@skyflux/api/models/user'
+import {PostService} from '@skyflux/api/models/post'
+import {areEntitiesEqual} from '@skyflux/api/utils/areEntitiesEqual'
 
 export const notifyPostChanged = (
   post: PostDbObject | Post,

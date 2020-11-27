@@ -1,5 +1,5 @@
 import Mongoose, {Document, Model} from 'mongoose'
-import {EventDbObject} from '@models/types'
+import {EventDbObject} from '@skyflux/api/models/types'
 
 const schema = new Mongoose.Schema(
   {

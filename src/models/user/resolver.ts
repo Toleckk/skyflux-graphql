@@ -5,11 +5,11 @@ import {
   Resolvers,
   SubscriptionResolvers,
   UserResolvers,
-} from '@models/types'
-import {SubService} from '@models/sub'
-import {PostService} from '@models/post'
-import {paginate} from '@utils/paginate'
-import {pubsub} from '@pubsub'
+} from '@skyflux/api/models/types'
+import {SubService} from '@skyflux/api/models/sub'
+import {PostService} from '@skyflux/api/models/post'
+import {paginate} from '@skyflux/api/utils/paginate'
+import {pubsub} from '@skyflux/api/pubsub'
 import * as UserService from './service'
 import {filterUserUpdated} from './subscriptions'
 

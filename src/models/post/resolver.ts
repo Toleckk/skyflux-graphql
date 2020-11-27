@@ -1,8 +1,8 @@
 import {withFilter} from 'apollo-server'
-import {UserService} from '@models/user'
-import {LikeService} from '@models/like'
-import {CommentService} from '@models/comment'
-import {pubsub} from '@pubsub'
+import {UserService} from '@skyflux/api/models/user'
+import {LikeService} from '@skyflux/api/models/like'
+import {CommentService} from '@skyflux/api/models/comment'
+import {pubsub} from '@skyflux/api/pubsub'
 import {
   CommentDbObject,
   DeletedPostResolvers,
@@ -12,8 +12,8 @@ import {
   QueryResolvers,
   Resolvers,
   SubscriptionResolvers,
-} from '@models/types'
-import {paginate} from '@utils/paginate'
+} from '@skyflux/api/models/types'
+import {paginate} from '@skyflux/api/utils/paginate'
 import * as PostService from './service'
 import {
   filterFeedUpdated,

@@ -1,5 +1,5 @@
 import {Document, Types} from 'mongoose'
-import {Scalars, User} from '@models/types'
+import {Scalars, User} from '@skyflux/api/models/types'
 
 export interface Session {
   _id: Scalars['ID']

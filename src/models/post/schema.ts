@@ -1,4 +1,4 @@
-import {text} from '@validation'
+import {text} from '@skyflux/api/validation'
 
 // language=GraphQL
 export const PostSchema = `

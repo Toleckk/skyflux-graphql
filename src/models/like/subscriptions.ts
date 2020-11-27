@@ -1,12 +1,12 @@
-import {pubsub} from '@pubsub'
+import {pubsub} from '@skyflux/api/pubsub'
 import {
   Like,
   LikeDbObject,
   SubscriptionLikeUpdatedArgs,
   UserDbObject,
-} from '@models/types'
-import {notifyPostChanged, PostService} from '@models/post'
-import {areEntitiesEqual} from '@utils/areEntitiesEqual'
+} from '@skyflux/api/models/types'
+import {notifyPostChanged, PostService} from '@skyflux/api/models/post'
+import {areEntitiesEqual} from '@skyflux/api/utils/areEntitiesEqual'
 
 export const notifyLikeChanged = async (
   like: Like | LikeDbObject,

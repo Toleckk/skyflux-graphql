@@ -3,32 +3,13 @@
     "files": true
   },
   "include": [
-    "src/**/*",
-    "__types/**/*"
+    "src"
   ],
   "compilerOptions": {
-    "baseUrl": "./src",
+    "baseUrl": "src",
     "paths": {
-      "@models/*": [
-        "./models/*"
-      ],
-      "@utils/*": [
-        "./utils/*"
-      ],
-      "@decorators": [
-        "./decorators"
-      ],
-      "@pubsub": [
-        "./pubsub"
-      ],
-      "@validation": [
-        "./validation"
-      ],
-      "@errors": [
-        "./errors"
-      ],
-      "@directives": [
-        "./directives/index"
+      "@skyflux/api/*": [
+        "./*"
       ]
     },
     "target": "es6",
@@ -43,10 +24,6 @@
     "rootDir": "./src",
     "strict": true,
     "moduleResolution": "node",
-    "typeRoots": [
-      "./__types",
-      "./node_modules/@types"
-    ],
     "types": [
       "jest",
       "node"

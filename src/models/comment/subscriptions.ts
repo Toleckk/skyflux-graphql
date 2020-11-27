@@ -1,4 +1,4 @@
-import {pubsub} from '@pubsub'
+import {pubsub} from '@skyflux/api/pubsub'
 import {
   Comment,
   CommentDbObject,
@@ -7,9 +7,9 @@ import {
   PostDbObject,
   SubscriptionCommentUpdatedArgs,
   UserDbObject,
-} from '@models/types'
-import {PostService} from '@models/post'
-import {areEntitiesEqual} from '@utils/areEntitiesEqual'
+} from '@skyflux/api/models/types'
+import {PostService} from '@skyflux/api/models/post'
+import {areEntitiesEqual} from '@skyflux/api/utils/areEntitiesEqual'
 
 export const notifyCommentChanged = (
   comment: Omit<CommentDbObject | DeletedComment, 'post'> & {

@@ -1,6 +1,6 @@
 import Mongoose, {Document, Model} from 'mongoose'
 import fuzzySearching from 'mongoose-fuzzy-searching'
-import {PostDbObject} from '@models/types'
+import {PostDbObject} from '@skyflux/api/models/types'
 
 const schema = new Mongoose.Schema(
   {

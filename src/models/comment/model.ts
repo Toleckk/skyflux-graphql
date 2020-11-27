@@ -1,5 +1,5 @@
 import Mongoose, {Document, Model} from 'mongoose'
-import {CommentDbObject} from '@models/types'
+import {CommentDbObject} from '@skyflux/api/models/types'
 
 const schema = new Mongoose.Schema(
   {

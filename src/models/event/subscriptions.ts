@@ -1,7 +1,7 @@
-import {Event, EventDbObject, UserDbObject} from '@models/types'
-import {pubsub} from '@pubsub'
-import {ChannelService} from '@models/channel'
-import {areEntitiesEqual} from '@utils/areEntitiesEqual'
+import {Event, EventDbObject, UserDbObject} from '@skyflux/api/models/types'
+import {pubsub} from '@skyflux/api/pubsub'
+import {ChannelService} from '@skyflux/api/models/channel'
+import {areEntitiesEqual} from '@skyflux/api/utils/areEntitiesEqual'
 
 export const notifyEventChanged = (
   event: EventDbObject | Partial<Event>,

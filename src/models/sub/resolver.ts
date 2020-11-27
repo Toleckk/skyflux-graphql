@@ -1,6 +1,6 @@
 import {withFilter} from 'apollo-server'
-import {pubsub} from '@pubsub'
-import {UserService} from '@models/user'
+import {pubsub} from '@skyflux/api/pubsub'
+import {UserService} from '@skyflux/api/models/user'
 import {
   DeletedSubResolvers,
   MaybeSubResolvers,
@@ -9,8 +9,8 @@ import {
   Resolvers,
   SubResolvers,
   SubscriptionResolvers,
-} from '@models/types'
-import {paginate} from '@utils/paginate'
+} from '@skyflux/api/models/types'
+import {paginate} from '@skyflux/api/utils/paginate'
 import * as SubService from './service'
 import {filterSubsUpdated} from './subscriptions'
 

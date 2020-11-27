@@ -1,4 +1,4 @@
-import {MutationResolvers, Resolvers} from '@models/types'
+import {MutationResolvers, Resolvers} from '@skyflux/api/models/types'
 import * as ResetService from './service'
 
 export const ResetResolver: Resolvers = {

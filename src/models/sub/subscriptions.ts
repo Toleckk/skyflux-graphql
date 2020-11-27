@@ -1,14 +1,14 @@
-import {pubsub} from '@pubsub'
+import {pubsub} from '@skyflux/api/pubsub'
 import {
   DeletedSub,
   Sub,
   SubDbObject,
   SubscriptionSubsUpdatedArgs,
   UserDbObject,
-} from '@models/types'
-import {notifyUserChanged} from '@models/user'
-import {isMongoId} from '@utils/isMongoId'
-import {areEntitiesEqual} from '@utils/areEntitiesEqual'
+} from '@skyflux/api/models/types'
+import {notifyUserChanged} from '@skyflux/api/models/user'
+import {isMongoId} from '@skyflux/api/utils/isMongoId'
+import {areEntitiesEqual} from '@skyflux/api/utils/areEntitiesEqual'
 
 export const notifySubChanged = (
   sub: Sub | SubDbObject | DeletedSub,

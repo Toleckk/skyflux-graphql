@@ -6,7 +6,7 @@ import {
   Sub,
   SubDbObject,
   UserDbObject,
-} from '@models/types'
+} from '@skyflux/api/models/types'
 
 export const subRequested = ({
   sub,

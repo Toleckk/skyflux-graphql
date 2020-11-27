@@ -7,7 +7,7 @@ import {
   nickname,
   password,
   token,
-} from '@validation'
+} from '@skyflux/api/validation'
 // language=GraphQL
 export const UserSchema = `
     type User @entity(additionalFields: [

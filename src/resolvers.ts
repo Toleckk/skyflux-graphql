@@ -1,12 +1,12 @@
 import {mergeResolvers} from 'graphql-tools'
-import {UserResolver} from '@models/user'
-import {SessionResolver} from '@models/session'
-import {ResetResolver} from '@models/reset'
-import {PostResolver} from '@models/post'
-import {LikeResolver} from '@models/like'
-import {CommentResolver} from '@models/comment'
-import {SubResolver} from '@models/sub'
-import {EventResolver} from '@models/event'
+import {UserResolver} from '@skyflux/api/models/user'
+import {SessionResolver} from '@skyflux/api/models/session'
+import {ResetResolver} from '@skyflux/api/models/reset'
+import {PostResolver} from '@skyflux/api/models/post'
+import {LikeResolver} from '@skyflux/api/models/like'
+import {CommentResolver} from '@skyflux/api/models/comment'
+import {SubResolver} from '@skyflux/api/models/sub'
+import {EventResolver} from '@skyflux/api/models/event'
 
 export const resolvers = mergeResolvers([
   UserResolver,

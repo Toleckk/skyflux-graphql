@@ -6,10 +6,10 @@ import {
   Post,
   PostDbObject,
   UserDbObject,
-} from '@models/types'
-import {EventService} from '@models/event'
-import {PostService} from '@models/post'
-import {isMongoId} from '@utils/isMongoId'
+} from '@skyflux/api/models/types'
+import {EventService} from '@skyflux/api/models/event'
+import {PostService} from '@skyflux/api/models/post'
+import {isMongoId} from '@skyflux/api/utils/isMongoId'
 import {LikeModel} from './model'
 import {likeCreated} from './events'
 import {notifyLikeChanged} from './subscriptions'

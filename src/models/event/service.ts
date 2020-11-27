@@ -1,8 +1,8 @@
 import Mongoose, {Types} from 'mongoose'
-import {EventDbObject, User, UserDbObject} from '@models/types'
-import {ChannelService} from '@models/channel'
-import {EventModel} from '@models/event/model'
-import {notifyEventChanged} from '@models/event/subscriptions'
+import {EventDbObject, User, UserDbObject} from '@skyflux/api/models/types'
+import {ChannelService} from '@skyflux/api/models/channel'
+import {EventModel} from '@skyflux/api/models/event/model'
+import {notifyEventChanged} from '@skyflux/api/models/event/subscriptions'
 
 export const getEventsByUser = async (
   user: User | UserDbObject,

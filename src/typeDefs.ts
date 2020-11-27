@@ -1,11 +1,11 @@
-import {UserSchema} from '@models/user'
-import {SessionSchema} from '@models/session'
-import {ResetSchema} from '@models/reset'
-import {PostSchema} from '@models/post'
-import {LikeSchema} from '@models/like'
-import {CommentSchema} from '@models/comment'
-import {SubSchema} from '@models/sub'
-import {EventSchema} from '@models/event'
+import {UserSchema} from '@skyflux/api/models/user'
+import {SessionSchema} from '@skyflux/api/models/session'
+import {ResetSchema} from '@skyflux/api/models/reset'
+import {PostSchema} from '@skyflux/api/models/post'
+import {LikeSchema} from '@skyflux/api/models/like'
+import {CommentSchema} from '@skyflux/api/models/comment'
+import {SubSchema} from '@skyflux/api/models/sub'
+import {EventSchema} from '@skyflux/api/models/event'
 // language=GraphQL
 const Schema = `
     scalar Date

@@ -1,5 +1,5 @@
 import Mongoose from 'mongoose'
-import {isMongoId} from '@utils/isMongoId'
+import {isMongoId} from '@skyflux/api/utils/isMongoId'
 
 export const areEntitiesEqual = (a: Comparable, b: Comparable): boolean => {
   if ((a || null) === (b || null)) return true

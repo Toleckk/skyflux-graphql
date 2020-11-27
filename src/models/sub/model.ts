@@ -1,5 +1,5 @@
 import Mongoose, {Document, Model} from 'mongoose'
-import {SubDbObject} from '@models/types'
+import {SubDbObject} from '@skyflux/api/models/types'
 
 const schema = new Mongoose.Schema({
   from: {type: Mongoose.Schema.Types.ObjectId, required: true, ref: 'User'},

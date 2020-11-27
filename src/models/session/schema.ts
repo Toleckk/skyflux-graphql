@@ -1,4 +1,4 @@
-import {login, password} from '@validation'
+import {login, password} from '@skyflux/api/validation'
 
 // language=GraphQL
 export const SessionSchema = `

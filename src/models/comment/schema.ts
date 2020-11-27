@@ -1,5 +1,5 @@
 // language=GraphQL
-import {text} from '@validation'
+import {text} from '@skyflux/api/validation'
 
 export const CommentSchema = `
     type Comment @entity {

@@ -1,4 +1,4 @@
-import {User, UserDbObject} from '@models/types'
+import {User, UserDbObject} from '@skyflux/api/models/types'
 
 export const restore = ({
   user,

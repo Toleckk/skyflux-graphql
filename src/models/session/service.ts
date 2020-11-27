@@ -1,7 +1,7 @@
 import {v4} from 'uuid'
-import {InvalidPasswordError, UserNotFoundError} from '@errors'
-import {UserDbObject} from '@models/types'
-import {UserModel, UserService} from '@models/user'
+import {InvalidPasswordError, UserNotFoundError} from '@skyflux/api/errors'
+import {UserDbObject} from '@skyflux/api/models/types'
+import {UserModel, UserService} from '@skyflux/api/models/user'
 import {SessionModel} from './model'
 
 export const getMe = async (token: string): Promise<UserDbObject | null> => {

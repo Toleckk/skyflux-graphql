@@ -1,6 +1,6 @@
 import {Aggregate} from 'mongoose'
-import {User, UserDbObject} from '@models/types'
-import {EventService} from '@models/event'
+import {User, UserDbObject} from '@skyflux/api/models/types'
+import {EventService} from '@skyflux/api/models/event'
 import {ChannelDocument} from './types'
 import {ChannelModel} from './model'
 

@@ -1,5 +1,5 @@
 import Mongoose, {Document, Model} from 'mongoose'
-import {LikeDbObject} from '@models/types'
+import {LikeDbObject} from '@skyflux/api/models/types'
 
 const schema = new Mongoose.Schema({
   post: {type: Mongoose.Schema.Types.ObjectId, required: true, ref: 'Post'},

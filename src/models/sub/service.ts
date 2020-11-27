@@ -1,7 +1,7 @@
 import Mongoose from 'mongoose'
-import {EventService} from '@models/event'
-import {UserService} from '@models/user'
-import {isMongoId} from '@utils/isMongoId'
+import {EventService} from '@skyflux/api/models/event'
+import {UserService} from '@skyflux/api/models/user'
+import {isMongoId} from '@skyflux/api/utils/isMongoId'
 import {
   DeletedSub,
   Scalars,
@@ -9,7 +9,7 @@ import {
   SubDbObject,
   User,
   UserDbObject,
-} from '@models/types'
+} from '@skyflux/api/models/types'
 import {subRequested} from './events'
 import {SubModel} from './model'
 import {notifySubChanged} from './subscriptions'

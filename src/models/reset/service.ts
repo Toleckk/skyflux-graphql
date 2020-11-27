@@ -1,8 +1,8 @@
 import {v4} from 'uuid'
 import {ModelOptions} from 'mongoose'
-import {UserNotFoundError} from '@errors'
-import {UserModel} from '@models/user'
-import {EmailService} from '@models/email'
+import {UserNotFoundError} from '@skyflux/api/errors'
+import {UserModel} from '@skyflux/api/models/user'
+import {EmailService} from '@skyflux/api/models/email'
 import {ResetDocument} from './types'
 import {ResetModel} from './model'
 

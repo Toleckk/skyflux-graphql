@@ -1,5 +1,5 @@
 import {withFilter} from 'apollo-server'
-import {pubsub} from '@pubsub'
+import {pubsub} from '@skyflux/api/pubsub'
 import {
   CommentEventBodyResolvers,
   EventBodyResolvers,
@@ -9,11 +9,11 @@ import {
   Resolvers,
   SubEventBodyResolvers,
   SubscriptionResolvers,
-} from '@models/types'
-import {CommentService} from '@models/comment'
-import {LikeService} from '@models/like'
-import {SubService} from '@models/sub'
-import {paginate} from '@utils/paginate'
+} from '@skyflux/api/models/types'
+import {CommentService} from '@skyflux/api/models/comment'
+import {LikeService} from '@skyflux/api/models/like'
+import {SubService} from '@skyflux/api/models/sub'
+import {paginate} from '@skyflux/api/utils/paginate'
 import * as EventService from './service'
 import {filterEventUpdated} from './subscriptions'
 

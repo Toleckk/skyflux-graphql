@@ -6,10 +6,10 @@ import {
   PostDbObject,
   Scalars,
   UserDbObject,
-} from '@models/types'
-import {PostService} from '@models/post'
-import {EventService} from '@models/event'
-import {isMongoId} from '@utils/isMongoId'
+} from '@skyflux/api/models/types'
+import {PostService} from '@skyflux/api/models/post'
+import {EventService} from '@skyflux/api/models/event'
+import {isMongoId} from '@skyflux/api/utils/isMongoId'
 import {CommentModel} from './model'
 import {commentCreated} from './events'
 import {notifyCommentChanged} from './subscriptions'

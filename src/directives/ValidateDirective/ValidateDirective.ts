@@ -13,7 +13,7 @@ import {
   pathEq,
   values,
 } from 'ramda'
-import {ValidationError} from '@errors'
+import {ValidationError} from '@skyflux/api/errors'
 import {
   Create,
   CreateValidateDirective,

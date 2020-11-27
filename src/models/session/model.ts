@@ -1,5 +1,5 @@
 import Mongoose, {Model} from 'mongoose'
-import {SessionDocument} from '@models/session/types'
+import {SessionDocument} from '@skyflux/api/models/session/types'
 
 const schema = new Mongoose.Schema({
   user: {type: Mongoose.Schema.Types.ObjectId, ref: 'User', required: true},

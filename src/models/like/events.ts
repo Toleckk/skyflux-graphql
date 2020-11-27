@@ -5,7 +5,7 @@ import {
   Like,
   LikeDbObject,
   UserDbObject,
-} from '@models/types'
+} from '@skyflux/api/models/types'
 
 export const likeCreated = ({
   like,

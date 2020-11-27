@@ -1,11 +1,11 @@
+import {ObjectID} from 'mongodb'
 import {
   Comment,
   CommentDbObject,
   EventDbObject,
   EventType,
   UserDbObject,
-} from '@models/types'
-import {ObjectID} from 'mongodb'
+} from '@skyflux/api/models/types'
 
 export const commentCreated = ({
   comment,

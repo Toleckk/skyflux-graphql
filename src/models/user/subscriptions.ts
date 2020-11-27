@@ -1,6 +1,10 @@
-import {SubscriptionUserUpdatedArgs, User, UserDbObject} from '@models/types'
-import {pubsub} from '@pubsub'
-import {areEntitiesEqual} from '@utils/areEntitiesEqual'
+import {
+  SubscriptionUserUpdatedArgs,
+  User,
+  UserDbObject,
+} from '@skyflux/api/models/types'
+import {pubsub} from '@skyflux/api/pubsub'
+import {areEntitiesEqual} from '@skyflux/api/utils/areEntitiesEqual'
 
 export const notifyUserChanged = (
   user: UserDbObject | Partial<User>,

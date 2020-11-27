@@ -1,5 +1,5 @@
 import {ObjectID} from 'mongodb'
-import {PageInfo} from '@models/types'
+import {PageInfo} from '@skyflux/api/models/types'
 
 export type Edge<T, Cursor = string> = {
   node: T

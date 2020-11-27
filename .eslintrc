@@ -18,7 +18,6 @@
       "error",
       {
         "allow": [
-          "module-alias/register",
           "nodemailer/lib/*"
         ]
       }
@@ -27,8 +26,24 @@
     "import/no-duplicates": "error",
     "import/newline-after-import": "error",
     "import/no-default-export": "error",
-    "import/order": "error",
+    "import/order": [
+      "error",
+      {
+        "groups": [
+          "builtin",
+          "external",
+          "internal",
+          "sibling",
+          "parent",
+          "index",
+          "object"
+        ]
+      }
+    ],
     "@typescript-eslint/no-explicit-any": 0
+  },
+  "settings": {
+    "import/internal-regex": "^@skyflux/api"
   },
   "plugins": [
     "import",

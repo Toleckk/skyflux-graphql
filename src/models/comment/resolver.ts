@@ -1,7 +1,7 @@
 import {withFilter} from 'apollo-server'
-import {pubsub} from '@pubsub'
-import {UserService} from '@models/user'
-import {PostService} from '@models/post'
+import {pubsub} from '@skyflux/api/pubsub'
+import {UserService} from '@skyflux/api/models/user'
+import {PostService} from '@skyflux/api/models/post'
 import {
   CommentResolvers,
   DeletedCommentResolvers,
@@ -10,8 +10,8 @@ import {
   QueryResolvers,
   Resolvers,
   SubscriptionResolvers,
-} from '@models/types'
-import {paginate} from '@utils/paginate'
+} from '@skyflux/api/models/types'
+import {paginate} from '@skyflux/api/utils/paginate'
 import * as CommentService from './service'
 
 export const CommentResolver: Resolvers = {

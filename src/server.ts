@@ -1,9 +1,9 @@
 import Mongoose from 'mongoose'
 import {ApolloServer} from 'apollo-server'
 import {makeExecutableSchema} from 'graphql-tools'
-import {SessionService} from '@models/session'
 import {map} from 'ramda'
-import {AuthDirective, ValidateDirective} from '@directives'
+import {SessionService} from '@skyflux/api/models/session'
+import {AuthDirective, ValidateDirective} from '@skyflux/api/directives'
 import {typeDefs} from './typeDefs'
 import {resolvers} from './resolvers'
 

@@ -4,7 +4,6 @@ import {
   GraphQLScalarType,
   GraphQLScalarTypeConfig,
 } from 'graphql'
-
 export type Maybe<T> = T | null
 export type Exact<T extends {[key: string]: unknown}> = {[K in keyof T]: T[K]}
 export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>
@@ -1603,7 +1602,6 @@ export type IDirectiveResolvers<
   ContextType = {user: UserDbObject; token: string}
 > = DirectiveResolvers<ContextType>
 import {ObjectID} from 'mongodb'
-
 export type CommentDbObject = {
   _id: ObjectID
   text: string
