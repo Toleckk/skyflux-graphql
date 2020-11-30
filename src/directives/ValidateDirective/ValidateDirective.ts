@@ -2,6 +2,8 @@ import {SchemaDirectiveVisitor} from 'graphql-tools'
 import {
   defaultFieldResolver,
   GraphQLInputObjectType,
+  GraphQLNonNull,
+  isInputObjectType,
   StringValueNode,
 } from 'graphql'
 import {
@@ -101,14 +103,17 @@ export const extractValidators: ExtractValidators = (
   config,
   path = [],
 ) => {
-  if (!isInput(arg)) {
+  if (
+    !isInputObjectType(arg.type) &&
+    (!('ofType' in arg.type) || !isInputObjectType(arg.type.ofType))
+  ) {
     const directive = arg?.astNode?.directives?.find(
       directive => directive.name.value === 'validate',
     )
 
     if (!directive) return undefined
 
-    const params = getDirectiveParams(directive)
+    const params = getDirectiveParams(directive, arg.type)
     const newPath = [...path, arg.name]
     const configParams: Params = newPath.reduce(
       (acc, cur) => (cur in acc ? acc[cur] : ({} as any)),
@@ -129,7 +134,7 @@ export const extractValidators: ExtractValidators = (
     .reduce(mergeDeepRight, {})
 }
 
-export const getDirectiveParams: GetDirectiveParams = directive => {
+export const getDirectiveParams: GetDirectiveParams = (directive, type) => {
   const args = directive?.arguments || []
   const patternArg = args.find(pathEq(['name', 'value'], 'pattern'))
   const errorArg = args.find(pathEq(['name', 'value'], 'error'))
@@ -137,10 +142,22 @@ export const getDirectiveParams: GetDirectiveParams = directive => {
   const patternValue = patternArg?.value as StringValueNode | undefined
   const errorValue = errorArg?.value as StringValueNode | undefined
 
-  const pattern = patternValue && new RegExp(patternValue.value)
+  const pattern =
+    patternValue &&
+    new RegExp(
+      type instanceof GraphQLNonNull
+        ? patternValue.value
+        : makeNotRequiredRegex(patternValue.value),
+    )
   const error = errorValue?.value
 
   return filter(e => !!e, {error, pattern})
+}
+
+export const makeNotRequiredRegex = (v: string): string => {
+  const internalRegex = v.match(/^\/?(.+?)(?:\/?$)/)?.[1]
+
+  return '(^$)|(' + (internalRegex || '') + ')'
 }
 
 export const isInput: IsInput = arg =>

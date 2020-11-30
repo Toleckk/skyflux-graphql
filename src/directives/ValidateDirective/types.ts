@@ -32,12 +32,15 @@ export type ValidateAll = (
 ) => any
 
 export type ExtractValidators = (
-  arg: GraphQLArgument | GraphQLField<any, any> | GraphQLInputField,
+  arg: GraphQLArgument | GraphQLField<any, any>,
   config: ValidateDirectiveConfig,
   path?: string | string[],
 ) => any
 
-export type GetDirectiveParams = (directive?: DirectiveNode) => Params
+export type GetDirectiveParams = (
+  directive?: DirectiveNode,
+  type?: any,
+) => Params
 
 export type IsInput = (
   arg: GraphQLArgument | GraphQLInputField | GraphQLField<any, any>,
