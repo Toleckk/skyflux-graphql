@@ -1,12 +1,17 @@
-import Mongoose, {ModelOptions} from 'mongoose'
-import {v4} from 'uuid'
 import nodemailer from 'nodemailer'
 import SMTPConnection from 'nodemailer/lib/smtp-connection'
 import Mail from 'nodemailer/lib/mailer'
-import {User, UserDbObject} from '@skyflux/api/models/types'
-import {EmailDocument, Mailer} from '@skyflux/api/models/email/types'
 import * as templates from './templates'
-import {EmailModel} from './model'
+
+export interface Mailer {
+  sendMail: (mailOptions: {
+    from?: string
+    to: string
+    subject?: string
+    text?: string
+    html?: string
+  }) => Promise<any>
+}
 
 export const createDefaultMailer = (): Mail =>
   nodemailer.createTransport(
@@ -40,37 +45,3 @@ export const sendEmail = async <T extends keyof typeof templates>({
 
   return true
 }
-
-/** Creates new change email request */
-export const changeEmail = async (
-  email: string,
-  user: User | UserDbObject,
-): Promise<boolean> => {
-  const token = v4()
-
-  const session = await Mongoose.startSession()
-  await session.withTransaction(async () => {
-    await sendEmail({
-      template: 'confirm',
-      subject: 'Confirm email',
-      email,
-      payload: {user, token},
-    })
-
-    await EmailModel.create({user: user._id, email, token})
-  })
-
-  return true
-}
-
-export const deleteAllUserRequests = async (
-  user: User | UserDbObject,
-  options: ModelOptions,
-): Promise<boolean> => {
-  const {deletedCount} = await EmailModel.deleteMany({user: user._id}, options)
-  return (deletedCount || 0) > 0
-}
-
-export const getRequestByToken = async (
-  token: string,
-): Promise<EmailDocument | null> => EmailModel.findOne({token})

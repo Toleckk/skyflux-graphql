@@ -1,9 +1,7 @@
 import Mongoose, {ModelUpdateOptions} from 'mongoose'
 import {Description, User, UserDbObject} from '@skyflux/api/models/types'
 import {UserModel} from '@skyflux/api/models/user'
-import {ResetService} from '@skyflux/api/models/reset'
 import {ChannelService} from '@skyflux/api/models/channel'
-import {EmailService} from '@skyflux/api/models/email'
 import {generateNickname} from '@skyflux/api/utils/generateNickname'
 import {isMongoId} from '@skyflux/api/utils/isMongoId'
 import {makeSearchPipeline} from '@skyflux/api/utils/makeSearchPipeline'
@@ -11,63 +9,21 @@ import {toUTCDate} from '@skyflux/api/utils/toUtcDate'
 import {notifyUserChanged} from '@skyflux/api/models/user/subscriptions'
 
 /** Creates a new user with passed email and password and generated nickname */
-export const createUser = async (
-  email: string,
-  password: string,
-): Promise<UserDbObject> => {
+export const createUser = async (): Promise<UserDbObject> => {
   const nickname = generateNickname()
 
   const user = await UserModel.create({
     nickname,
-    email,
-    password,
     private: false,
     description: {},
   })
 
   await Promise.all([
-    EmailService.changeEmail(user.email, user),
     ChannelService.subscribeUserToChannel(user, `Sub_${user._id}`),
     notifyUserChanged(user),
   ])
 
   return user
-}
-
-/** Updates user password by reset token */
-export const resetPassword = async (
-  token: string,
-  password: string,
-): Promise<boolean> => {
-  const request = await ResetService.getResetByToken(token)
-
-  if (!request) return false
-
-  const session = await Mongoose.startSession()
-  await session.withTransaction(async () => {
-    await UserModel.updateOne({_id: request.user}, {password}, {session})
-    await ResetService.deleteResetByToken(token, {session})
-  })
-
-  return true
-}
-
-/** Updates user password by old password */
-export const updatePassword = async (
-  user: User | UserDbObject,
-  oldPassword: string,
-  newPassword: string,
-): Promise<boolean> => {
-  const userDoc = await UserModel.findById(user._id)
-
-  if (!userDoc) return false
-
-  if (userDoc.password !== oldPassword) return false
-
-  userDoc.password = newPassword
-  await userDoc.save()
-
-  return true
 }
 
 /** Updates user's 'about', 'birthday', 'from' and 'avatar' */
@@ -144,29 +100,6 @@ export const updateNickname = async (
   notifyUserChanged(user)
 
   return user
-}
-
-/** Changes email by token */
-export const confirmEmail = async (token: string): Promise<boolean> => {
-  const request = await EmailService.getRequestByToken(token)
-
-  if (!request) return false
-
-  const user = await getUserById(request.user)
-
-  if (!user) return false
-
-  const session = await Mongoose.startSession()
-  await session.withTransaction(async () => {
-    await UserModel.updateOne(
-      {_id: user._id},
-      {email: request.email},
-      {session},
-    )
-    await EmailService.deleteAllUserRequests(user, {session})
-  })
-
-  return true
 }
 
 /** Checks if user with specified nickname exists */

@@ -2,8 +2,8 @@ import Mongoose from 'mongoose'
 import {ApolloServer} from 'apollo-server'
 import {makeExecutableSchema} from 'graphql-tools'
 import {map} from 'ramda'
-import {SessionService} from '@skyflux/api/models/session'
 import {AuthDirective, ValidateDirective} from '@skyflux/api/directives'
+import {userByToken} from '@skyflux/api/auth'
 import {typeDefs} from './typeDefs'
 import {resolvers} from './resolvers'
 
@@ -51,7 +51,7 @@ const server = new ApolloServer({
     return {
       ...context,
       token,
-      user: token ? await SessionService.getMe(token) : null,
+      user: await userByToken(token),
     }
   },
   cors: {

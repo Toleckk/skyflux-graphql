@@ -1,6 +1,4 @@
 import {UserSchema} from '@skyflux/api/models/user'
-import {SessionSchema} from '@skyflux/api/models/session'
-import {ResetSchema} from '@skyflux/api/models/reset'
 import {PostSchema} from '@skyflux/api/models/post'
 import {LikeSchema} from '@skyflux/api/models/like'
 import {CommentSchema} from '@skyflux/api/models/comment'
@@ -60,8 +58,6 @@ const Schema = `
 export const typeDefs = [
   Schema,
   UserSchema,
-  SessionSchema,
-  ResetSchema,
   PostSchema,
   LikeSchema,
   CommentSchema,

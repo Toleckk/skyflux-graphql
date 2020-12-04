@@ -37,20 +37,12 @@ export const UserResolver: Resolvers = {
       )(first, after),
   },
   Mutation: <MutationResolvers>{
-    createUser: (root, {user}) =>
-      UserService.createUser(user.email, user.password),
-    resetPassword: (root, {credentials}) =>
-      UserService.resetPassword(credentials.token, credentials.password),
-    updatePassword: (root, {credentials: {oldPassword, newPassword}}, {user}) =>
-      UserService.updatePassword(user, oldPassword, newPassword),
     updateNickname: (root, {user: {nickname}}, {user}) =>
       UserService.updateNickname(user, nickname),
     updateProfileInfo: (root, {user: info}, {user}) =>
       UserService.updateProfileInfo(user, info),
     makeAccountPublic: (_, __, {user}) => UserService.makePublic(user),
     makeAccountPrivate: (_, __, {user}) => UserService.makePrivate(user),
-    confirmEmail: (_, {credentials: {token}}) =>
-      UserService.confirmEmail(token),
   },
   Subscription: <SubscriptionResolvers>{
     userUpdated: {

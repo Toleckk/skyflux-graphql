@@ -1,19 +1,7 @@
-import {
-  about,
-  avatarUrl,
-  date,
-  email,
-  from,
-  nickname,
-  password,
-  token,
-} from '@skyflux/api/validation'
+import {about, avatarUrl, date, from, nickname} from '@skyflux/api/validation'
 // language=GraphQL
 export const UserSchema = `
-    type User @entity(additionalFields: [
-        {path: "email", type: "string"},
-        {path: "password", type: "string"},
-    ]) {
+    type User @entity {
         _id: ID! @id
         nickname: String! @column
         avatar: String @column
@@ -50,21 +38,6 @@ export const UserSchema = `
         doesNicknameExist(nickname: String!): Boolean!
     }
 
-    input CreateUser {
-        email: String! @validate(pattern: "${email.p}", error: "${email.e}")
-        password: String! @validate(pattern: "${password.p}", error: "${password.e}")
-    }
-
-    input ResetPassword {
-        token: String! @validate(pattern: "${token.p}", error: "${token.e}")
-        password: String! @validate(pattern: "${password.p}", error: "${token.e}")
-    }
-
-    input UpdatePassword {
-        oldPassword: String! @validate(pattern: "${password.p}", error: "${password.e}")
-        newPassword: String! @validate(pattern: "${password.p}", error: "${password.e}")
-    }
-
     input UpdateNickname {
         nickname: String! @validate(pattern: "${nickname.p}", error: "${nickname.e}")
     }
@@ -80,19 +53,11 @@ export const UserSchema = `
         from: String @validate(pattern: "${from.p}", error: "${from.e}")
     }
 
-    input ConfirmEmail {
-        token: String! @validate(pattern: "${token.p}", error: "${token.e}")
-    }
-
     extend type Mutation {
-        createUser(user: CreateUser!): User!
-        resetPassword(credentials: ResetPassword!): Boolean
-        updatePassword(credentials: UpdatePassword!): Boolean @auth
         updateNickname(user: UpdateNickname!): User! @auth
         updateProfileInfo(user: UpdateProfileInfo!): User! @auth
         makeAccountPublic: User! @auth
         makeAccountPrivate: User! @auth
-        confirmEmail(credentials: ConfirmEmail!): Boolean!
     }
 
     extend type Subscription {

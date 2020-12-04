@@ -9,8 +9,6 @@ const Description = new Mongoose.Schema({
 })
 
 const schema = new Mongoose.Schema({
-  email: {type: Mongoose.Schema.Types.String, required: true, unique: true},
-  password: {type: Mongoose.Schema.Types.String, required: true},
   nickname: {type: Mongoose.Schema.Types.String, required: true, unique: true},
   avatar: {type: Mongoose.Schema.Types.String},
   description: {type: Description, required: true, default: {}},
