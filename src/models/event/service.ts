@@ -89,6 +89,3 @@ export const deleteEvent = async ({
 
   return event._id
 }
-
-export const deleteEventsByChannel = async (channel: string): Promise<void> =>
-  void (await EventModel.deleteMany({channel}))

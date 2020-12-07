@@ -2,9 +2,6 @@ import Mongoose from 'mongoose'
 import {isMongoId} from '@skyflux/api/utils/isMongoId'
 import {Post, PostDbObject, User, UserDbObject} from '@skyflux/api/models/types'
 import {UserService} from '@skyflux/api/models/user'
-import {CommentService} from '@skyflux/api/models/comment'
-import {LikeService} from '@skyflux/api/models/like'
-import {ChannelService} from '@skyflux/api/models/channel'
 import {SubService} from '@skyflux/api/models/sub'
 import {makeSearchPipeline} from '@skyflux/api/utils/makeSearchPipeline'
 import {areEntitiesEqual} from '@skyflux/api/utils/areEntitiesEqual'
@@ -19,10 +16,6 @@ export const createPost = async (
     text,
     user: user._id,
   })
-
-  await ChannelService.subscribeUserToChannel(user, `Comment_${post._id}`)
-
-  await ChannelService.subscribeUserToChannel(user, `Like_${post._id}`)
 
   const postWithUser = {
     ...post.toObject(),
@@ -88,12 +81,6 @@ export const deletePost = async (
   if (!post) return null
 
   await post.deleteOne()
-
-  await CommentService.deleteCommentsByPost(post)
-  await ChannelService.deleteChannel(`Comment_${post._id}`)
-
-  await LikeService.deleteLikesByPost(post)
-  await ChannelService.deleteChannel(`Like_${post._id}`)
 
   const deletedPost = {...post.toObject(), user, deleted: true}
 

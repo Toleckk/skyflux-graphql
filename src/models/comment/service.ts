@@ -3,7 +3,6 @@ import {
   Comment,
   CommentDbObject,
   Post,
-  PostDbObject,
   Scalars,
   UserDbObject,
 } from '@skyflux/api/models/types'
@@ -105,10 +104,4 @@ export const canDeleteComment = async (
   const postOwnerId = '_id' in post.user ? post.user._id : post.user
 
   return String(postOwnerId) === String(user._id)
-}
-
-export const deleteCommentsByPost = async (
-  post: PostDbObject | Post,
-): Promise<void> => {
-  await CommentModel.deleteMany({post: post._id})
 }

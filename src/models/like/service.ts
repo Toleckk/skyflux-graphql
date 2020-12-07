@@ -4,7 +4,6 @@ import {
   Like,
   LikeDbObject,
   Post,
-  PostDbObject,
   UserDbObject,
 } from '@skyflux/api/models/types'
 import {EventService} from '@skyflux/api/models/event'
@@ -34,12 +33,6 @@ export const deleteLike = async (
   notifyLikeChanged(like)
 
   return deletedLike
-}
-
-export const deleteLikesByPost = async (
-  post: PostDbObject | Post,
-): Promise<void> => {
-  await LikeModel.deleteMany({post: post._id})
 }
 
 export const createLike = async (

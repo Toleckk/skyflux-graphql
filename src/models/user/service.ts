@@ -1,7 +1,6 @@
 import Mongoose, {ModelUpdateOptions} from 'mongoose'
 import {Description, User, UserDbObject} from '@skyflux/api/models/types'
 import {UserModel} from '@skyflux/api/models/user'
-import {ChannelService} from '@skyflux/api/models/channel'
 import {generateNickname} from '@skyflux/api/utils/generateNickname'
 import {isMongoId} from '@skyflux/api/utils/isMongoId'
 import {makeSearchPipeline} from '@skyflux/api/utils/makeSearchPipeline'
@@ -18,10 +17,7 @@ export const createUser = async (): Promise<UserDbObject> => {
     description: {},
   })
 
-  await Promise.all([
-    ChannelService.subscribeUserToChannel(user, `Sub_${user._id}`),
-    notifyUserChanged(user),
-  ])
+  notifyUserChanged(user)
 
   return user
 }
