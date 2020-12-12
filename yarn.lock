@@ -1817,6 +1817,21 @@
     "@types/bson" "*"
     "@types/node" "*"
 
+"@types/mongoose-delete@^0.5.2":
+  version "0.5.2"
+  resolved "https://registry.yarnpkg.com/@types/mongoose-delete/-/mongoose-delete-0.5.2.tgz#3e678c2997b7cbf6dc2f10d097375319598a20f8"
+  integrity sha512-R7J3cGnK+4n6niIAixvFUacRdhR1GG7lqLDoigPDubtLPnVcQvS2Cr6cC5PP4DAMv9V2u/74OSV6fKLSRQe6Gg==
+  dependencies:
+    "@types/mongoose" "*"
+
+"@types/mongoose@*":
+  version "5.10.2"
+  resolved "https://registry.yarnpkg.com/@types/mongoose/-/mongoose-5.10.2.tgz#761d73b78caaa2c4c745ab4fcca4cb976e3fad1e"
+  integrity sha512-n23tptnyVk0FDew/5YMG9eee5DQGRq2YLyFxm5b04V5QzCmomX6L8sA4BUv1s4ibr+HP9gCABIEhcItFOQi/dA==
+  dependencies:
+    "@types/mongodb" "*"
+    "@types/node" "*"
+
 "@types/mongoose@^5.7.36":
   version "5.10.1"
   resolved "https://registry.yarnpkg.com/@types/mongoose/-/mongoose-5.10.1.tgz#41d5fe0fef5dce33c140467f1cb2a53b689a66e6"
@@ -6430,6 +6445,11 @@ mongodb@3.6.3:
     safe-buffer "^5.1.2"
   optionalDependencies:
     saslprep "^1.0.0"
+
+mongoose-delete@^0.5.3:
+  version "0.5.3"
+  resolved "https://registry.yarnpkg.com/mongoose-delete/-/mongoose-delete-0.5.3.tgz#c35c2147ca6c460af54cfd3f3f9fb656ac6a0dc0"
+  integrity sha512-7RdnGf7U9Bzp0F0ovW2C00G0otj7OltB1HdmL3ElX5EgjtqfBupq+22sYbhbQ/74+zCIkx37nsNaKYHFVWDm2w==
 
 mongoose-fuzzy-searching@^1.3.1:
   version "1.3.4"

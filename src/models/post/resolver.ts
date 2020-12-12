@@ -79,6 +79,7 @@ export const PostResolver: Resolvers = {
     },
   },
   MaybePost: <MaybePostResolvers>{
-    __resolveType: root => ('deleted' in root ? 'DeletedPost' : 'Post'),
+    __resolveType: root =>
+      'deleted' in root && root.deleted ? 'DeletedPost' : 'Post',
   },
 }

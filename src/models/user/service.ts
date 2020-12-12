@@ -5,21 +5,14 @@ import {generateNickname} from '@skyflux/api/utils/generateNickname'
 import {isMongoId} from '@skyflux/api/utils/isMongoId'
 import {makeSearchPipeline} from '@skyflux/api/utils/makeSearchPipeline'
 import {toUTCDate} from '@skyflux/api/utils/toUtcDate'
-import {notifyUserChanged} from '@skyflux/api/models/user/subscriptions'
 
 /** Creates a new user with passed email and password and generated nickname */
 export const createUser = async (): Promise<UserDbObject> => {
-  const nickname = generateNickname()
-
-  const user = await UserModel.create({
-    nickname,
+  return UserModel.create({
+    nickname: generateNickname(),
     private: false,
     description: {},
   })
-
-  notifyUserChanged(user)
-
-  return user
 }
 
 /** Updates user's 'about', 'birthday', 'from' and 'avatar' */
@@ -40,8 +33,6 @@ export const updateProfileInfo = async (
     birthday: info.description.birthday && toUTCDate(info.description.birthday),
   }
   await userDoc.save()
-
-  notifyUserChanged(userDoc)
 
   return userDoc
 }
@@ -77,8 +68,6 @@ export const setPrivate = async (
 
   user.private = isPrivate
 
-  notifyUserChanged(user)
-
   return user
 }
 
@@ -92,8 +81,6 @@ export const updateNickname = async (
   await UserModel.updateOne({_id: user._id}, {nickname})
 
   user.nickname = nickname
-
-  notifyUserChanged(user)
 
   return user
 }
@@ -144,14 +131,16 @@ export const getSuggestions = async (
   UserModel.aggregate([
     {$match: {_id: {$ne: user._id}, private: false}},
     {
-      $lookup: {
-        from: 'posts',
-        localField: '_id',
-        foreignField: 'user',
-        as: 'posts',
-      },
+      from: 'posts',
+      let: {userId: '$_id'},
+      pipeline: [
+        {$match: {$expr: {$eq: ['$user', '$$userId']}}},
+        {$match: {deleted: {$ne: true}}},
+        {$limit: 1},
+      ],
+      as: 'posts',
     },
-    {$match: {posts: {$gt: [{$size: 'posts'}, 1]}}},
+    {$match: {posts: {$gt: {$size: 0}}}},
     {$limit: first},
   ])
 

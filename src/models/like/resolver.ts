@@ -23,7 +23,8 @@ export const LikeResolver: IResolvers = {
     post: (root, _, {user}) => PostService.resolvePost(root, user),
   },
   MaybeLike: <MaybeLikeResolvers>{
-    __resolveType: like => ('deleted' in like ? 'DeletedLike' : 'Like'),
+    __resolveType: like =>
+      'deleted' in like && like.deleted ? 'DeletedLike' : 'Like',
   },
   Mutation: <MutationResolvers>{
     createLike: (_, {post_id}, {user}) => LikeService.createLike(post_id, user),

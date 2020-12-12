@@ -7,11 +7,8 @@ import {
   UserDbObject,
 } from '@skyflux/api/models/types'
 import {PostService} from '@skyflux/api/models/post'
-import {EventService} from '@skyflux/api/models/event'
 import {isMongoId} from '@skyflux/api/utils/isMongoId'
 import {CommentModel} from './model'
-import {commentCreated} from './events'
-import {notifyCommentChanged} from './subscriptions'
 
 export const createComment = async (
   text: string,
@@ -30,44 +27,32 @@ export const createComment = async (
     text,
   })
 
-  if (!commentDoc) return null
-
-  const comment: Comment = {
+  return {
     ...commentDoc.toObject(),
     user,
     post,
   }
-
-  EventService.createEvent(commentCreated({comment, user}))
-  notifyCommentChanged(comment)
-
-  return comment
 }
 
 export const deleteComment = async (
   _id: string,
   user: UserDbObject,
 ): Promise<(CommentDbObject & {deleted: true}) | null> => {
-  const comment = await CommentModel.findById(_id)
+  const comment = await CommentModel.findOne({_id})
 
   if (!(comment && (await canDeleteComment(comment, user)))) return null
 
-  await comment.deleteOne()
+  await comment.delete()
 
-  const deletedComment = {
+  return {
     ...comment.toObject(),
     deleted: true,
   }
-
-  EventService.deleteEvent(commentCreated({comment, user}))
-  notifyCommentChanged(deletedComment)
-
-  return deletedComment
 }
 
 export const getCommentById = async (
   _id: string | Mongoose.Types.ObjectId,
-): Promise<CommentDbObject | null> => CommentModel.findById(_id)
+): Promise<CommentDbObject | null> => CommentModel.findOne({_id})
 
 export const getCommentsByPostId = async (
   post_id: Scalars['ID'],

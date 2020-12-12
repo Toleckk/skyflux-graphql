@@ -24,7 +24,8 @@ export const SubResolver: Resolvers = {
     to: root => UserService.resolveUser({user: root.to}),
   },
   MaybeSub: <MaybeSubResolvers>{
-    __resolveType: sub => ('deleted' in sub ? 'DeletedSub' : 'Sub'),
+    __resolveType: sub =>
+      'deleted' in sub && sub.deleted ? 'DeletedSub' : 'Sub',
   },
   Query: <QueryResolvers>{
     subRequests: (_, {first, after}, {user}) =>

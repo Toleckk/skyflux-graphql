@@ -1,4 +1,8 @@
-import Mongoose, {Document, Model} from 'mongoose'
+import Mongoose from 'mongoose'
+import MongooseDeletePlugin, {
+  SoftDeleteDocument,
+  SoftDeleteModel,
+} from 'mongoose-delete'
 import {CommentDbObject} from '@skyflux/api/models/types'
 
 const schema = new Mongoose.Schema(
@@ -18,7 +22,9 @@ const schema = new Mongoose.Schema(
   {timestamps: {createdAt: true, updatedAt: false}},
 )
 
+schema.plugin(MongooseDeletePlugin, {overrideMethods: true, deletedAt: true})
+
 export const CommentModel = Mongoose.model<
-  CommentDbObject & Document,
-  Model<CommentDbObject & Document>
+  CommentDbObject & SoftDeleteDocument,
+  SoftDeleteModel<CommentDbObject & SoftDeleteDocument>
 >('Comment', schema)

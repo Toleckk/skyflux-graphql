@@ -6,26 +6,15 @@ import {SubService} from '@skyflux/api/models/sub'
 import {makeSearchPipeline} from '@skyflux/api/utils/makeSearchPipeline'
 import {areEntitiesEqual} from '@skyflux/api/utils/areEntitiesEqual'
 import {PostModel} from './model'
-import {notifyPostChanged} from './subscriptions'
 
 export const createPost = async (
   text: string,
   user: User | UserDbObject,
-): Promise<Post | null> => {
-  const post = await PostModel.create<Omit<PostDbObject, 'createdAt'>>({
+): Promise<Post | null> =>
+  PostModel.create<Omit<PostDbObject, 'createdAt'>>({
     text,
     user: user._id,
-  })
-
-  const postWithUser = {
-    ...post.toObject(),
-    user,
-  }
-
-  notifyPostChanged(postWithUser)
-
-  return postWithUser
-}
+  }).then(post => ({...post.toObject(), user}))
 
 export const getFeed = async (
   user: User | UserDbObject,
@@ -44,6 +33,7 @@ export const getFeed = async (
                 $and: [
                   {$eq: ['$to', '$$user']},
                   {$eq: ['$accepted', true]},
+                  {$ne: ['$deleted', true]},
                   {$eq: ['$from', user._id]},
                 ],
               },
@@ -80,13 +70,9 @@ export const deletePost = async (
 
   if (!post) return null
 
-  await post.deleteOne()
+  await post.delete()
 
-  const deletedPost = {...post.toObject(), user, deleted: true}
-
-  notifyPostChanged(deletedPost)
-
-  return deletedPost
+  return {...post.toObject(), user, deleted: true}
 }
 
 export const getPostById = async (
@@ -94,7 +80,7 @@ export const getPostById = async (
   user?: UserDbObject,
   ignoreUser?: boolean,
 ): Promise<PostDbObject | null> => {
-  const post = await PostModel.findById(_id)
+  const post = await PostModel.findOne({_id})
 
   if (!post) return null
 
@@ -139,7 +125,15 @@ export const getFoundPosts = async (
           ...(user
             ? [
                 {'user._id': user._id},
-                {subs: {$elemMatch: {from: user._id, accepted: true}}},
+                {
+                  subs: {
+                    $elemMatch: {
+                      from: user._id,
+                      accepted: true,
+                      deleted: {$ne: true},
+                    },
+                  },
+                },
               ]
             : []),
         ],

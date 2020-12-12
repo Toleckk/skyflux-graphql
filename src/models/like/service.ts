@@ -6,12 +6,9 @@ import {
   Post,
   UserDbObject,
 } from '@skyflux/api/models/types'
-import {EventService} from '@skyflux/api/models/event'
 import {PostService} from '@skyflux/api/models/post'
 import {isMongoId} from '@skyflux/api/utils/isMongoId'
 import {LikeModel} from './model'
-import {likeCreated} from './events'
-import {notifyLikeChanged} from './subscriptions'
 
 export const deleteLike = async (
   post_id: string,
@@ -21,18 +18,13 @@ export const deleteLike = async (
 
   if (!like) return null
 
-  await like.deleteOne()
+  await like.delete()
 
-  const deletedLike: DeletedLike = {
+  return {
     ...like.toObject(),
     user,
     deleted: true,
   }
-
-  EventService.deleteEvent(likeCreated({like, user}))
-  notifyLikeChanged(like)
-
-  return deletedLike
 }
 
 export const createLike = async (
@@ -47,16 +39,11 @@ export const createLike = async (
 
   if (!likeDocument) return null
 
-  const like: Like = {
+  return {
     ...likeDocument.toObject(),
     user,
     post,
   }
-
-  EventService.createEvent(likeCreated({like, user}))
-  notifyLikeChanged(like)
-
-  return like
 }
 
 export const isPostLikedBy = async (
@@ -65,7 +52,7 @@ export const isPostLikedBy = async (
 ): Promise<boolean> => {
   if (!user) return false
 
-  return LikeModel.exists({post: post._id, user: user._id})
+  return LikeModel.exists({post: post._id, user: user._id, deleted: false})
 }
 
 export const countPostLikes = async (post: Post): Promise<number> =>
@@ -83,6 +70,6 @@ export const resolveLike = async (root: {
 export const getLikeById = async (
   _id: Mongoose.Types.ObjectId | string,
 ): Promise<LikeDbObject | null> => {
-  const like = await LikeModel.findById(_id)
+  const like = await LikeModel.findOne({_id})
   return like || null
 }

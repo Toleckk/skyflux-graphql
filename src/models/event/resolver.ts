@@ -19,7 +19,8 @@ import {filterEventUpdated} from './subscriptions'
 
 export const EventResolver: Resolvers = {
   MaybeEvent: <MaybeEventResolvers>{
-    __resolveType: parent => ('deleted' in parent ? 'DeletedEvent' : 'Event'),
+    __resolveType: parent =>
+      'deleted' in parent && parent.deleted ? 'DeletedEvent' : 'Event',
   },
   EventBody: <EventBodyResolvers>{
     __resolveType: root =>

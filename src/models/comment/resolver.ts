@@ -12,6 +12,7 @@ import {
   SubscriptionResolvers,
 } from '@skyflux/api/models/types'
 import {paginate} from '@skyflux/api/utils/paginate'
+import {filterCommentUpdated} from './subscriptions'
 import * as CommentService from './service'
 
 export const CommentResolver: Resolvers = {
@@ -24,7 +25,7 @@ export const CommentResolver: Resolvers = {
   },
   MaybeComment: <MaybeCommentResolvers>{
     __resolveType: parent =>
-      'deleted' in parent ? 'DeletedComment' : 'Comment',
+      'deleted' in parent && parent.deleted ? 'DeletedComment' : 'Comment',
   },
   Query: <QueryResolvers>{
     comments: (_, {post_id, first, after}) =>
@@ -42,10 +43,7 @@ export const CommentResolver: Resolvers = {
     commentUpdated: {
       subscribe: withFilter(
         (): AsyncIterator<Comment> => pubsub.asyncIterator('comment'),
-        async ({commentUpdated}, {post_id}, {user}): Promise<boolean> =>
-          PostService.resolvePost(commentUpdated, user).then(
-            post => !!post && String(post._id) === post_id,
-          ),
+        filterCommentUpdated,
       ),
     },
   },

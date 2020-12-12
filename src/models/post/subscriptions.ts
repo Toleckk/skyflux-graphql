@@ -1,4 +1,3 @@
-import {pubsub} from '@skyflux/api/pubsub'
 import {
   Post,
   PostDbObject,
@@ -6,23 +5,8 @@ import {
   SubscriptionPostUpdatedArgs,
   UserDbObject,
 } from '@skyflux/api/models/types'
-import {notifyUserChanged, UserService} from '@skyflux/api/models/user'
 import {PostService} from '@skyflux/api/models/post'
 import {areEntitiesEqual} from '@skyflux/api/utils/areEntitiesEqual'
-
-export const notifyPostChanged = (
-  post: PostDbObject | Post,
-): Promise<[void, void]> =>
-  Promise.all([
-    pubsub.publish('post', {
-      postUpdated: post,
-      postsUpdated: post,
-      feedUpdated: post,
-    }),
-    UserService.resolveUser(post).then(user =>
-      user ? notifyUserChanged(user) : undefined,
-    ),
-  ])
 
 export const filterPostUpdated = async (
   {postUpdated}: {postUpdated?: Post | PostDbObject},

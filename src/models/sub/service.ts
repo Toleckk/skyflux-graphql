@@ -1,5 +1,4 @@
 import Mongoose from 'mongoose'
-import {EventService} from '@skyflux/api/models/event'
 import {UserService} from '@skyflux/api/models/user'
 import {isMongoId} from '@skyflux/api/utils/isMongoId'
 import {
@@ -10,9 +9,7 @@ import {
   User,
   UserDbObject,
 } from '@skyflux/api/models/types'
-import {subRequested} from './events'
 import {SubModel} from './model'
-import {notifySubChanged} from './subscriptions'
 
 export const createSub = async (
   nickname: string,
@@ -30,22 +27,17 @@ export const createSub = async (
     accepted: !to.private,
   })
 
-  const sub: Sub = {
+  return {
     ...subDocument.toObject(),
     to,
     from: user,
   }
-
-  EventService.createEvent(subRequested({sub, user}))
-  notifySubChanged(sub)
-
-  return sub
 }
 
 export const getSubById = async (
   _id: string | Mongoose.Types.ObjectId,
 ): Promise<SubDbObject | null> => {
-  const sub = await SubModel.findById(_id)
+  const sub = await SubModel.findOne({_id})
   return sub?.toObject()
 }
 
@@ -69,17 +61,10 @@ export const acceptSub = async (
   subDocument.accepted = true
   await subDocument.save()
 
-  const from = await UserService.getUserById(subDocument.from)
-
-  const sub = {
+  return {
     ...subDocument.toObject(),
     to: user,
-    from,
   }
-
-  notifySubChanged(sub)
-
-  return sub
 }
 
 export const isSubscribedBy = async (
@@ -92,6 +77,7 @@ export const isSubscribedBy = async (
     from: from._id,
     to: to._id,
     accepted: true,
+    deleted: false,
   })
 }
 
@@ -136,7 +122,7 @@ export const deleteSub = async (
 
   const removingSub = {...sub.toObject(), to, from: user}
 
-  return remove(removingSub, user)
+  return remove(removingSub)
 }
 
 export const declineSub = async (
@@ -147,22 +133,16 @@ export const declineSub = async (
 
   if (!sub || String(sub.to) !== String(user._id)) return null
 
-  return remove(sub, user)
+  return remove(sub)
 }
 
 export const remove = async <T extends Sub | SubDbObject | DeletedSub>(
   sub: T,
-  user: UserDbObject,
 ): Promise<T & {deleted: boolean}> => {
-  await SubModel.deleteOne({_id: sub._id})
+  await SubModel.deleteById(sub._id)
 
-  const deletedSub = {
+  return {
     ...sub,
     deleted: true,
   }
-
-  EventService.deleteEvent(subRequested({sub: deletedSub, user}))
-  notifySubChanged(deletedSub)
-
-  return deletedSub
 }

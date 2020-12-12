@@ -1,4 +1,8 @@
-import Mongoose, {Document, Model} from 'mongoose'
+import Mongoose from 'mongoose'
+import MongooseDeletePlugin, {
+  SoftDeleteDocument,
+  SoftDeleteModel,
+} from 'mongoose-delete'
 import {LikeDbObject} from '@skyflux/api/models/types'
 
 const schema = new Mongoose.Schema({
@@ -6,9 +10,14 @@ const schema = new Mongoose.Schema({
   user: {type: Mongoose.Schema.Types.ObjectId, required: true, ref: 'User'},
 })
 
-schema.index({post: 1, user: 1}, {unique: true})
+schema.plugin(MongooseDeletePlugin, {
+  deletedAt: true,
+  overrideMethods: ['countDocuments', 'findOne'],
+})
+
+schema.index({post: 1, user: 1, deletedAt: 1}, {unique: true})
 
 export const LikeModel = Mongoose.model<
-  LikeDbObject & Document,
-  Model<LikeDbObject & Document>
+  LikeDbObject & SoftDeleteDocument,
+  SoftDeleteModel<LikeDbObject & SoftDeleteDocument>
 >('Like', schema)
