@@ -11,7 +11,7 @@
   "rules": {
     "linebreak-style": [
       "error",
-      "windows"
+      "unix"
     ],
     "eol-last": "error",
     "import/no-internal-modules": [

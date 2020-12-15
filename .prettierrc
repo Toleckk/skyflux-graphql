@@ -9,5 +9,5 @@
   "bracketSpacing": false,
   "parser": "typescript",
   "arrowParens": "avoid",
-  "endOfLine": "crlf"
+  "endOfLine": "lf"
 }
