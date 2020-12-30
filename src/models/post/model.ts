@@ -17,7 +17,7 @@ const schema = new Mongoose.Schema(
 
 schema.plugin(MongooseDeletePlugin, {
   deletedAt: true,
-  overrideMethods: ['count', 'countDocuments', 'findOne', 'update'],
+  overrideMethods: ['count', 'countDocuments', 'findOne', 'update', 'find'],
 })
 
 schema.plugin(fuzzySearching, {fields: ['text']})
