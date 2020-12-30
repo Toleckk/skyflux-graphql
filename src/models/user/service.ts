@@ -12,7 +12,7 @@ export const createUser = async (): Promise<UserDbObject> => {
     nickname: generateNickname(),
     private: false,
     description: {},
-  })
+  } as any)
 }
 
 /** Updates user's 'about', 'birthday', 'from' and 'avatar' */
@@ -131,14 +131,16 @@ export const getSuggestions = async (
   UserModel.aggregate([
     {$match: {_id: {$ne: user._id}, private: false}},
     {
-      from: 'posts',
-      let: {userId: '$_id'},
-      pipeline: [
-        {$match: {$expr: {$eq: ['$user', '$$userId']}}},
-        {$match: {deleted: {$ne: true}}},
-        {$limit: 1},
-      ],
-      as: 'posts',
+      $lookup: {
+        from: 'posts',
+        let: {userId: '$_id'},
+        pipeline: [
+          {$match: {$expr: {$eq: ['$user', '$$userId']}}},
+          {$match: {deleted: {$ne: true}}},
+          {$limit: 1},
+        ],
+        as: 'posts',
+      },
     },
     {$match: {posts: {$gt: {$size: 0}}}},
     {$limit: first},

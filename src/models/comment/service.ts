@@ -3,6 +3,7 @@ import {
   Comment,
   CommentDbObject,
   Post,
+  PostDbObject,
   Scalars,
   UserDbObject,
 } from '@skyflux/api/models/types'
@@ -14,18 +15,19 @@ export const createComment = async (
   text: string,
   post_id: string,
   user: UserDbObject,
-): Promise<CommentDbObject | Comment | null> => {
+): Promise<
+  | (Omit<Comment, 'user' | 'post'> & {user: UserDbObject; post: PostDbObject})
+  | null
+> => {
   const post = await PostService.getPostById(post_id, user)
 
   if (!post) return null
 
-  const commentDoc = await CommentModel.create<
-    Omit<CommentDbObject, 'createdAt'>
-  >({
+  const commentDoc = await CommentModel.create({
     post: post._id,
     user: user._id,
     text,
-  })
+  } as any)
 
   return {
     ...commentDoc.toObject(),

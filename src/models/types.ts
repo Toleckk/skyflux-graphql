@@ -13,7 +13,7 @@ export type RequireFields<T, K extends keyof T> = {
   {[P in K]-?: NonNullable<T[P]>}
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
-  ID: string
+  ID: any
   String: string
   Boolean: boolean
   Int: number
@@ -441,17 +441,17 @@ export type ConnectionWithDbObject<T extends Connection> = Omit<T, 'edges'> & {
 }
 
 export type ResolverWithDbObject<T> = T extends Comment
-  ? Common<Comment, CommentDbObject>
+  ? Partial<Common<Comment, CommentDbObject>>
   : T extends Event
-  ? Common<Event, EventDbObject>
+  ? Partial<Common<Event, EventDbObject>>
   : T extends Like
-  ? Common<Like, LikeDbObject>
+  ? Partial<Common<Like, LikeDbObject>>
   : T extends Post
-  ? Common<Post, PostDbObject>
+  ? Partial<Common<Post, PostDbObject>>
   : T extends Sub
-  ? Common<Sub, SubDbObject>
+  ? Partial<Common<Sub, SubDbObject>>
   : T extends User
-  ? Common<User, UserDbObject>
+  ? Partial<Common<User, UserDbObject>>
   : T extends CommentConnection
   ? ConnectionWithDbObject<CommentConnection>
   : T extends EventConnection
@@ -1496,6 +1496,7 @@ export type IDirectiveResolvers<
   ContextType = {user: UserDbObject; token: string}
 > = DirectiveResolvers<ContextType>
 import {ObjectID} from 'mongodb'
+
 export type CommentDbObject = {
   _id: ObjectID
   text: string

@@ -1,4 +1,4 @@
-import Mongoose from 'mongoose'
+import Mongoose, {Document, Model} from 'mongoose'
 import MongooseDeletePlugin, {
   SoftDeleteDocument,
   SoftDeleteModel,
@@ -25,6 +25,7 @@ const schema = new Mongoose.Schema(
 schema.plugin(MongooseDeletePlugin, {overrideMethods: true, deletedAt: true})
 
 export const CommentModel = Mongoose.model<
-  CommentDbObject & SoftDeleteDocument,
-  SoftDeleteModel<CommentDbObject & SoftDeleteDocument>
+  CommentDbObject & Document & SoftDeleteDocument,
+  Model<CommentDbObject & Document & SoftDeleteDocument> &
+    SoftDeleteModel<CommentDbObject & Document & SoftDeleteDocument>
 >('Comment', schema)

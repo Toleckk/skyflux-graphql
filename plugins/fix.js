@@ -33,7 +33,7 @@ const isEntityConnection = entities => type =>
   entities.some(e => e + 'Connection' === type.name)
 
 const createSingleTypeString = typename =>
-  `T extends ${typename} ? Common<${typename}, ${typename}DbObject>`
+  `T extends ${typename} ? Partial<Common<${typename}, ${typename}DbObject>>`
 
 const createSingleConnectionString = connection =>
   `T extends ${connection} ? ConnectionWithDbObject<${connection}>`

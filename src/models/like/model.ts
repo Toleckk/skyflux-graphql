@@ -1,4 +1,4 @@
-import Mongoose from 'mongoose'
+import Mongoose, {Model, Document} from 'mongoose'
 import MongooseDeletePlugin, {
   SoftDeleteDocument,
   SoftDeleteModel,
@@ -18,6 +18,7 @@ schema.plugin(MongooseDeletePlugin, {
 schema.index({post: 1, user: 1, deletedAt: 1}, {unique: true})
 
 export const LikeModel = Mongoose.model<
-  LikeDbObject & SoftDeleteDocument,
-  SoftDeleteModel<LikeDbObject & SoftDeleteDocument>
+  LikeDbObject & SoftDeleteDocument & Document,
+  Model<LikeDbObject & SoftDeleteDocument & Document> &
+    SoftDeleteModel<LikeDbObject & SoftDeleteDocument & Document>
 >('Like', schema)

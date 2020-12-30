@@ -1,9 +1,10 @@
 import Mongoose from 'mongoose'
+import {ObjectId} from 'mongodb'
 import {
-  DeletedLike,
   Like,
   LikeDbObject,
   Post,
+  User,
   UserDbObject,
 } from '@skyflux/api/models/types'
 import {PostService} from '@skyflux/api/models/post'
@@ -13,7 +14,9 @@ import {LikeModel} from './model'
 export const deleteLike = async (
   post_id: string,
   user: UserDbObject,
-): Promise<DeletedLike | null> => {
+): Promise<
+  (Omit<LikeDbObject, 'user'> & {user: Partial<User>; deleted: boolean}) | null
+> => {
   const like = await LikeModel.findOne({post: post_id, user: user._id})
 
   if (!like) return null
@@ -30,12 +33,21 @@ export const deleteLike = async (
 export const createLike = async (
   postId: string,
   user: UserDbObject,
-): Promise<LikeDbObject | Like | null> => {
+): Promise<
+  | (Omit<LikeDbObject, 'user' | 'post'> & {
+      user: UserDbObject
+      post: Partial<Omit<Post, 'user'> & {user: ObjectId}>
+    })
+  | null
+> => {
   const post = await PostService.getPostById(postId, user)
 
   if (!post) return null
 
-  const likeDocument = await LikeModel.create({post: post._id, user: user._id})
+  const likeDocument = await LikeModel.create({
+    post: post._id,
+    user: user._id,
+  } as any)
 
   if (!likeDocument) return null
 
