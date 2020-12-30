@@ -2,7 +2,6 @@ import Mongoose from 'mongoose'
 import {UserService} from '@skyflux/api/models/user'
 import {isMongoId} from '@skyflux/api/utils/isMongoId'
 import {
-  DeletedSub,
   Scalars,
   Sub,
   SubDbObject,
@@ -14,7 +13,13 @@ import {SubModel} from './model'
 export const createSub = async (
   nickname: string,
   user: UserDbObject,
-): Promise<SubDbObject | Sub | null> => {
+): Promise<
+  | null
+  | (Omit<SubDbObject, 'to' | 'from'> & {
+      to: Partial<User>
+      from: Partial<User>
+    })
+> => {
   if (user.nickname === nickname) return null
 
   const to = await UserService.getUserByNickname(nickname)
@@ -25,7 +30,7 @@ export const createSub = async (
     from: user._id,
     to: to._id,
     accepted: !to.private,
-  })
+  } as any)
 
   return {
     ...subDocument.toObject(),
@@ -36,14 +41,14 @@ export const createSub = async (
 
 export const getSubById = async (
   _id: string | Mongoose.Types.ObjectId,
-): Promise<SubDbObject | null> => {
+): Promise<SubDbObject | null | undefined> => {
   const sub = await SubModel.findOne({_id})
   return sub?.toObject()
 }
 
 export const resolveSub = async (root: {
   sub: Sub | SubDbObject | Mongoose.Types.ObjectId | string
-}): Promise<Sub | SubDbObject | null> => {
+}): Promise<Sub | SubDbObject | null | undefined> => {
   if (typeof root.sub === 'string' || isMongoId(root.sub))
     return getSubById(root.sub)
 
@@ -53,7 +58,7 @@ export const resolveSub = async (root: {
 export const acceptSub = async (
   _id: Scalars['ID'],
   user: UserDbObject,
-): Promise<SubDbObject | null> => {
+): Promise<(Omit<SubDbObject, 'to'> & {to: Partial<User>}) | null> => {
   const subDocument = await SubModel.findOne({_id, to: user._id})
 
   if (!subDocument) return null
@@ -111,7 +116,14 @@ export const getSubFromTo = async (
 export const deleteSub = async (
   nickname: string,
   user: UserDbObject,
-): Promise<SubDbObject | null> => {
+): Promise<
+  | (Omit<SubDbObject, 'to' | 'from'> & {
+      to: Partial<User>
+      from: Partial<User>
+      deleted: boolean
+    })
+  | null
+> => {
   const to = await UserService.getUserByNickname(nickname)
 
   if (!to) return null
@@ -120,7 +132,7 @@ export const deleteSub = async (
 
   if (!sub) return null
 
-  const removingSub = {...sub.toObject(), to, from: user}
+  const removingSub = {...sub.toObject(), to, from: user, _id: sub._id}
 
   return remove(removingSub)
 }
@@ -136,7 +148,7 @@ export const declineSub = async (
   return remove(sub)
 }
 
-export const remove = async <T extends Sub | SubDbObject | DeletedSub>(
+export const remove = async <T extends {_id: any}>(
   sub: T,
 ): Promise<T & {deleted: boolean}> => {
   await SubModel.deleteById(sub._id)

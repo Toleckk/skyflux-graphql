@@ -1,9 +1,6 @@
-import Mongoose from 'mongoose'
+import Mongoose, {Document, Model} from 'mongoose'
 import fuzzySearching from 'mongoose-fuzzy-searching'
-import MongooseDeletePlugin, {
-  SoftDeleteDocument,
-  SoftDeleteModel,
-} from 'mongoose-delete'
+import MongooseDeletePlugin, {SoftDeleteModel} from 'mongoose-delete'
 import {PostDbObject} from '@skyflux/api/models/types'
 
 const schema = new Mongoose.Schema(
@@ -18,11 +15,14 @@ const schema = new Mongoose.Schema(
   {timestamps: {createdAt: true, updatedAt: false}},
 )
 
-schema.plugin(MongooseDeletePlugin, {deletedAt: true, overrideMethods: true})
+schema.plugin(MongooseDeletePlugin, {
+  deletedAt: true,
+  overrideMethods: ['count', 'countDocuments', 'findOne', 'update'],
+})
 
 schema.plugin(fuzzySearching, {fields: ['text']})
 
 export const PostModel = Mongoose.model<
-  PostDbObject & SoftDeleteDocument,
-  SoftDeleteModel<PostDbObject & SoftDeleteDocument>
+  PostDbObject & Document,
+  Model<PostDbObject & Document> & SoftDeleteModel<PostDbObject & Document>
 >('Post', schema)

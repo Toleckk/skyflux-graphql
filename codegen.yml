@@ -15,3 +15,5 @@ generates:
       contextType: "{user: UserDbObject, token: string}"
       useIndexSignature: true
       skipTypename: true
+      scalars:
+        ID: any

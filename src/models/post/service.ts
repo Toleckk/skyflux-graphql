@@ -1,4 +1,4 @@
-import Mongoose from 'mongoose'
+import Mongoose, {ObjectId} from 'mongoose'
 import {isMongoId} from '@skyflux/api/utils/isMongoId'
 import {Post, PostDbObject, User, UserDbObject} from '@skyflux/api/models/types'
 import {UserService} from '@skyflux/api/models/user'
@@ -9,12 +9,14 @@ import {PostModel} from './model'
 
 export const createPost = async (
   text: string,
-  user: User | UserDbObject,
-): Promise<Post | null> =>
-  PostModel.create<Omit<PostDbObject, 'createdAt'>>({
+  user: UserDbObject | User,
+): Promise<
+  (Partial<Omit<Post, 'user'>> & {user: UserDbObject | User}) | null
+> =>
+  PostModel.create({
     text,
     user: user._id,
-  }).then(post => ({...post.toObject(), user}))
+  } as any).then(post => ({...post.toObject(), user}))
 
 export const getFeed = async (
   user: User | UserDbObject,
@@ -22,6 +24,7 @@ export const getFeed = async (
   after = 'ffffffffffffffffffffffff',
 ): Promise<Post[]> =>
   PostModel.aggregate([
+    {$match: {deleted: {$ne: true}}},
     {
       $lookup: {
         from: 'subs',
@@ -65,7 +68,13 @@ export const getFeed = async (
 export const deletePost = async (
   _id: string,
   user: User | UserDbObject,
-): Promise<PostDbObject | null> => {
+): Promise<
+  | (Omit<PostDbObject, 'user'> & {
+      user: ObjectId | UserDbObject | User
+      deleted: true
+    })
+  | null
+> => {
   const post = await PostModel.findOne({_id, user: user._id})
 
   if (!post) return null
@@ -97,6 +106,7 @@ export const getFoundPosts = async (
 ): Promise<Post[]> => {
   const posts = await PostModel.aggregate([
     ...makeSearchPipeline({after, text, field: 'text'}),
+    {$match: {deleted: {$ne: true}}},
     {
       $lookup: {
         from: 'users',

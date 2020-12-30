@@ -1,4 +1,4 @@
-import Mongoose, {Document, Model} from 'mongoose'
+import Mongoose, {Document} from 'mongoose'
 import fuzzySearching from 'mongoose-fuzzy-searching'
 import {UserDbObject} from '@skyflux/api/models/types'
 
@@ -21,7 +21,4 @@ const schema = new Mongoose.Schema({
 
 schema.plugin(fuzzySearching, {fields: ['nickname']})
 
-export const UserModel = Mongoose.model<
-  UserDbObject & Document,
-  Model<UserDbObject & Document>
->('User', schema)
+export const UserModel = Mongoose.model<UserDbObject & Document>('User', schema)
