@@ -1,29 +1,45 @@
 import Firebase from 'firebase-admin'
+import jwt from 'jsonwebtoken'
 import {UserService} from '@skyflux/api/models/user'
 import {UserDbObject} from '@skyflux/api/models/types'
 
-export const admin = Firebase.initializeApp({
-  credential: Firebase.credential.cert({
-    projectId: process.env.FIREBASE_PROJECT_ID,
-    privateKey: process.env.FIREBASE_PRIVATE_KEY,
-    clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-  }),
-  databaseURL: process.env.FIREBASE_DATABASE_URL,
-})
+export const admin = Firebase.initializeApp(
+  !process.env.FIREBASE_AUTH_EMULATOR_HOST
+    ? {
+        credential: Firebase.credential.cert({
+          projectId: process.env.FIREBASE_PROJECT_ID,
+          privateKey: process.env.FIREBASE_PRIVATE_KEY,
+          clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+        }),
+        databaseURL: process.env.FIREBASE_DATABASE_URL,
+      }
+    : {
+        projectId: process.env.FIREBASE_PROJECT_ID,
+      },
+)
 
 export const userByToken = async (
   token?: string,
 ): Promise<null | UserDbObject> => {
   if (!token) return null
 
-  const user = await admin
-    .auth()
-    .verifyIdToken(token, true)
-    .catch(() => null)
+  const user = await decodeToken(token)
 
   if (!user) return null
 
-  return getUserByUID(user.uid)
+  return getUserByUID(user.uid || user.user_id)
+}
+
+export const decodeToken = async (
+  token: string,
+): Promise<{uid?: string; user_id?: string} | null> => {
+  if (process.env.FIREBASE_AUTH_EMULATOR_HOST)
+    return jwt.decode(token) as {uid: string; user_id: string}
+
+  return admin
+    .auth()
+    .verifyIdToken(token, true)
+    .catch(() => null)
 }
 
 export const getUserByUID = async (
